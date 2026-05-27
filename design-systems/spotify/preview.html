@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spotify-Inspired Design System</title>
+<!-- SpotifyMixUI / CircularSp are proprietary; using Manrope as nearest Google Fonts equivalent (geometric sans with similar circular character) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Brand */
+    --spotify-green: #1ed760;
+    --spotify-green-border: #1db954;
+
+    /* Surfaces */
+    --bg-base: #121212;
+    --surface-1: #181818;
+    --surface-2: #1f1f1f;
+    --card-dark: #252525;
+    --card-mid: #272727;
+
+    /* Text */
+    --text-base: #ffffff;
+    --text-silver: #b3b3b3;
+    --text-near-white: #cbcbcb;
+    --text-light: #fdfdfd;
+
+    /* Semantic */
+    --text-negative: #f3727f;
+    --text-warning: #ffa42b;
+    --text-announcement: #539df5;
+
+    /* Borders */
+    --border-gray: #4d4d4d;
+    --border-light: #7c7c7c;
+    --separator: #b3b3b3;
+    --light-surface: #eeeeee;
+
+    /* Shadows */
+    --shadow-heavy: rgba(0,0,0,0.5) 0px 8px 24px;
+    --shadow-medium: rgba(0,0,0,0.3) 0px 8px 8px;
+    --shadow-inset: rgb(18,18,18) 0px 1px 0px, rgb(124,124,124) 0px 0px 0px 1px inset;
+
+    /* Radii */
+    --r-minimal: 2px;
+    --r-subtle: 4px;
+    --r-standard: 6px;
+    --r-comfortable: 8px;
+    --r-medium: 10px;
+    --r-medium-lg: 20px;
+    --r-large: 100px;
+    --r-pill: 500px;
+    --r-full-pill: 9999px;
+    --r-circle: 50%;
+
+    /* Spacing */
+    --s-1: 1px; --s-2: 2px; --s-3: 3px; --s-4: 4px; --s-5: 5px;
+    --s-6: 6px; --s-8: 8px; --s-10: 10px; --s-12: 12px;
+    --s-14: 14px; --s-15: 15px; --s-16: 16px; --s-20: 20px;
+
+    --font-title: 'Manrope', 'SpotifyMixUITitle', 'CircularSp-Arab', 'CircularSp-Hebr', 'CircularSp-Cyrl', 'CircularSp-Grek', 'CircularSp-Deva', 'Helvetica Neue', helvetica, arial, sans-serif;
+    --font-ui: 'Manrope', 'SpotifyMixUI', 'CircularSp-Arab', 'CircularSp-Hebr', 'CircularSp-Cyrl', 'CircularSp-Grek', 'CircularSp-Deva', 'Helvetica Neue', helvetica, arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg-base);
+    color: var(--text-base);
+    font-family: var(--font-ui);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100vh;
+  }
+
+  .wrap {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ---------- NAV ---------- */
+  .topnav {
+    background: var(--bg-base);
+    border-bottom: 1px solid #000;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .topnav-inner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 0;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-title);
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--text-base);
+  }
+  .logo-mark {
+    width: 32px; height: 32px;
+    border-radius: var(--r-circle);
+    background: var(--spotify-green);
+    display: grid; place-items: center;
+    color: #000;
+  }
+  .logo-mark svg { width: 20px; height: 20px; display: block; }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 24px;
+    flex: 1;
+  }
+  .nav-link {
+    font-family: var(--font-ui);
+    font-size: 14px;
+    color: var(--text-silver);
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: var(--r-full-pill);
+    font-weight: 400;
+  }
+  .nav-link.active {
+    color: var(--text-base);
+    font-weight: 700;
+    background: var(--surface-2);
+  }
+  .nav-link:hover { color: var(--text-base); }
+
+  .nav-ctas { display: flex; gap: 8px; align-items: center; }
+
+  /* ---------- BUTTONS ---------- */
+  .btn {
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    border: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    transition: transform .12s ease, background .12s ease, color .12s ease, border-color .12s ease;
+  }
+  .btn:hover { transform: scale(1.04); }
+
+  /* sizes */
+  .btn-sm { padding: 8px 16px; font-size: 12px; letter-spacing: 1.4px; }
+  .btn-md { padding: 12px 28px; font-size: 14px; letter-spacing: 1.6px; }
+  .btn-lg { padding: 16px 40px; font-size: 14px; letter-spacing: 2px; }
+
+  /* variants */
+  .btn-primary {
+    background: var(--spotify-green);
+    color: #000;
+    border-radius: var(--r-pill);
+  }
+  .btn-primary:hover { background: #1fdf64; }
+
+  .btn-secondary {
+    background: var(--surface-2);
+    color: var(--text-base);
+    border-radius: var(--r-full-pill);
+  }
+  .btn-secondary:hover { background: #2a2a2a; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-base);
+    border: 1px solid var(--border-light);
+    border-radius: var(--r-full-pill);
+  }
+  .btn-ghost:hover { border-color: #fff; color: #fff; }
+
+  /* circular play */
+  .btn-play {
+    width: 48px; height: 48px;
+    border-radius: var(--r-circle);
+    background: var(--spotify-green);
+    color: #000;
+    display: grid; place-items: center;
+    border: 0;
+    cursor: pointer;
+    box-shadow: var(--shadow-medium);
+  }
+  .btn-play:hover { transform: scale(1.06); background: #1fdf64; }
+  .btn-play svg { width: 18px; height: 18px; }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    position: relative;
+    padding: 96px 0 80px;
+    overflow: hidden;
+    border-radius: var(--r-comfortable);
+    margin-top: 24px;
+    background:
+      radial-gradient(60% 80% at 15% 20%, rgba(30,215,96,0.18) 0%, transparent 60%),
+      radial-gradient(50% 60% at 90% 80%, rgba(83,157,245,0.10) 0%, transparent 60%),
+      linear-gradient(180deg, #181818 0%, #121212 100%);
+  }
+  .hero-inner {
+    position: relative;
+    padding: 0 48px;
+    max-width: 760px;
+  }
+  .hero-eyebrow {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 600;
+    line-height: 1.33;
+    text-transform: capitalize;
+    background: rgba(30,215,96,0.12);
+    color: var(--spotify-green);
+    padding: 6px 12px;
+    border-radius: var(--r-full-pill);
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-family: var(--font-title);
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--text-light);
+    margin-bottom: 20px;
+  }
+  .hero h1 .accent { color: var(--spotify-green); }
+  .hero p {
+    font-family: var(--font-ui);
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--text-silver);
+    line-height: 1.5;
+    margin-bottom: 32px;
+    max-width: 520px;
+  }
+  .hero-cta { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
+  /* ---------- SECTION ---------- */
+  section.block { padding: 56px 0; border-bottom: 1px solid #000; }
+  .section-title {
+    font-family: var(--font-title);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-base);
+    margin-bottom: 8px;
+  }
+  .section-sub {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-silver);
+    margin-bottom: 32px;
+  }
+
+  /* ---------- BUTTONS GALLERY ---------- */
+  .btn-grid {
+    display: grid;
+    grid-template-columns: 120px repeat(3, 1fr);
+    gap: 16px;
+    align-items: center;
+  }
+  .btn-label {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+    color: var(--text-silver);
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+  }
+  .btn-cell {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  /* ---------- FORM ---------- */
+  .form {
+    background: var(--surface-1);
+    padding: 32px;
+    border-radius: var(--r-comfortable);
+    max-width: 560px;
+  }
+  .form-row { margin-bottom: 20px; }
+  .form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-base);
+    margin-bottom: 8px;
+    letter-spacing: 0.14px;
+  }
+  .form-input {
+    width: 100%;
+    background: var(--surface-2);
+    color: var(--text-base);
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 400;
+    padding: 12px 20px;
+    border: 0;
+    outline: 0;
+    border-radius: var(--r-subtle);
+    box-shadow: var(--shadow-inset);
+  }
+  .form-input.pill {
+    border-radius: var(--r-pill);
+    padding: 12px 24px 12px 48px;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23b3b3b3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='8'/><line x1='21' y1='21' x2='16.65' y2='16.65'/></svg>");
+    background-repeat: no-repeat;
+    background-position: 20px center;
+  }
+  .form-input:focus {
+    box-shadow: rgb(18,18,18) 0px 1px 0px, #fff 0px 0px 0px 1px inset;
+  }
+  textarea.form-input {
+    min-height: 110px;
+    resize: vertical;
+    border-radius: var(--r-comfortable);
+  }
+  .form-hint {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-silver);
+    margin-top: 6px;
+  }
+
+  /* ---------- CARDS ---------- */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+  }
+  .card {
+    background: var(--surface-1);
+    padding: 16px;
+    border-radius: var(--r-comfortable);
+    transition: background .2s ease, box-shadow .2s ease, transform .2s ease;
+    position: relative;
+    cursor: pointer;
+  }
+  .card:hover {
+    background: var(--card-dark);
+    box-shadow: var(--shadow-medium);
+  }
+  .card-art {
+    width: 100%;
+    aspect-ratio: 1/1;
+    border-radius: var(--r-standard);
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-medium);
+  }
+  .card-art .play-hover {
+    position: absolute;
+    bottom: 8px; right: 8px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity .2s ease, transform .2s ease;
+  }
+  .card:hover .card-art .play-hover {
+    opacity: 1; transform: translateY(0);
+  }
+  .card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-base);
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .card-sub {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-silver);
+    line-height: 1.5;
+  }
+  /* fake album art gradients */
+  .art-1 { background: linear-gradient(135deg, #1ed760 0%, #0a3d24 100%); }
+  .art-2 { background: linear-gradient(135deg, #f3727f 0%, #4a1d22 100%); }
+  .art-3 { background: linear-gradient(135deg, #539df5 0%, #1a2e4d 100%); }
+  .art-4 { background: linear-gradient(135deg, #ffa42b 0%, #4a2e0a 100%); }
+
+  /* ---------- STATS ---------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .stat {
+    background: var(--surface-1);
+    border-radius: var(--r-comfortable);
+    padding: 24px;
+  }
+  .stat-label {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--text-silver);
+    margin-bottom: 12px;
+  }
+  .stat-num {
+    font-family: var(--font-title);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-base);
+    margin-bottom: 4px;
+  }
+  .stat-delta {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+    color: var(--spotify-green);
+  }
+  .stat-delta.neg { color: var(--text-negative); }
+
+  /* ---------- TABLE ---------- */
+  .table-wrap {
+    background: transparent;
+    border-radius: var(--r-comfortable);
+    overflow: hidden;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-ui);
+  }
+  th, td {
+    text-align: left;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-base);
+  }
+  thead th {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+    color: var(--text-silver);
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    border-bottom: 1px solid var(--border-gray);
+  }
+  tbody tr {
+    border-radius: var(--r-subtle);
+    transition: background .15s ease;
+  }
+  tbody tr:hover { background: var(--surface-2); }
+  td.num { color: var(--text-silver); font-variant-numeric: tabular-nums; }
+  td.title { font-weight: 700; }
+  td.muted { color: var(--text-silver); }
+  .row-index {
+    width: 40px;
+    color: var(--text-silver);
+    font-variant-numeric: tabular-nums;
+  }
+  .track-cell { display: flex; align-items: center; gap: 12px; }
+  .track-art {
+    width: 40px; height: 40px;
+    border-radius: var(--r-subtle);
+    flex-shrink: 0;
+  }
+  .track-meta-title { font-size: 16px; font-weight: 400; color: var(--text-base); }
+  .track-meta-artist { font-size: 14px; font-weight: 400; color: var(--text-silver); }
+
+  /* ---------- TYPE RAMP ---------- */
+  .ramp { display: flex; flex-direction: column; gap: 4px; }
+  .ramp-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 24px;
+    align-items: baseline;
+    padding: 14px 0;
+    border-bottom: 1px solid #222;
+  }
+  .ramp-token {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-silver);
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    line-height: 1.5;
+  }
+  .ramp-token small {
+    display: block;
+    font-size: 10px;
+    font-weight: 400;
+    color: var(--border-light);
+    text-transform: none;
+    letter-spacing: 0;
+    margin-top: 4px;
+  }
+  .t-section { font-family: var(--font-title); font-size: 24px; font-weight: 700; line-height: normal; }
+  .t-feature { font-family: var(--font-ui); font-size: 18px; font-weight: 600; line-height: 1.3; }
+  .t-body-bold { font-family: var(--font-ui); font-size: 16px; font-weight: 700; }
+  .t-body { font-family: var(--font-ui); font-size: 16px; font-weight: 400; }
+  .t-btn-upper { font-family: var(--font-ui); font-size: 14px; font-weight: 700; line-height: 1; letter-spacing: 1.6px; text-transform: uppercase; }
+  .t-btn { font-family: var(--font-ui); font-size: 14px; font-weight: 700; letter-spacing: 0.14px; }
+  .t-nav-bold { font-family: var(--font-ui); font-size: 14px; font-weight: 700; }
+  .t-nav { font-family: var(--font-ui); font-size: 14px; font-weight: 400; }
+  .t-caption-bold { font-family: var(--font-ui); font-size: 14px; font-weight: 700; line-height: 1.5; }
+  .t-caption { font-family: var(--font-ui); font-size: 14px; font-weight: 400; }
+  .t-small-bold { font-family: var(--font-ui); font-size: 12px; font-weight: 700; line-height: 1.5; }
+  .t-small { font-family: var(--font-ui); font-size: 12px; font-weight: 400; }
+  .t-badge { font-family: var(--font-ui); font-size: 10.5px; font-weight: 600; line-height: 1.33; text-transform: capitalize; }
+  .t-micro { font-family: var(--font-ui); font-size: 10px; font-weight: 400; }
+
+  /* ---------- PALETTE ---------- */
+  .palette {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+  .swatch {
+    background: var(--surface-1);
+    border-radius: var(--r-comfortable);
+    overflow: hidden;
+  }
+  .swatch-chip {
+    height: 96px;
+    width: 100%;
+    border-bottom: 1px solid #000;
+  }
+  .swatch-meta { padding: 12px 14px; }
+  .swatch-name { font-size: 12px; font-weight: 700; line-height: 1.5; color: var(--text-base); }
+  .swatch-hex { font-size: 10px; font-weight: 400; color: var(--text-silver); margin-top: 2px; font-variant-numeric: tabular-nums; letter-spacing: 0.5px; }
+
+  /* ---------- RADII ---------- */
+  .radii {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+  }
+  .radius-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+  .radius-box {
+    width: 96px;
+    height: 96px;
+    background: var(--surface-2);
+    border: 1px solid var(--border-gray);
+  }
+  .r-2 { border-radius: 2px; }
+  .r-4 { border-radius: 4px; }
+  .r-6 { border-radius: 6px; }
+  .r-8 { border-radius: 8px; }
+  .r-10 { border-radius: 10px; }
+  .r-20 { border-radius: 20px; }
+  .r-100 { border-radius: 100px; }
+  .r-500 { border-radius: 500px; }
+  .r-9999 { border-radius: 9999px; }
+  .r-50 { border-radius: 50%; }
+  .radius-name { font-size: 12px; font-weight: 700; line-height: 1.5; color: var(--text-base); text-align: center; }
+  .radius-value { font-size: 10px; color: var(--text-silver); font-variant-numeric: tabular-nums; }
+
+  /* ---------- SPACING ---------- */
+  .spacing { display: flex; flex-direction: column; gap: 8px; }
+  .space-row {
+    display: grid;
+    grid-template-columns: 80px 60px 1fr;
+    align-items: center;
+    gap: 16px;
+    padding: 4px 0;
+  }
+  .space-label { font-size: 12px; font-weight: 700; line-height: 1.5; color: var(--text-base); text-transform: uppercase; letter-spacing: 1.4px; }
+  .space-value { font-size: 10px; color: var(--text-silver); font-variant-numeric: tabular-nums; }
+  .space-bar { height: 12px; background: var(--spotify-green); border-radius: 2px; }
+
+  /* ---------- FOOTER ---------- */
+  footer {
+    padding: 48px 0 32px;
+    border-top: 1px solid #000;
+    margin-top: 24px;
+  }
+  .foot-grid {
+    display: grid;
+    grid-template-columns: 1.5fr repeat(3, 1fr);
+    gap: 32px;
+    margin-bottom: 32px;
+  }
+  .foot-title {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+    text-transform: uppercase;
+    letter-spacing: 1.4px;
+    color: var(--text-base);
+    margin-bottom: 16px;
+  }
+  .foot-link {
+    display: block;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-silver);
+    text-decoration: none;
+    padding: 6px 0;
+  }
+  .foot-link:hover { color: var(--text-base); }
+  .foot-bottom {
+    padding-top: 24px;
+    border-top: 1px solid #222;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-silver);
+  }
+
+  /* badges + semantic chips */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: var(--r-full-pill);
+    font-size: 10.5px;
+    font-weight: 600;
+    line-height: 1.33;
+    text-transform: capitalize;
+  }
+  .chip.green { background: rgba(30,215,96,0.14); color: var(--spotify-green); }
+  .chip.red { background: rgba(243,114,127,0.14); color: var(--text-negative); }
+  .chip.orange { background: rgba(255,164,43,0.14); color: var(--text-warning); }
+  .chip.blue { background: rgba(83,157,245,0.14); color: var(--text-announcement); }
+
+  /* now playing strip */
+  .now-playing {
+    background: var(--surface-1);
+    padding: 14px 20px;
+    border-radius: var(--r-comfortable);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 24px;
+    box-shadow: var(--shadow-medium);
+  }
+  .np-art {
+    width: 56px; height: 56px;
+    border-radius: var(--r-standard);
+    background: linear-gradient(135deg, #1ed760, #539df5);
+    flex-shrink: 0;
+  }
+  .np-meta { flex: 1; min-width: 0; }
+  .np-title { font-size: 14px; font-weight: 700; color: var(--text-base); }
+  .np-artist { font-size: 12px; font-weight: 400; color: var(--text-silver); margin-top: 2px; }
+  .np-controls { display: flex; gap: 8px; align-items: center; }
+  .np-icon-btn {
+    width: 36px; height: 36px;
+    border-radius: var(--r-circle);
+    background: transparent;
+    color: var(--text-silver);
+    border: 0;
+    display: grid; place-items: center;
+    cursor: pointer;
+  }
+  .np-icon-btn:hover { color: var(--text-base); }
+
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 44px; }
+    .btn-grid { grid-template-columns: 1fr; }
+    .ramp-row { grid-template-columns: 1fr; gap: 4px; }
+    .nav-links { display: none; }
+    .foot-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 480px) {
+    .hero { padding: 64px 0 56px; }
+    .hero-inner { padding: 0 24px; }
+    .hero h1 { font-size: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<header class="topnav">
+  <div class="wrap topnav-inner">
+    <div class="logo">
+      <span class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34a.748.748 0 01-1.029.25c-2.82-1.72-6.37-2.11-10.561-1.16a.748.748 0 11-.32-1.46c4.601-1.05 8.521-.6 11.671 1.34.36.22.46.7.24 1.03zm1.47-3.27a.94.94 0 01-1.29.31c-3.23-1.99-8.16-2.57-11.98-1.41a.94.94 0 11-.55-1.79c4.37-1.32 9.81-.68 13.51 1.6.44.27.59.85.31 1.29zm.13-3.41C15.241 8.39 8.74 8.17 5.08 9.27a1.128 1.128 0 11-.65-2.16c4.21-1.27 11.39-1.02 15.88 1.62a1.128 1.128 0 01-1.19 1.93z"/></svg>
+      </span>
+      Soundwave
+    </div>
+    <nav class="nav-links">
+      <a href="#" class="nav-link active">Home</a>
+      <a href="#" class="nav-link">Browse</a>
+      <a href="#" class="nav-link">Library</a>
+      <a href="#" class="nav-link">Podcasts</a>
+      <a href="#" class="nav-link">Radio</a>
+      <a href="#" class="nav-link">Discover</a>
+    </nav>
+    <div class="nav-ctas">
+      <button class="btn btn-secondary btn-sm">Sign in</button>
+      <button class="btn btn-primary btn-sm">Get Premium</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <span class="hero-eyebrow">Now in Beta</span>
+      <h1>Sound, <span class="accent">unboxed.</span><br>Built for headphones at midnight.</h1>
+      <p>An immersive listening experience that recedes into the dark so the music can take the foreground. Discover, save and share — without the noise.</p>
+      <div class="hero-cta">
+        <button class="btn btn-primary btn-lg">Start Listening</button>
+        <button class="btn btn-ghost btn-md">Explore Plans</button>
+        <button class="btn-play" aria-label="Play preview">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOW PLAYING STRIP -->
+  <div class="now-playing">
+    <div class="np-art"></div>
+    <div class="np-meta">
+      <div class="np-title">Midnight Static</div>
+      <div class="np-artist">Lumen Drift · After Hours</div>
+    </div>
+    <div class="np-controls">
+      <button class="np-icon-btn" aria-label="Previous">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+      </button>
+      <button class="btn-play" aria-label="Play">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <button class="np-icon-btn" aria-label="Next">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- BUTTONS GALLERY -->
+  <section class="block">
+    <h2 class="section-title">Buttons</h2>
+    <p class="section-sub">Pill geometry across three sizes. Uppercase labels with wide tracking — the systematic Spotify voice.</p>
+    <div class="btn-grid">
+      <div class="btn-label">Primary</div>
+      <div class="btn-cell"><button class="btn btn-primary btn-sm">Play Now</button></div>
+      <div class="btn-cell"><button class="btn btn-primary btn-md">Play Now</button></div>
+      <div class="btn-cell"><button class="btn btn-primary btn-lg">Play Now</button></div>
+
+      <div class="btn-label">Secondary</div>
+      <div class="btn-cell"><button class="btn btn-secondary btn-sm">Follow</button></div>
+      <div class="btn-cell"><button class="btn btn-secondary btn-md">Follow</button></div>
+      <div class="btn-cell"><button class="btn btn-secondary btn-lg">Follow</button></div>
+
+      <div class="btn-label">Ghost</div>
+      <div class="btn-cell"><button class="btn btn-ghost btn-sm">Add to Queue</button></div>
+      <div class="btn-cell"><button class="btn btn-ghost btn-md">Add to Queue</button></div>
+      <div class="btn-cell"><button class="btn btn-ghost btn-lg">Add to Queue</button></div>
+    </div>
+  </section>
+
+  <!-- FORM -->
+  <section class="block">
+    <h2 class="section-title">Forms & Inputs</h2>
+    <p class="section-sub">Pill search, inset border-shadow on standard inputs. Focus tightens to a pure white ring.</p>
+    <form class="form" onsubmit="return false;">
+      <div class="form-row">
+        <label class="form-label" for="search">Search the catalog</label>
+        <input id="search" class="form-input pill" type="text" placeholder="Songs, artists, albums, podcasts" />
+        <div class="form-hint">Use quotes for exact phrase. e.g. "ambient drift"</div>
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="email">Email address</label>
+        <input id="email" class="form-input" type="email" placeholder="you@soundwave.fm" />
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="notes">Playlist notes</label>
+        <textarea id="notes" class="form-input" placeholder="What does this playlist feel like?"></textarea>
+      </div>
+      <div style="display: flex; gap: 12px; margin-top: 8px;">
+        <button type="submit" class="btn btn-primary btn-md">Save Playlist</button>
+        <button type="reset" class="btn btn-ghost btn-md">Cancel</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- CARDS -->
+  <section class="block">
+    <h2 class="section-title">Made For You</h2>
+    <p class="section-sub">Album cards on `#181818` surface, 8px radius, medium shadow on hover.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="card-art art-1">
+          <button class="btn-play play-hover" aria-label="Play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+        </div>
+        <div class="card-title">Daily Mix 1</div>
+        <div class="card-sub">Lumen Drift, Cassette Coma, Pale Horizon and more</div>
+      </div>
+      <div class="card">
+        <div class="card-art art-2">
+          <button class="btn-play play-hover" aria-label="Play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+        </div>
+        <div class="card-title">Discover Weekly</div>
+        <div class="card-sub">Your weekly mixtape of fresh music</div>
+      </div>
+      <div class="card">
+        <div class="card-art art-3">
+          <button class="btn-play play-hover" aria-label="Play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+        </div>
+        <div class="card-title">Release Radar</div>
+        <div class="card-sub">Catch the latest from artists you follow</div>
+      </div>
+      <div class="card">
+        <div class="card-art art-4">
+          <button class="btn-play play-hover" aria-label="Play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+        </div>
+        <div class="card-title">Late Night Focus</div>
+        <div class="card-sub">Ambient textures for deep work after dark</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="block">
+    <h2 class="section-title">This Week</h2>
+    <p class="section-sub">Listening metrics with semantic delta colors.</p>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Minutes Listened</div>
+        <div class="stat-num">12,847</div>
+        <div class="stat-delta">▲ 18% vs last week</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">New Artists</div>
+        <div class="stat-num">24</div>
+        <div class="stat-delta">▲ 6 new this week</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Skips</div>
+        <div class="stat-num">312</div>
+        <div class="stat-delta neg">▼ 4% vs last week</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Saved Tracks</div>
+        <div class="stat-num">1,209</div>
+        <div class="stat-delta">▲ 42 added</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TABLE -->
+  <section class="block">
+    <h2 class="section-title">Top Tracks</h2>
+    <p class="section-sub">Compact, uppercase column headers. Row hover lifts to `#1f1f1f`.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th class="row-index">#</th>
+            <th>Title</th>
+            <th>Album</th>
+            <th>Status</th>
+            <th style="text-align:right;">Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="num row-index">1</td>
+            <td>
+              <div class="track-cell">
+                <div class="track-art art-1"></div>
+                <div>
+                  <div class="track-meta-title">Midnight Static</div>
+                  <div class="track-meta-artist">Lumen Drift</div>
+                </div>
+              </div>
+            </td>
+            <td class="muted">After Hours</td>
+            <td><span class="chip green">Playing</span></td>
+            <td class="num" style="text-align:right;">3:42</td>
+          </tr>
+          <tr>
+            <td class="num row-index">2</td>
+            <td>
+              <div class="track-cell">
+                <div class="track-art art-2"></div>
+                <div>
+                  <div class="track-meta-title">Cassette Coma</div>
+                  <div class="track-meta-artist">Pale Horizon</div>
+                </div>
+              </div>
+            </td>
+            <td class="muted">Static Bloom</td>
+            <td><span class="chip blue">New</span></td>
+            <td class="num" style="text-align:right;">4:08</td>
+          </tr>
+          <tr>
+            <td class="num row-index">3</td>
+            <td>
+              <div class="track-cell">
+                <div class="track-art art-3"></div>
+                <div>
+                  <div class="track-meta-title">Slow Frequency</div>
+                  <div class="track-meta-artist">Halftone Echo</div>
+                </div>
+              </div>
+            </td>
+            <td class="muted">North Drift</td>
+            <td><span class="chip orange">Explicit</span></td>
+            <td class="num" style="text-align:right;">5:21</td>
+          </tr>
+          <tr>
+            <td class="num row-index">4</td>
+            <td>
+              <div class="track-cell">
+                <div class="track-art art-4"></div>
+                <div>
+                  <div class="track-meta-title">Backlit Window</div>
+                  <div class="track-meta-artist">Quiet Index</div>
+                </div>
+              </div>
+            </td>
+            <td class="muted">Roomtone</td>
+            <td><span class="chip red">Region locked</span></td>
+            <td class="num" style="text-align:right;">2:54</td>
+          </tr>
+          <tr>
+            <td class="num row-index">5</td>
+            <td>
+              <div class="track-cell">
+                <div class="track-art art-1"></div>
+                <div>
+                  <div class="track-meta-title">Velvet Channel</div>
+                  <div class="track-meta-artist">Glass Mountain</div>
+                </div>
+              </div>
+            </td>
+            <td class="muted">Resonant</td>
+            <td><span class="chip green">Saved</span></td>
+            <td class="num" style="text-align:right;">3:17</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TYPE RAMP -->
+  <section class="block">
+    <h2 class="section-title">Type Ramp</h2>
+    <p class="section-sub">SpotifyMixUI/Title across the full hierarchy, compact 10–24px range.</p>
+    <div class="ramp">
+      <div class="ramp-row">
+        <div class="ramp-token">Section Title <small>SpotifyMixUITitle · 24 / 700</small></div>
+        <div class="t-section">Made For You Tonight</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">Feature Heading <small>SpotifyMixUI · 18 / 600 · lh 1.30</small></div>
+        <div class="t-feature">Your week in sound, distilled</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">Body Bold <small>SpotifyMixUI · 16 / 700</small></div>
+        <div class="t-body-bold">Listening to ambient music can lower cortisol levels.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">Body <small>SpotifyMixUI · 16 / 400</small></div>
+        <div class="t-body">Listening to ambient music can lower cortisol levels and create a sense of spatial calm.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">Button Uppercase <small>SpotifyMixUI · 14 / 700 · LS 1.6px · UPPER</small></div>
+        <div class="t-btn-upper">Start Listening Now</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">Button <small>SpotifyMixUI · 14 / 700 · LS 0.14px</small></div>
+        <div class="t-btn">Continue with email</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">Nav Link Bold <small>SpotifyMixUI · 14 / 700</small></div>
+        <div class="t-nav-bold">Home</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">Nav Link <small>SpotifyMixUI · 14 / 400</small></div>
+        <div class="t-nav">Browse</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">Caption Bold <small>SpotifyMixUI · 14 / 700 · lh 1.5</small></div>
+        <div class="t-caption-bold">Lumen Drift · 1.2M monthly listeners</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">Caption <small>SpotifyMixUI · 14 / 400</small></div>
+        <div class="t-caption">Released April 17, 2026 · 12 tracks · 48 min</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">Small Bold <small>SpotifyMixUI · 12 / 700 · lh 1.5</small></div>
+        <div class="t-small-bold">PLAYING NOW</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">Small <small>SpotifyMixUI · 12 / 400</small></div>
+        <div class="t-small">Tap and hold any track to add it to your queue.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">Badge <small>SpotifyMixUI · 10.5 / 600 · capitalize</small></div>
+        <div class="t-badge">New release</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">Micro <small>SpotifyMixUI · 10 / 400</small></div>
+        <div class="t-micro">© 2026 Soundwave AB. All audio rights reserved.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PALETTE -->
+  <section class="block">
+    <h2 class="section-title">Palette</h2>
+    <p class="section-sub">Achromatic by design — green is the only true color. Semantic accents reserved for state.</p>
+    <div class="palette">
+      <div class="swatch"><div class="swatch-chip" style="background:#1ed760;"></div><div class="swatch-meta"><div class="swatch-name">Spotify Green</div><div class="swatch-hex">#1ED760</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#1db954;"></div><div class="swatch-meta"><div class="swatch-name">Green Border</div><div class="swatch-hex">#1DB954</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#121212;"></div><div class="swatch-meta"><div class="swatch-name">Near Black</div><div class="swatch-hex">#121212</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#181818;"></div><div class="swatch-meta"><div class="swatch-name">Dark Surface</div><div class="swatch-hex">#181818</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#1f1f1f;"></div><div class="swatch-meta"><div class="swatch-name">Mid Dark</div><div class="swatch-hex">#1F1F1F</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#252525;"></div><div class="swatch-meta"><div class="swatch-name">Dark Card</div><div class="swatch-hex">#252525</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#272727;"></div><div class="swatch-meta"><div class="swatch-name">Mid Card</div><div class="swatch-hex">#272727</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#ffffff;"></div><div class="swatch-meta"><div class="swatch-name">White</div><div class="swatch-hex">#FFFFFF</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#fdfdfd;"></div><div class="swatch-meta"><div class="swatch-name">Light</div><div class="swatch-hex">#FDFDFD</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#cbcbcb;"></div><div class="swatch-meta"><div class="swatch-name">Near White</div><div class="swatch-hex">#CBCBCB</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#b3b3b3;"></div><div class="swatch-meta"><div class="swatch-name">Silver</div><div class="swatch-hex">#B3B3B3</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#7c7c7c;"></div><div class="swatch-meta"><div class="swatch-name">Light Border</div><div class="swatch-hex">#7C7C7C</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#4d4d4d;"></div><div class="swatch-meta"><div class="swatch-name">Border Gray</div><div class="swatch-hex">#4D4D4D</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#eeeeee;"></div><div class="swatch-meta"><div class="swatch-name">Light Surface</div><div class="swatch-hex">#EEEEEE</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#f3727f;"></div><div class="swatch-meta"><div class="swatch-name">Negative Red</div><div class="swatch-hex">#F3727F</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#ffa42b;"></div><div class="swatch-meta"><div class="swatch-name">Warning Orange</div><div class="swatch-hex">#FFA42B</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#539df5;"></div><div class="swatch-meta"><div class="swatch-name">Announcement Blue</div><div class="swatch-hex">#539DF5</div></div></div>
+    </div>
+  </section>
+
+  <!-- RADII -->
+  <section class="block">
+    <h2 class="section-title">Radii</h2>
+    <p class="section-sub">From hairline 2px tags to full-pill 9999px buttons and 50% circular controls.</p>
+    <div class="radii">
+      <div class="radius-card"><div class="radius-box r-2"></div><div class="radius-name">Minimal</div><div class="radius-value">2px · badges</div></div>
+      <div class="radius-card"><div class="radius-box r-4"></div><div class="radius-name">Subtle</div><div class="radius-value">4px · inputs</div></div>
+      <div class="radius-card"><div class="radius-box r-6"></div><div class="radius-name">Standard</div><div class="radius-value">6px · album art</div></div>
+      <div class="radius-card"><div class="radius-box r-8"></div><div class="radius-name">Comfortable</div><div class="radius-value">8px · cards</div></div>
+      <div class="radius-card"><div class="radius-box r-10"></div><div class="radius-name">Medium</div><div class="radius-value">10px · panels</div></div>
+      <div class="radius-card"><div class="radius-box r-20"></div><div class="radius-name">Medium LG</div><div class="radius-value">20px · overlays</div></div>
+      <div class="radius-card"><div class="radius-box r-100"></div><div class="radius-name">Large</div><div class="radius-value">100px · pill lg</div></div>
+      <div class="radius-card"><div class="radius-box r-500"></div><div class="radius-name">Pill</div><div class="radius-value">500px · primary</div></div>
+      <div class="radius-card"><div class="radius-box r-9999"></div><div class="radius-name">Full Pill</div><div class="radius-value">9999px · nav</div></div>
+      <div class="radius-card"><div class="radius-box r-50"></div><div class="radius-name">Circle</div><div class="radius-value">50% · play</div></div>
+    </div>
+  </section>
+
+  <!-- SPACING -->
+  <section class="block">
+    <h2 class="section-title">Spacing Rhythm</h2>
+    <p class="section-sub">Base 8 with fine-grained micro-steps from 1px up to 20px. Dense compression, not roomy.</p>
+    <div class="spacing">
+      <div class="space-row"><div class="space-label">space.1</div><div class="space-value">1px</div><div class="space-bar" style="width:1px;"></div></div>
+      <div class="space-row"><div class="space-label">space.2</div><div class="space-value">2px</div><div class="space-bar" style="width:2px;"></div></div>
+      <div class="space-row"><div class="space-label">space.3</div><div class="space-value">3px</div><div class="space-bar" style="width:3px;"></div></div>
+      <div class="space-row"><div class="space-label">space.4</div><div class="space-value">4px</div><div class="space-bar" style="width:4px;"></div></div>
+      <div class="space-row"><div class="space-label">space.5</div><div class="space-value">5px</div><div class="space-bar" style="width:5px;"></div></div>
+      <div class="space-row"><div class="space-label">space.6</div><div class="space-value">6px</div><div class="space-bar" style="width:6px;"></div></div>
+      <div class="space-row"><div class="space-label">space.8</div><div class="space-value">8px · base</div><div class="space-bar" style="width:8px;"></div></div>
+      <div class="space-row"><div class="space-label">space.10</div><div class="space-value">10px</div><div class="space-bar" style="width:10px;"></div></div>
+      <div class="space-row"><div class="space-label">space.12</div><div class="space-value">12px</div><div class="space-bar" style="width:12px;"></div></div>
+      <div class="space-row"><div class="space-label">space.14</div><div class="space-value">14px</div><div class="space-bar" style="width:14px;"></div></div>
+      <div class="space-row"><div class="space-label">space.15</div><div class="space-value">15px</div><div class="space-bar" style="width:15px;"></div></div>
+      <div class="space-row"><div class="space-label">space.16</div><div class="space-value">16px</div><div class="space-bar" style="width:16px;"></div></div>
+      <div class="space-row"><div class="space-label">space.20</div><div class="space-value">20px</div><div class="space-bar" style="width:20px;"></div></div>
+    </div>
+  </section>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="logo" style="margin-bottom:16px;">
+          <span class="logo-mark">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34a.748.748 0 01-1.029.25c-2.82-1.72-6.37-2.11-10.561-1.16a.748.748 0 11-.32-1.46c4.601-1.05 8.521-.6 11.671 1.34.36.22.46.7.24 1.03zm1.47-3.27a.94.94 0 01-1.29.31c-3.23-1.99-8.16-2.57-11.98-1.41a.94.94 0 11-.55-1.79c4.37-1.32 9.81-.68 13.51 1.6.44.27.59.85.31 1.29zm.13-3.41C15.241 8.39 8.74 8.17 5.08 9.27a1.128 1.128 0 11-.65-2.16c4.21-1.27 11.39-1.02 15.88 1.62a1.128 1.128 0 01-1.19 1.93z"/></svg>
+          </span>
+          Soundwave
+        </div>
+        <p style="font-size:14px;color:var(--text-silver);line-height:1.5;max-width:300px;">An immersive listening experience built for the dark. Sound recedes into shadow so music can glow.</p>
+      </div>
+      <div>
+        <div class="foot-title">Company</div>
+        <a href="#" class="foot-link">About</a>
+        <a href="#" class="foot-link">Jobs</a>
+        <a href="#" class="foot-link">For the Record</a>
+        <a href="#" class="foot-link">Newsroom</a>
+      </div>
+      <div>
+        <div class="foot-title">Communities</div>
+        <a href="#" class="foot-link">For Artists</a>
+        <a href="#" class="foot-link">Developers</a>
+        <a href="#" class="foot-link">Advertising</a>
+        <a href="#" class="foot-link">Investors</a>
+      </div>
+      <div>
+        <div class="foot-title">Useful Links</div>
+        <a href="#" class="foot-link">Support</a>
+        <a href="#" class="foot-link">Free Mobile App</a>
+        <a href="#" class="foot-link">Premium</a>
+        <a href="#" class="foot-link">Status</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Soundwave AB · Inspired by Spotify's design language</span>
+      <span style="display:flex; gap:16px;">
+        <a href="#" class="foot-link" style="padding:0;">Legal</a>
+        <a href="#" class="foot-link" style="padding:0;">Privacy</a>
+        <a href="#" class="foot-link" style="padding:0;">Cookies</a>
+      </span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

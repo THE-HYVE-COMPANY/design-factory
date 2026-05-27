@@ -1,0 +1,75 @@
+node_modules/
+dist/
+.env
+make_icons.py
+# Vercel CLI workspace metadata — created by `vercel link` / `vercel deploy`,
+# carries org + project ids tied to a specific deployment. Local per machine,
+# never tracked in the OSS repo.
+.vercel/
+# Founder/CI scratch — playwright one-offs, ad-hoc dumps. If you need to
+# keep one of these, move it into scripts/ or tests/ with a real name.
+.tmp-*.mjs
+.tmp-*.js
+scratch/
+# Audit run output dirs (run.sh writes to /tmp by default; if AUDIT_DIR points
+# anywhere under the repo, keep transient probes out of git).
+scripts/audit-full/*.local.*
+# AIOS session artifacts — handoffs, ephemeral logs, worktree metadata.
+# Local per dev session, should never reach the repo.
+.aios/
+# Internal planning, audits, founder reviews, capture scripts. Private to the
+# team — never part of the public OSS surface. The release manifest excludes it
+# "by definition"; keep it untracked so it can't reach the public repo.
+/_internal/
+# Generated artifacts (POCs, previews, intermediate dumps) — regenerable.
+artifacts/
+# Playwright — keep snapshots in __snapshots__, drop transient output
+test-results/
+playwright-report/
+# User project artifacts — design-factory writes generated HTML + attachments
+# into folders at the repo root when running in browser preview without a
+# workspace_root set. Protect the repo by default: only let source directories
+# through. Add specific allow-lists here if you intentionally stage one.
+/admin-dashboard/
+/projeto-*/
+/projects/
+/test-*/
+# Design systems — ship ten curated public examples (apple, claude, framer,
+# linear, nike, raycast, spotify, vercel, wired, xai). Everything else stays
+# local to each developer's machine: their own imports, their own iterations,
+# anything the bridge mkdirs on a generate-from-folder flow.
+/design-systems/*
+!/design-systems/apple/
+!/design-systems/claude/
+!/design-systems/framer/
+!/design-systems/linear/
+!/design-systems/nike/
+!/design-systems/raycast/
+!/design-systems/spotify/
+!/design-systems/vercel/
+!/design-systems/wired/
+!/design-systems/xai/
+# Skills — ship seven curated public skills + the README. New skills the user
+# installs via the in-app importer also land under /skills/<slug>/ but stay
+# local until someone explicitly adds them.
+/skills/*
+!/skills/README.md
+!/skills/emil-design-eng/
+!/skills/frontend-design/
+!/skills/frontend-guidelines-master/
+!/skills/impeccable-main/
+!/skills/make-interfaces-feel-better-main/
+!/skills/taste-skill-main/
+!/skills/ui-skills-main/
+# Any dir at root that isn't a source/config dir is presumed to be a project
+# artifact. If you add a real top-level dir, whitelist it explicitly.
+/*.html
+# Generic slug-shape folders (lowercase, dash-separated) are presumed project
+# artifacts too. Edit this list if collision arises.
+/my-*/
+/new-*/
+/demo-*/
+docs/readme/git-history-full.txt
+
+# Rust/Tauri build output (multi-GB, regenerable) — added for OSS migration
+src-tauri/target/

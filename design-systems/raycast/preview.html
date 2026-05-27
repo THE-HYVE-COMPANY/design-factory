@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raycast — Design System Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Brand & Accent */
+    --primary: #ffffff;
+    --primary-pressed: #e8e8e8;
+    --on-primary: #000000;
+
+    /* Surface */
+    --canvas: #07080a;
+    --surface: #0d0d0d;
+    --surface-elevated: #101111;
+    --surface-card: #121212;
+    --button-fg: #18191a;
+    --hairline: #242728;
+    --hairline-soft: rgba(255,255,255,0.08);
+    --hairline-strong: rgba(255,255,255,0.16);
+
+    /* Text */
+    --ink: #f4f4f6;
+    --body: #cdcdcd;
+    --charcoal: #d3d3d4;
+    --mute: #9c9c9d;
+    --ash: #6a6b6c;
+    --stone: #434345;
+    --on-dark: #ffffff;
+    --on-dark-mute: rgba(255,255,255,0.72);
+
+    /* Semantic */
+    --accent-blue: #57c1ff;
+    --accent-blue-soft: rgba(87,193,255,0.15);
+    --accent-red: #ff6161;
+    --accent-red-soft: rgba(255,97,97,0.15);
+    --accent-green: #59d499;
+    --accent-green-soft: rgba(89,212,153,0.15);
+    --accent-yellow: #ffc533;
+    --accent-yellow-soft: rgba(255,197,51,0.15);
+
+    /* Gradients */
+    --hero-stripe-start: #ff5757;
+    --hero-stripe-end: #a1131a;
+    --key-bg-start: #121212;
+    --key-bg-end: #0d0d0d;
+
+    /* Spacing */
+    --xxs: 2px;
+    --xs: 4px;
+    --sm: 8px;
+    --md: 12px;
+    --lg: 16px;
+    --xl: 24px;
+    --xxl: 32px;
+    --section: 96px;
+
+    /* Radius */
+    --r-none: 0px;
+    --r-xs: 4px;
+    --r-sm: 6px;
+    --r-md: 8px;
+    --r-lg: 10px;
+    --r-xl: 16px;
+    --r-full: 9999px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--canvas);
+    color: var(--body);
+    font-family: 'Inter', 'Inter Fallback', system-ui, -apple-system, sans-serif;
+    font-feature-settings: "calt", "kern", "liga", "ss03";
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  a { color: var(--on-dark); text-decoration: none; }
+  a:focus { text-decoration: underline; }
+
+  .container {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ===== Nav ===== */
+  .nav {
+    background: var(--canvas);
+    border-bottom: 1px solid var(--hairline);
+    height: 56px;
+    display: flex;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--on-dark);
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.2px;
+  }
+  .logo-mark {
+    width: 22px; height: 22px;
+    background: linear-gradient(135deg, var(--hero-stripe-start), var(--hero-stripe-end));
+    border-radius: var(--r-sm);
+    position: relative;
+  }
+  .logo-mark::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 1.5px solid #fff;
+    border-radius: 2px;
+    transform: rotate(45deg);
+  }
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--on-dark);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.6;
+    letter-spacing: 0.2px;
+  }
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  /* ===== Buttons ===== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-family: inherit;
+    font-feature-settings: "calt", "kern", "liga", "ss03";
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    line-height: 1.6;
+    border-radius: var(--r-md);
+    border: none;
+    cursor: pointer;
+    transition: background 0.12s ease;
+    white-space: nowrap;
+  }
+  .btn-sm { padding: 4px 10px; font-size: 12px; height: 28px; }
+  .btn-md { padding: 8px 16px; font-size: 14px; height: 36px; }
+  .btn-lg { padding: 10px 20px; font-size: 16px; height: 44px; }
+
+  .btn-primary { background: var(--primary); color: var(--on-primary); }
+  .btn-primary:active { background: var(--primary-pressed); }
+
+  .btn-secondary { background: transparent; color: var(--on-dark); }
+  .btn-secondary:active { background: var(--surface); }
+
+  .btn-tertiary { background: var(--surface-elevated); color: var(--on-dark); }
+  .btn-tertiary:active { background: var(--surface-card); }
+
+  .btn-install {
+    background: transparent;
+    color: var(--on-dark);
+    border: 1px solid var(--hairline-strong);
+    padding: 6px 14px;
+    height: 32px;
+    border-radius: var(--r-md);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+  }
+
+  /* ===== Hero ===== */
+  .hero {
+    position: relative;
+    padding: var(--section) 24px;
+    overflow: hidden;
+    background: var(--canvas);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .hero-stripes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 280px;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .hero-stripes::before {
+    content: '';
+    position: absolute;
+    inset: -50px -100px auto -100px;
+    height: 380px;
+    background:
+      linear-gradient(115deg,
+        transparent 0%, transparent 18%,
+        var(--hero-stripe-start) 19%, var(--hero-stripe-end) 24%,
+        transparent 25%, transparent 38%,
+        var(--hero-stripe-start) 39%, var(--hero-stripe-end) 46%,
+        transparent 47%, transparent 62%,
+        var(--hero-stripe-start) 63%, var(--hero-stripe-end) 72%,
+        transparent 73%);
+    filter: blur(2px);
+    opacity: 0.85;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.95) 0%, transparent 100%);
+  }
+  .hero-inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .hero-copy h1 {
+    font-size: 64px;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: 0;
+    color: var(--ink);
+    font-feature-settings: "calt", "kern", "ss02", "ss03", "ss08";
+    margin-bottom: 24px;
+  }
+  .hero-copy p {
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--body);
+    margin-bottom: 32px;
+    max-width: 480px;
+  }
+  .hero-cta {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .hero-meta {
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--mute);
+    font-size: 13px;
+    letter-spacing: 0.1px;
+  }
+
+  /* ===== Command Palette Mockup ===== */
+  .palette {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-xl);
+    overflow: hidden;
+    width: 100%;
+  }
+  .palette-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .traffic { display: flex; gap: 6px; }
+  .traffic span {
+    width: 10px; height: 10px;
+    border-radius: var(--r-full);
+    background: var(--surface-card);
+    border: 1px solid var(--hairline);
+  }
+  .palette-search {
+    flex: 1;
+    background: var(--surface-elevated);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-md);
+    padding: 6px 10px;
+    color: var(--mute);
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .palette-body { padding: 6px; }
+  .pal-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    border-radius: var(--r-sm);
+    color: var(--on-dark);
+    font-size: 14px;
+  }
+  .pal-row-active { background: var(--surface-card); }
+  .pal-row .meta { margin-left: auto; display: flex; gap: 4px; align-items: center; color: var(--mute); font-size: 12px; }
+  .icon-tile {
+    width: 24px; height: 24px;
+    border-radius: var(--r-sm);
+    background: var(--surface-card);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .icon-tile.yellow { background: var(--accent-yellow); color: #2a1d00; }
+  .icon-tile.red    { background: var(--accent-red); color: #2a0606; }
+  .icon-tile.green  { background: var(--accent-green); color: #062a14; }
+  .icon-tile.blue   { background: var(--accent-blue); color: #03253a; }
+
+  .keycap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, var(--key-bg-start), var(--key-bg-end));
+    border: 1px solid var(--hairline);
+    color: var(--body);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.1px;
+    border-radius: var(--r-xs);
+    padding: 1px 6px;
+    min-width: 18px;
+    height: 20px;
+  }
+
+  /* ===== Sections ===== */
+  section.block {
+    padding: var(--section) 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .eyebrow {
+    color: var(--mute);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  h2.section-title {
+    font-size: 56px;
+    font-weight: 500;
+    line-height: 1.17;
+    letter-spacing: 0.2px;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+  .section-lede {
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--body);
+    max-width: 640px;
+    margin-bottom: 48px;
+  }
+
+  /* ===== Buttons Gallery ===== */
+  .buttons-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-lg);
+    padding: 32px;
+  }
+  .btn-col h4 {
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    color: var(--on-dark);
+    margin-bottom: 16px;
+  }
+  .btn-col .row {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  /* ===== Form ===== */
+  .form {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-lg);
+    padding: 32px;
+    max-width: 560px;
+  }
+  .form h3 {
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.15;
+    color: var(--ink);
+    margin-bottom: 24px;
+  }
+  .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .field label {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.6;
+    letter-spacing: 0.2px;
+    color: var(--on-dark);
+  }
+  .input {
+    background: var(--surface-elevated);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-md);
+    padding: 8px 12px;
+    height: 36px;
+    color: var(--on-dark);
+    font-family: inherit;
+    font-feature-settings: "calt", "kern", "liga", "ss03";
+    font-size: 16px;
+    line-height: 1.6;
+    outline: none;
+    transition: border-color 0.12s ease;
+  }
+  .input:focus { border-color: var(--hairline-strong); }
+  textarea.input { height: auto; min-height: 96px; resize: vertical; padding: 10px 12px; }
+  .form-actions { margin-top: 8px; display: flex; gap: 12px; }
+
+  /* ===== Cards ===== */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-lg);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .feature-card.elevated { background: var(--surface-elevated); }
+  .feature-card .icons-row { display: flex; gap: 8px; }
+  .icon-tile.lg {
+    width: 48px; height: 48px;
+    border-radius: var(--r-md);
+    font-size: 18px;
+  }
+  .feature-card h3 {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.4;
+    letter-spacing: 0.2px;
+    color: var(--ink);
+  }
+  .feature-card p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--body);
+  }
+  .feature-card .learn {
+    color: var(--on-dark);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    margin-top: auto;
+  }
+
+  /* ===== Store Extension Cards ===== */
+  .store-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 32px;
+  }
+  .ext-card {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-md);
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .ext-card .info { flex: 1; min-width: 0; }
+  .ext-card .name {
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    color: var(--on-dark);
+    margin-bottom: 2px;
+  }
+  .ext-card .author {
+    font-size: 13px;
+    color: var(--mute);
+    letter-spacing: 0.1px;
+    margin-bottom: 6px;
+  }
+  .ext-card .desc {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--body);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ===== Stats ===== */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-lg);
+    padding: 24px;
+  }
+  .stat .num {
+    font-size: 56px;
+    font-weight: 500;
+    line-height: 1.17;
+    letter-spacing: 0.2px;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .stat .label {
+    font-size: 13px;
+    color: var(--mute);
+    letter-spacing: 0.1px;
+  }
+
+  /* ===== Pricing Tier ===== */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 32px;
+  }
+  .tier {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-lg);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .tier.featured { background: var(--surface-elevated); }
+  .tier-head { display: flex; align-items: center; justify-content: space-between; }
+  .tier h3 {
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1.6;
+    letter-spacing: 0.2px;
+    color: var(--ink);
+  }
+  .badge-pro {
+    background: var(--surface-elevated);
+    color: var(--on-dark-mute);
+    font-size: 12px;
+    letter-spacing: 0.4px;
+    padding: 2px 6px;
+    border-radius: var(--r-xs);
+    line-height: 1.5;
+  }
+  .tier .price {
+    font-size: 56px;
+    font-weight: 500;
+    line-height: 1.17;
+    letter-spacing: 0.2px;
+    color: var(--ink);
+  }
+  .tier .price small { font-size: 16px; color: var(--mute); font-weight: 400; }
+  .tier .tier-desc { font-size: 18px; line-height: 1.6; color: var(--body); }
+  .tier ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .tier ul li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--body);
+  }
+  .tier ul li::before {
+    content: '✓';
+    color: var(--accent-green);
+    font-weight: 600;
+  }
+
+  /* ===== Table ===== */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th, td {
+    text-align: left;
+    padding: 14px 24px;
+    font-size: 14px;
+    line-height: 1.6;
+    border-bottom: 1px solid var(--hairline-strong);
+  }
+  th {
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    color: var(--on-dark);
+    background: var(--surface-elevated);
+  }
+  td { color: var(--body); }
+  tr:last-child td { border-bottom: none; }
+  td .check { color: var(--accent-green); font-weight: 600; }
+  td .dash { color: var(--ash); }
+
+  /* ===== Pill tabs ===== */
+  .pill-row { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+  .pill-tab {
+    background: transparent;
+    color: var(--body);
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 4px 10px;
+    border-radius: var(--r-full);
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-feature-settings: "calt", "kern", "liga", "ss03";
+  }
+  .pill-tab.active {
+    background: var(--surface-elevated);
+    color: var(--on-dark);
+  }
+
+  /* ===== Type Ramp ===== */
+  .ramp { display: flex; flex-direction: column; }
+  .ramp-row {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    align-items: baseline;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--hairline);
+    gap: 24px;
+  }
+  .ramp-row:last-child { border-bottom: none; }
+  .ramp-token {
+    color: var(--mute);
+    font-size: 13px;
+    letter-spacing: 0.1px;
+    font-family: 'Inter', sans-serif;
+  }
+  .ramp-token .dims { display: block; color: var(--stone); font-size: 12px; margin-top: 4px; }
+  .ramp-sample { color: var(--ink); }
+
+  .t-display-xl { font-size: 64px; font-weight: 600; line-height: 1.1; letter-spacing: 0; font-feature-settings: "calt", "kern", "ss02", "ss03", "ss08"; }
+  .t-display-lg { font-size: 56px; font-weight: 500; line-height: 1.17; letter-spacing: 0.2px; }
+  .t-heading-xl { font-size: 24px; font-weight: 500; line-height: 1.6; letter-spacing: 0.2px; }
+  .t-heading-lg { font-size: 22px; font-weight: 500; line-height: 1.15; letter-spacing: 0; }
+  .t-heading-md { font-size: 20px; font-weight: 500; line-height: 1.4; letter-spacing: 0.2px; }
+  .t-heading-sm { font-size: 18px; font-weight: 500; line-height: 1.4; letter-spacing: 0.2px; }
+  .t-body-lg    { font-size: 18px; font-weight: 400; line-height: 1.6; letter-spacing: 0; }
+  .t-body-md    { font-size: 16px; font-weight: 400; line-height: 1.6; letter-spacing: 0; }
+  .t-body-strong{ font-size: 16px; font-weight: 500; line-height: 1.4; letter-spacing: 0.2px; }
+  .t-body-sm    { font-size: 14px; font-weight: 400; line-height: 1.6; letter-spacing: 0; }
+  .t-body-sm-strong { font-size: 14px; font-weight: 500; line-height: 1.6; letter-spacing: 0.2px; }
+  .t-caption-md { font-size: 13px; font-weight: 400; line-height: 1.4; letter-spacing: 0.1px; }
+  .t-caption-sm { font-size: 12px; font-weight: 400; line-height: 1.5; letter-spacing: 0.4px; }
+  .t-link-md    { font-size: 16px; font-weight: 500; line-height: 1.4; letter-spacing: 0.3px; text-decoration: underline; }
+  .t-button-md  { font-size: 14px; font-weight: 500; line-height: 1.6; letter-spacing: 0.2px; }
+
+  /* ===== Palette ===== */
+  .swatch-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .swatch {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-md);
+    overflow: hidden;
+  }
+  .swatch .chip {
+    height: 96px;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .swatch .meta { padding: 12px 14px; }
+  .swatch .name { font-size: 14px; font-weight: 500; color: var(--on-dark); letter-spacing: 0.2px; }
+  .swatch .hex  { font-size: 12px; color: var(--mute); letter-spacing: 0.4px; margin-top: 2px; text-transform: uppercase; }
+
+  /* ===== Radii showcase ===== */
+  .radii-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 16px;
+  }
+  .radius-cell { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+  .radius-box {
+    width: 96px; height: 96px;
+    background: var(--surface-card);
+    border: 1px solid var(--hairline);
+  }
+  .radius-cell .label { font-size: 13px; color: var(--on-dark); letter-spacing: 0.1px; }
+  .radius-cell .val { font-size: 12px; color: var(--mute); letter-spacing: 0.4px; }
+
+  /* ===== Spacing rhythm ===== */
+  .spacing-list { display: flex; flex-direction: column; gap: 16px; }
+  .space-row { display: grid; grid-template-columns: 100px 80px 1fr; align-items: center; gap: 16px; }
+  .space-row .name { font-size: 14px; color: var(--on-dark); letter-spacing: 0.2px; }
+  .space-row .val  { font-size: 12px; color: var(--mute); letter-spacing: 0.4px; }
+  .space-bar {
+    height: 8px;
+    background: linear-gradient(90deg, var(--hero-stripe-start), var(--hero-stripe-end));
+    border-radius: var(--r-xs);
+  }
+
+  /* ===== Footer ===== */
+  .footer {
+    background: var(--canvas);
+    border-top: 1px solid var(--hairline);
+    padding: 64px 24px;
+    position: relative;
+  }
+  .footer::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 80px;
+    background:
+      linear-gradient(115deg,
+        transparent 0%, transparent 40%,
+        var(--hero-stripe-start) 41%, var(--hero-stripe-end) 47%,
+        transparent 48%, transparent 65%,
+        var(--hero-stripe-start) 66%, var(--hero-stripe-end) 73%,
+        transparent 74%);
+    opacity: 0.35;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
+    pointer-events: none;
+  }
+  .footer-inner { max-width: 1240px; margin: 0 auto; position: relative; }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+  .footer-col h5 {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.6;
+    letter-spacing: 0.2px;
+    color: var(--on-dark);
+    margin-bottom: 12px;
+  }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .footer-col ul a {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--mute);
+  }
+  .footer-bottom {
+    border-top: 1px solid var(--hairline);
+    padding-top: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .subscribe {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .subscribe .input { min-width: 280px; }
+  .footer-copy {
+    color: var(--mute);
+    font-size: 13px;
+    letter-spacing: 0.1px;
+  }
+
+  /* ===== Utility ===== */
+  .stack-32 > * + * { margin-top: 32px; }
+  .row-gap-16 { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+
+  @media (max-width: 1024px) {
+    .hero-inner { grid-template-columns: 1fr; }
+    .buttons-grid, .cards-grid, .stats, .pricing-grid, .swatch-grid { grid-template-columns: repeat(2, 1fr); }
+    .radii-grid { grid-template-columns: repeat(4, 1fr); }
+    .footer-grid { grid-template-columns: repeat(3, 1fr); }
+    .store-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .hero-copy h1 { font-size: 44px; }
+    h2.section-title { font-size: 40px; }
+    .buttons-grid, .cards-grid, .stats, .pricing-grid, .swatch-grid { grid-template-columns: 1fr; }
+    .radii-grid { grid-template-columns: repeat(3, 1fr); }
+    .footer-grid { grid-template-columns: repeat(2, 1fr); }
+    .ramp-row { grid-template-columns: 1fr; }
+    section.block { padding: 64px 0; }
+  }
+  @media (max-width: 480px) {
+    .hero-copy h1 { font-size: 36px; }
+    .container { padding: 0 16px; }
+    section.block { padding: 48px 0; }
+    .radii-grid { grid-template-columns: repeat(2, 1fr); }
+    .footer-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Primary Nav ===== -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="logo">
+      <span class="logo-mark"></span>
+      <span>Raycast</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#">Pro</a></li>
+      <li><a href="#">AI</a></li>
+      <li><a href="#">Store</a></li>
+      <li><a href="#">Manual</a></li>
+      <li><a href="#">Changelog</a></li>
+      <li><a href="#">Blog</a></li>
+      <li><a href="#">Pricing</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="#" class="btn btn-secondary btn-md">Sign in</a>
+      <a href="#" class="btn btn-primary btn-md">Download</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== Hero ===== -->
+<section class="hero">
+  <div class="hero-stripes"></div>
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <div class="eyebrow">Raycast Pro · Now with AI</div>
+      <h1>Built for the perfect tools.</h1>
+      <p>Raycast is a blazingly fast, totally extendable launcher. It lets you complete tasks, calculate, share common links, and much more.</p>
+      <div class="hero-cta">
+        <a href="#" class="btn btn-primary btn-lg">Download for Mac</a>
+        <a href="#" class="btn btn-secondary btn-lg">Watch demo →</a>
+      </div>
+      <div class="hero-meta">
+        <span class="keycap">⌘</span>
+        <span class="keycap">Space</span>
+        <span>to launch · Free for individuals</span>
+      </div>
+    </div>
+
+    <!-- Command palette mockup -->
+    <div class="palette">
+      <div class="palette-header">
+        <div class="traffic"><span></span><span></span><span></span></div>
+        <div class="palette-search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+          <span>Search for apps and commands...</span>
+        </div>
+      </div>
+      <div class="palette-body">
+        <div class="pal-row pal-row-active">
+          <span class="icon-tile yellow">H</span>
+          <span>Hacker News — Top Stories</span>
+          <span class="meta">Extension <span class="keycap">⏎</span></span>
+        </div>
+        <div class="pal-row">
+          <span class="icon-tile red">S</span>
+          <span>Slack — Send Message</span>
+          <span class="meta"><span class="keycap">⌘</span><span class="keycap">S</span></span>
+        </div>
+        <div class="pal-row">
+          <span class="icon-tile green">L</span>
+          <span>Linear — Create Issue</span>
+          <span class="meta"><span class="keycap">⌘</span><span class="keycap">N</span></span>
+        </div>
+        <div class="pal-row">
+          <span class="icon-tile blue">F</span>
+          <span>Figma — Open File</span>
+          <span class="meta"><span class="keycap">⌘</span><span class="keycap">O</span></span>
+        </div>
+        <div class="pal-row">
+          <span class="icon-tile">N</span>
+          <span>Notion — Quick Capture</span>
+          <span class="meta">Extension</span>
+        </div>
+        <div class="pal-row">
+          <span class="icon-tile">S</span>
+          <span>Spotify — Play / Pause</span>
+          <span class="meta"><span class="keycap">⌘</span><span class="keycap">P</span></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Buttons Gallery ===== -->
+<section class="block">
+  <div class="container">
+    <div class="eyebrow">Components</div>
+    <h2 class="section-title">Buttons.</h2>
+    <p class="section-lede">Three variants across three sizes. White pill anchors every primary action — secondary stays transparent, tertiary sits on the surface ladder.</p>
+
+    <div class="buttons-grid">
+      <div class="btn-col">
+        <h4>Primary</h4>
+        <div class="row">
+          <button class="btn btn-primary btn-sm">Download</button>
+          <button class="btn btn-primary btn-md">Download</button>
+          <button class="btn btn-primary btn-lg">Download</button>
+        </div>
+      </div>
+      <div class="btn-col">
+        <h4>Secondary</h4>
+        <div class="row">
+          <button class="btn btn-secondary btn-sm">Learn more →</button>
+          <button class="btn btn-secondary btn-md">Learn more →</button>
+          <button class="btn btn-secondary btn-lg">Learn more →</button>
+        </div>
+      </div>
+      <div class="btn-col">
+        <h4>Tertiary</h4>
+        <div class="row">
+          <button class="btn btn-tertiary btn-sm">Watch demo</button>
+          <button class="btn btn-tertiary btn-md">Watch demo</button>
+          <button class="btn btn-tertiary btn-lg">Watch demo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Form ===== -->
+<section class="block">
+  <div class="container">
+    <div class="eyebrow">Forms</div>
+    <h2 class="section-title">Get on the list.</h2>
+    <p class="section-lede">Inputs sit at 36px with the standard 8px radius. Focused border brightens to <code>hairline-strong</code> — no colored ring.</p>
+
+    <form class="form" onsubmit="event.preventDefault()">
+      <h3>Subscribe to the changelog</h3>
+      <div class="field">
+        <label for="name">Full name</label>
+        <input id="name" class="input" type="text" placeholder="Thomas Paul Mann" />
+      </div>
+      <div class="field">
+        <label for="email">Email address</label>
+        <input id="email" class="input" type="email" placeholder="you@company.com" />
+      </div>
+      <div class="field">
+        <label for="role">What do you use Raycast for?</label>
+        <textarea id="role" class="input" placeholder="Tell us a little about your workflow..."></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-md">Subscribe</button>
+        <button type="button" class="btn btn-secondary btn-md">Cancel</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- ===== Feature Cards ===== -->
+<section class="block">
+  <div class="container">
+    <div class="eyebrow">Core features</div>
+    <h2 class="section-title">Explore.</h2>
+    <p class="section-lede">Three feature cards built from the surface ladder. The middle card sits one notch lighter to break tonal rhythm.</p>
+
+    <div class="cards-grid">
+      <div class="feature-card">
+        <div class="icons-row">
+          <span class="icon-tile lg yellow">H</span>
+        </div>
+        <h3>AI Chat</h3>
+        <p>Chat with any of the latest AI models — Claude, GPT, Llama — directly from your command palette. Bring your own keys or use Raycast Pro.</p>
+        <a href="#" class="learn">Learn more →</a>
+      </div>
+      <div class="feature-card elevated">
+        <div class="icons-row">
+          <span class="icon-tile lg green">L</span>
+          <span class="icon-tile lg red">S</span>
+          <span class="icon-tile lg blue">F</span>
+        </div>
+        <h3>Quicklinks</h3>
+        <p>Open frequently visited websites, files, and folders with a single keystroke. Build your own shortcuts or import from your team.</p>
+        <a href="#" class="learn">Learn more →</a>
+      </div>
+      <div class="feature-card">
+        <div class="icons-row">
+          <span class="icon-tile lg">N</span>
+        </div>
+        <h3>Snippets</h3>
+        <p>Save and reuse text fragments anywhere on your Mac. Trigger them by typing a keyword, no matter which app you're in.</p>
+        <a href="#" class="learn">Learn more →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Store / Extensions ===== -->
+<section class="block">
+  <div class="container">
+    <div class="eyebrow">Store</div>
+    <h2 class="section-title">Extensions.</h2>
+    <p class="section-lede">Tap into a community-built library of 1,500+ extensions. Filter, browse, install — all without leaving the launcher.</p>
+
+    <div class="pill-row">
+      <button class="pill-tab active">All Extensions</button>
+      <button class="pill-tab">Recently Added</button>
+      <button class="pill-tab">Most Popular</button>
+      <button class="pill-tab">AI</button>
+      <button class="pill-tab">Productivity</button>
+      <button class="pill-tab">Developer Tools</button>
+    </div>
+
+    <div class="store-grid">
+      <div class="ext-card">
+        <span class="icon-tile lg yellow" style="width:48px;height:48px;font-size:20px;">Y</span>
+        <div class="info">
+          <div class="name">Hacker News</div>
+          <div class="author">by Thomas Paul Mann</div>
+          <div class="desc">Read the latest stories from Hacker News right from your command palette.</div>
+        </div>
+        <button class="btn-install">Install Extension</button>
+      </div>
+      <div class="ext-card">
+        <span class="icon-tile lg red" style="width:48px;height:48px;font-size:20px;">S</span>
+        <div class="info">
+          <div class="name">Slack</div>
+          <div class="author">by Slack Inc.</div>
+          <div class="desc">Quickly search, send messages and switch between Slack workspaces.</div>
+        </div>
+        <button class="btn-install">Install Extension</button>
+      </div>
+      <div class="ext-card">
+        <span class="icon-tile lg green" style="width:48px;height:48px;font-size:20px;">L</span>
+        <div class="info">
+          <div class="name">Linear</div>
+          <div class="author">by Linear</div>
+          <div class="desc">Create issues, track sprints, and search your team's roadmap.</div>
+        </div>
+        <button class="btn-install">Install Extension</button>
+      </div>
+      <div class="ext-card">
+        <span class="icon-tile lg blue" style="width:48px;height:48px;font-size:20px;">F</span>
+        <div class="info">
+          <div class="name">Figma Files</div>
+          <div class="author">by Raycast</div>
+          <div class="desc">Search and open Figma files from your team's workspace instantly.</div>
+        </div>
+        <button class="btn-install">Install Extension</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Stats ===== -->
+<section class="block">
+  <div class="container">
+    <div class="eyebrow">By the numbers</div>
+    <h2 class="section-title">Trusted at scale.</h2>
+    <div class="stats">
+      <div class="stat">
+        <div class="num">1.5k+</div>
+        <div class="label">Extensions in the store</div>
+      </div>
+      <div class="stat">
+        <div class="num">200k</div>
+        <div class="label">Active daily users</div>
+      </div>
+      <div class="stat">
+        <div class="num">4.9★</div>
+        <div class="label">Setapp App Store rating</div>
+      </div>
+      <div class="stat">
+        <div class="num">96ms</div>
+        <div class="label">Average launch time</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Pricing ===== -->
+<section class="block">
+  <div class="container">
+    <div class="eyebrow">Plans</div>
+    <h2 class="section-title">Pricing.</h2>
+    <p class="section-lede">Free forever for individuals. Pro unlocks AI, cloud sync, and team features.</p>
+
+    <div class="pricing-grid">
+      <div class="tier">
+        <div class="tier-head">
+          <h3>Free</h3>
+          <span class="badge-pro">Individuals</span>
+        </div>
+        <div class="price">$0<small>/mo</small></div>
+        <p class="tier-desc">All the core features — perfect for personal use.</p>
+        <ul>
+          <li>Unlimited launcher use</li>
+          <li>Community extensions</li>
+          <li>Quicklinks & Snippets</li>
+        </ul>
+        <a href="#" class="btn btn-secondary btn-md">Download for free</a>
+      </div>
+
+      <div class="tier featured">
+        <div class="tier-head">
+          <h3>Pro</h3>
+          <span class="badge-pro">Most Popular</span>
+        </div>
+        <div class="price">$8<small>/mo</small></div>
+        <p class="tier-desc">AI, cloud sync, and unlimited window snapping for power users.</p>
+        <ul>
+          <li>Everything in Free</li>
+          <li>Raycast AI (Claude, GPT)</li>
+          <li>Cloud sync across devices</li>
+          <li>Pro themes & custom hotkeys</li>
+        </ul>
+        <a href="#" class="btn btn-primary btn-md">Get Pro</a>
+      </div>
+
+      <div class="tier">
+        <div class="tier-head">
+          <h3>Advanced AI</h3>
+          <span class="badge-pro">Pro+</span>
+        </div>
+        <div class="price">$20<small>/mo</small></div>
+        <p class="tier-desc">Frontier models, larger context, and priority access.</p>
+        <ul>
+          <li>Everything in Pro</li>
+          <li>Frontier models (Opus, GPT-4 class)</li>
+          <li>Larger context windows</li>
+          <li>Priority support</li>
+        </ul>
+        <a href="#" class="btn btn-primary btn-md">Upgrade</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Comparison Table ===== -->
+<section class="block">
+  <div class="container">
+    <div class="eyebrow">Compare</div>
+    <h2 class="section-title">Feature breakdown.</h2>
+    <p class="section-lede">Every plan side by side, including teams and enterprise.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>Free</th>
+            <th>Pro</th>
+            <th>Advanced AI</th>
+            <th>Enterprise</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Unlimited launcher use</td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Cloud sync across devices</td>
+            <td><span class="dash">—</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Raycast AI (standard models)</td>
+            <td><span class="dash">—</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Frontier model access</td>
+            <td><span class="dash">—</span></td>
+            <td><span class="dash">—</span></td>
+            <td><span class="check">✓</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>Team workspaces</td>
+            <td><span class="dash">—</span></td>
+            <td><span class="dash">—</span></td>
+            <td><span class="dash">—</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+          <tr>
+            <td>SSO & SCIM provisioning</td>
+            <td><span class="dash">—</span></td>
+            <td><span class="dash">—</span></td>
+            <td><span class="dash">—</span></td>
+            <td><span class="check">✓</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Type Ramp ===== -->
+<section class="block">
+  <div class="container">
+    <div class="eyebrow">Typography</div>
+    <h2 class="section-title">Type ramp.</h2>
+    <p class="section-lede">Inter site-wide with <code>ss03</code> enabled — the alternate single-story <em>g</em> is the brand's signature.</p>
+
+    <div class="ramp">
+      <div class="ramp-row">
+        <div class="ramp-token">display-xl<span class="dims">64 / 600 / 1.1</span></div>
+        <div class="ramp-sample t-display-xl">The new way to navigate</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">display-lg<span class="dims">56 / 500 / 1.17 · 0.2px</span></div>
+        <div class="ramp-sample t-display-lg">Explore the store</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">heading-xl<span class="dims">24 / 500 / 1.6 · 0.2px</span></div>
+        <div class="ramp-sample t-heading-xl">Sub-section heading</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">heading-lg<span class="dims">22 / 500 / 1.15</span></div>
+        <div class="ramp-sample t-heading-lg">Mid-section feature heading</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">heading-md<span class="dims">20 / 500 / 1.4 · 0.2px</span></div>
+        <div class="ramp-sample t-heading-md">Card group title</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">heading-sm<span class="dims">18 / 500 / 1.4 · 0.2px</span></div>
+        <div class="ramp-sample t-heading-sm">Extension card title</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">body-lg<span class="dims">18 / 400 / 1.6</span></div>
+        <div class="ramp-sample t-body-lg">Pricing tier description and hero subtitle copy lives at this size.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">body-md<span class="dims">16 / 400 / 1.6</span></div>
+        <div class="ramp-sample t-body-md">Default paragraph text. Raycast is a blazingly fast, totally extendable launcher built for the perfect tools.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">body-strong<span class="dims">16 / 500 / 1.4 · 0.2px</span></div>
+        <div class="ramp-sample t-body-strong">Inline emphasis and primary nav link.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">body-sm<span class="dims">14 / 400 / 1.6</span></div>
+        <div class="ramp-sample t-body-sm">Card description and secondary copy renders at this size.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">body-sm-strong<span class="dims">14 / 500 / 1.6 · 0.2px</span></div>
+        <div class="ramp-sample t-body-sm-strong">In-card label · table-header text</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">caption-md<span class="dims">13 / 400 / 1.4 · 0.1px</span></div>
+        <div class="ramp-sample t-caption-md">Caption and metadata text — author attribution.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">caption-sm<span class="dims">12 / 400 / 1.5 · 0.4px</span></div>
+        <div class="ramp-sample t-caption-sm">SMALLEST UTILITY TEXT · BADGE LABEL</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">link-md<span class="dims">16 / 500 / 1.4 · 0.3px</span></div>
+        <div class="ramp-sample t-link-md">Inline body anchor link</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">button-md<span class="dims">14 / 500 / 1.6 · 0.2px</span></div>
+        <div class="ramp-sample t-button-md">Standard button label</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Palette ===== -->
+<section class="block">
+  <div class="container">
+    <div class="eyebrow">Colors</div>
+    <h2 class="section-title">Palette.</h2>
+    <p class="section-lede">A four-step surface ladder, a single white CTA, and saturated category accents reserved for illustrations.</p>
+
+    <div class="swatch-grid">
+      <div class="swatch"><div class="chip" style="background:#ffffff;"></div><div class="meta"><div class="name">primary</div><div class="hex">#FFFFFF</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#e8e8e8;"></div><div class="meta"><div class="name">primary-pressed</div><div class="hex">#E8E8E8</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#000000;"></div><div class="meta"><div class="name">on-primary</div><div class="hex">#000000</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#07080a;"></div><div class="meta"><div class="name">canvas</div><div class="hex">#07080A</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#0d0d0d;"></div><div class="meta"><div class="name">surface</div><div class="hex">#0D0D0D</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#101111;"></div><div class="meta"><div class="name">surface-elevated</div><div class="hex">#101111</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#121212;"></div><div class="meta"><div class="name">surface-card</div><div class="hex">#121212</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#18191a;"></div><div class="meta"><div class="name">button-fg</div><div class="hex">#18191A</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#242728;"></div><div class="meta"><div class="name">hairline</div><div class="hex">#242728</div></div></div>
+      <div class="swatch"><div class="chip" style="background:rgba(255,255,255,0.08);"></div><div class="meta"><div class="name">hairline-soft</div><div class="hex">rgba 255·.08</div></div></div>
+      <div class="swatch"><div class="chip" style="background:rgba(255,255,255,0.16);"></div><div class="meta"><div class="name">hairline-strong</div><div class="hex">rgba 255·.16</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#f4f4f6;"></div><div class="meta"><div class="name">ink</div><div class="hex">#F4F4F6</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#cdcdcd;"></div><div class="meta"><div class="name">body</div><div class="hex">#CDCDCD</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#d3d3d4;"></div><div class="meta"><div class="name">charcoal</div><div class="hex">#D3D3D4</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#9c9c9d;"></div><div class="meta"><div class="name">mute</div><div class="hex">#9C9C9D</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#6a6b6c;"></div><div class="meta"><div class="name">ash</div><div class="hex">#6A6B6C</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#434345;"></div><div class="meta"><div class="name">stone</div><div class="hex">#434345</div></div></div>
+      <div class="swatch"><div class="chip" style="background:rgba(255,255,255,0.72);"></div><div class="meta"><div class="name">on-dark-mute</div><div class="hex">rgba 255·.72</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#57c1ff;"></div><div class="meta"><div class="name">accent-blue</div><div class="hex">#57C1FF</div></div></div>
+      <div class="swatch"><div class="chip" style="background:rgba(87,193,255,0.15);"></div><div class="meta"><div class="name">accent-blue-soft</div><div class="hex">rgba 57c1ff·.15</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#ff6161;"></div><div class="meta"><div class="name">accent-red</div><div class="hex">#FF6161</div></div></div>
+      <div class="swatch"><div class="chip" style="background:rgba(255,97,97,0.15);"></div><div class="meta"><div class="name">accent-red-soft</div><div class="hex">rgba ff6161·.15</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#59d499;"></div><div class="meta"><div class="name">accent-green</div><div class="hex">#59D499</div></div></div>
+      <div class="swatch"><div class="chip" style="background:rgba(89,212,153,0.15);"></div><div class="meta"><div class="name">accent-green-soft</div><div class="hex">rgba 59d499·.15</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#ffc533;"></div><div class="meta"><div class="name">accent-yellow</div><div class="hex">#FFC533</div></div></div>
+      <div class="swatch"><div class="chip" style="background:rgba(255,197,51,0.15);"></div><div class="meta"><div class="name">accent-yellow-soft</div><div class="hex">rgba ffc533·.15</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#ff5757;"></div><div class="meta"><div class="name">hero-stripe-start</div><div class="hex">#FF5757</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#a1131a;"></div><div class="meta"><div class="name">hero-stripe-end</div><div class="hex">#A1131A</div></div></div>
+      <div class="swatch"><div class="chip" style="background:linear-gradient(180deg,#121212,#0d0d0d);"></div><div class="meta"><div class="name">keycap gradient</div><div class="hex">key-bg-start → end</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Radii ===== -->
+<section class="block">
+  <div class="container">
+    <div class="eyebrow">Shape</div>
+    <h2 class="section-title">Radii.</h2>
+    <p class="section-lede">Vocabulary clusters tightly between 4 and 16px. Cards never go flat; pills round fully.</p>
+
+    <div class="radii-grid">
+      <div class="radius-cell">
+        <div class="radius-box" style="border-radius:0;"></div>
+        <div class="label">none</div><div class="val">0px</div>
+      </div>
+      <div class="radius-cell">
+        <div class="radius-box" style="border-radius:4px;"></div>
+        <div class="label">xs</div><div class="val">4px</div>
+      </div>
+      <div class="radius-cell">
+        <div class="radius-box" style="border-radius:6px;"></div>
+        <div class="label">sm</div><div class="val">6px</div>
+      </div>
+      <div class="radius-cell">
+        <div class="radius-box" style="border-radius:8px;"></div>
+        <div class="label">md</div><div class="val">8px</div>
+      </div>
+      <div class="radius-cell">
+        <div class="radius-box" style="border-radius:10px;"></div>
+        <div class="label">lg</div><div class="val">10px</div>
+      </div>
+      <div class="radius-cell">
+        <div class="radius-box" style="border-radius:16px;"></div>
+        <div class="label">xl</div><div class="val">16px</div>
+      </div>
+      <div class="radius-cell">
+        <div class="radius-box" style="border-radius:9999px;"></div>
+        <div class="label">full</div><div class="val">9999px</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Spacing ===== -->
+<section class="block">
+  <div class="container">
+    <div class="eyebrow">Rhythm</div>
+    <h2 class="section-title">Spacing.</h2>
+    <p class="section-lede">Base unit 8px with 2/4/12px steps for tight inline gaps. Sections rest on a 96px rhythm.</p>
+
+    <div class="spacing-list">
+      <div class="space-row"><span class="name">xxs</span><span class="val">2px</span><div class="space-bar" style="width:2px;"></div></div>
+      <div class="space-row"><span class="name">xs</span><span class="val">4px</span><div class="space-bar" style="width:4px;"></div></div>
+      <div class="space-row"><span class="name">sm</span><span class="val">8px</span><div class="space-bar" style="width:8px;"></div></div>
+      <div class="space-row"><span class="name">md</span><span class="val">12px</span><div class="space-bar" style="width:12px;"></div></div>
+      <div class="space-row"><span class="name">lg</span><span class="val">16px</span><div class="space-bar" style="width:16px;"></div></div>
+      <div class="space-row"><span class="name">xl</span><span class="val">24px</span><div class="space-bar" style="width:24px;"></div></div>
+      <div class="space-row"><span class="name">xxl</span><span class="val">32px</span><div class="space-bar" style="width:32px;"></div></div>
+      <div class="space-row"><span class="name">section</span><span class="val">96px</span><div class="space-bar" style="width:96px;"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <h5>Product</h5>
+        <ul>
+          <li><a href="#">Pro</a></li>
+          <li><a href="#">AI</a></li>
+          <li><a href="#">For Teams</a></li>
+          <li><a href="#">Pricing</a></li>
+          <li><a href="#">Changelog</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Core Features</h5>
+        <ul>
+          <li><a href="#">Launcher</a></li>
+          <li><a href="#">Quicklinks</a></li>
+          <li><a href="#">Snippets</a></li>
+          <li><a href="#">Window Mgmt</a></li>
+          <li><a href="#">Clipboard</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Top Extensions</h5>
+        <ul>
+          <li><a href="#">Hacker News</a></li>
+          <li><a href="#">Slack</a></li>
+          <li><a href="#">Linear</a></li>
+          <li><a href="#">Figma Files</a></li>
+          <li><a href="#">Notion</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Press Kit</a></li>
+          <li><a href="#">Brand</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Community</h5>
+        <ul>
+          <li><a href="#">Developers</a></li>
+          <li><a href="#">GitHub</a></li>
+          <li><a href="#">Slack</a></li>
+          <li><a href="#">Twitter</a></li>
+          <li><a href="#">RSS</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>By Raycast</h5>
+        <ul>
+          <li><a href="#">Manual</a></li>
+          <li><a href="#">Wallpapers</a></li>
+          <li><a href="#">Icon Maker</a></li>
+          <li><a href="#">Themes</a></li>
+          <li><a href="#">Status</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="logo">
+        <span class="logo-mark"></span>
+        <span>Raycast</span>
+      </div>
+      <form class="subscribe" onsubmit="event.preventDefault()">
+        <input class="input" type="email" placeholder="you@company.com" />
+        <button class="btn btn-primary btn-md">Subscribe</button>
+      </form>
+      <div class="footer-copy">© 2026 Raycast Technologies Ltd.</div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

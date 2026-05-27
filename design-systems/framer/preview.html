@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Framer — Design System Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- GT Walsheim Medium is a commercial face. Falling back to Mona Sans (closest open-source equivalent per design.md) for display. Inter Variable is open-source and used as-is. -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Mona+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Colors */
+    --primary: #FFFFFF;
+    --accent-blue: #0099FF;
+    --canvas: #0A0908;
+    --surface-1: #161513;
+    --surface-2: #242220;
+    --hairline: rgba(255,255,255,0.12);
+    --hairline-soft: rgba(255,255,255,0.06);
+    --inverse-canvas: #FFFFFF;
+    --ink: #FFFFFF;
+    --ink-muted: #999999;
+    --on-primary: #0A0908;
+    --semantic-success: #2DCC70;
+
+    /* Gradients */
+    --gradient-magenta: linear-gradient(135deg, #FF2E93 0%, #B91D73 60%, #6D1149 100%);
+    --gradient-violet: linear-gradient(135deg, #7A2BFF 0%, #4D17C7 55%, #2A0975 100%);
+    --gradient-orange: linear-gradient(135deg, #FF8A3D 0%, #FF5A3D 50%, #C9356E 100%);
+    --gradient-coral: linear-gradient(135deg, #FF8A9E 0%, #FF5277 55%, #B82E58 100%);
+
+    /* Spacing */
+    --s-hair: 1px;
+    --s-xxs: 4px;
+    --s-xs: 8px;
+    --s-sm: 12px;
+    --s-md: 15px;
+    --s-lg: 20px;
+    --s-xl: 30px;
+    --s-xxl: 40px;
+    --s-section: 96px;
+
+    /* Radius */
+    --r-xs: 4px;
+    --r-sm: 6px;
+    --r-md: 10px;
+    --r-lg: 15px;
+    --r-xl: 20px;
+    --r-xxl: 30px;
+    --r-pill: 100px;
+    --r-full: 9999px;
+
+    /* Shadows */
+    --shadow-level2: 0 0 0 0.5px rgba(255,255,255,0.10) inset, 0px 10px 30px rgba(0,0,0,0.25);
+    --shadow-level3: 0px 0px 0px 1px rgba(0,153,255,0.45), 0px 0px 0px 4px rgba(0,153,255,0.15);
+    --shadow-flat-outline: 0 0 0 2px rgba(0,0,0,0.9);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-feature-settings: 'cv01','cv05','cv09','cv11','ss03','ss07','dlig','tnum';
+    font-variation-settings: normal;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body { font-size: 15px; line-height: 1.30; letter-spacing: -0.15px; }
+
+  .container { max-width: 1199px; margin: 0 auto; padding: 0 var(--s-xl); }
+
+  /* === Typography classes === */
+  .t-display-xxl { font-family: 'Mona Sans', 'Inter', sans-serif; font-size: 110px; font-weight: 500; line-height: 0.85; letter-spacing: -5.5px; }
+  .t-display-xl  { font-family: 'Mona Sans', 'Inter', sans-serif; font-size: 85px;  font-weight: 500; line-height: 0.95; letter-spacing: -4.25px; }
+  .t-display-lg  { font-family: 'Mona Sans', 'Inter', sans-serif; font-size: 62px;  font-weight: 500; line-height: 1.00; letter-spacing: -3.1px; }
+  .t-display-md  { font-family: 'Mona Sans', 'Inter', sans-serif; font-size: 32px;  font-weight: 500; line-height: 1.13; letter-spacing: -1.0px; }
+  .t-headline    { font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 700; line-height: 1.20; letter-spacing: -0.8px; }
+  .t-subhead     { font-family: 'Inter', sans-serif; font-size: 24px; font-weight: 400; line-height: 1.30; letter-spacing: -0.01px; }
+  .t-body-lg     { font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 400; line-height: 1.30; letter-spacing: -0.18px; }
+  .t-body        { font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 400; line-height: 1.30; letter-spacing: -0.15px; }
+  .t-body-sm     { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; line-height: 1.40; letter-spacing: -0.14px; }
+  .t-caption     { font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500; line-height: 1.20; letter-spacing: -0.13px; }
+  .t-micro       { font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 400; line-height: 1.20; letter-spacing: -0.12px; }
+  .t-button      { font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; line-height: 1.0;  letter-spacing: -0.14px; }
+
+  a { color: var(--accent-blue); text-decoration: none; }
+  ::selection { background: rgba(0,153,255,0.35); color: var(--ink); }
+
+  /* === Buttons === */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    border: none; cursor: pointer; white-space: nowrap;
+    font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500;
+    letter-spacing: -0.14px; line-height: 1.0;
+    border-radius: var(--r-pill);
+    transition: transform .15s ease, background .15s ease;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary   { background: var(--primary); color: var(--on-primary); padding: 10px 15px; }
+  .btn-secondary { background: var(--surface-1); color: var(--ink); padding: 10px 15px; }
+  .btn-ghost     { background: transparent; color: var(--ink); padding: 10px 15px; }
+  .btn-translucent { background: var(--surface-2); color: var(--ink); padding: 8px 14px; border-radius: var(--r-xxl); }
+
+  /* Button sizes */
+  .btn-sm { font-size: 13px; padding: 7px 12px; }
+  .btn-md { font-size: 14px; padding: 10px 15px; }
+  .btn-lg { font-size: 16px; padding: 14px 22px; }
+
+  .btn-icon-circular {
+    width: 40px; height: 40px; padding: 0;
+    border-radius: var(--r-full); background: var(--surface-1); color: var(--ink);
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+
+  /* === Top Nav === */
+  .top-nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(10,9,8,0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--hairline-soft);
+    height: 56px;
+    display: flex; align-items: center;
+  }
+  .top-nav-inner {
+    width: 100%; max-width: 1199px; margin: 0 auto; padding: 0 var(--s-xl);
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: var(--s-lg);
+  }
+  .logo {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: 'Mona Sans', sans-serif; font-weight: 600; font-size: 18px;
+    letter-spacing: -0.6px; color: var(--ink);
+  }
+  .logo-mark {
+    width: 22px; height: 22px; background: var(--primary); border-radius: 4px;
+    clip-path: polygon(0 0, 100% 0, 100% 33%, 50% 33%, 100% 66%, 50% 66%, 50% 100%, 0 100%);
+  }
+  .nav-links {
+    display: flex; gap: var(--s-lg); justify-self: center;
+  }
+  .nav-links a {
+    color: var(--ink); font-size: 14px; font-weight: 500; letter-spacing: -0.14px;
+    padding: 6px 10px; border-radius: var(--r-sm);
+  }
+  .nav-links a:hover { color: var(--ink-muted); }
+  .nav-cta-cluster { display: flex; gap: var(--s-xs); justify-self: end; align-items: center; }
+
+  /* === Hero === */
+  .hero {
+    padding: var(--s-section) 0 var(--s-section);
+    text-align: center; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(600px 400px at 20% 10%, rgba(122,43,255,0.18), transparent 60%),
+      radial-gradient(500px 350px at 85% 30%, rgba(255,90,61,0.10), transparent 60%);
+  }
+  .hero-inner { position: relative; max-width: 980px; margin: 0 auto; padding: 0 var(--s-xl); }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--surface-1); color: var(--ink-muted);
+    padding: 6px 14px; border-radius: var(--r-pill);
+    font-size: 13px; font-weight: 500; letter-spacing: -0.13px;
+    margin-bottom: var(--s-xl);
+  }
+  .hero-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-blue); }
+  .hero h1 { margin-bottom: var(--s-xl); }
+  .hero-sub {
+    color: var(--ink-muted); max-width: 600px; margin: 0 auto var(--s-xxl);
+  }
+  .hero-cta { display: flex; gap: var(--s-sm); justify-content: center; flex-wrap: wrap; }
+
+  /* === Section frame === */
+  section { padding: var(--s-section) 0; }
+  .section-head { margin-bottom: var(--s-xxl); max-width: 720px; }
+  .section-head .eyebrow {
+    color: var(--ink-muted); text-transform: none; margin-bottom: var(--s-md);
+  }
+  .section-head h2 { margin-bottom: var(--s-md); }
+
+  /* === Spotlight grid === */
+  .spotlight-grid {
+    display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--s-lg);
+  }
+  .card {
+    background: var(--surface-1); color: var(--ink);
+    border-radius: var(--r-xl); padding: var(--s-lg);
+  }
+  .card-mockup {
+    background: var(--surface-1); border-radius: var(--r-xl); padding: 16px;
+    box-shadow: var(--shadow-level2);
+  }
+  .browser-frame {
+    background: #0E0D0B; border-radius: var(--r-md); overflow: hidden;
+    border: 1px solid var(--hairline-soft);
+  }
+  .browser-bar {
+    display: flex; align-items: center; gap: 6px;
+    padding: 10px 12px; border-bottom: 1px solid var(--hairline-soft);
+  }
+  .browser-bar .dot { width: 10px; height: 10px; border-radius: 50%; background: #2A2825; }
+  .browser-body {
+    height: 220px;
+    background:
+      radial-gradient(circle at 30% 40%, rgba(122,43,255,0.25), transparent 60%),
+      linear-gradient(180deg, #0E0D0B, #161513);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink-muted); font-size: 13px;
+  }
+
+  .spot {
+    border-radius: var(--r-xxl); padding: var(--s-xl); color: var(--ink);
+    min-height: 260px; display: flex; flex-direction: column; justify-content: space-between;
+    position: relative; overflow: hidden;
+  }
+  .spot h3 { font-family: 'Inter'; font-size: 24px; font-weight: 400; line-height: 1.30; letter-spacing: -0.01px; max-width: 280px; }
+  .spot .spot-foot { display: flex; align-items: center; justify-content: space-between; }
+  .spot-violet  { background: var(--gradient-violet); }
+  .spot-magenta { background: var(--gradient-magenta); }
+  .spot-orange  { background: var(--gradient-orange); }
+  .spot-coral   { background: var(--gradient-coral); }
+
+  .col-6 { grid-column: span 6; }
+  .col-4 { grid-column: span 4; }
+  .col-8 { grid-column: span 8; }
+  .col-3 { grid-column: span 3; }
+  .col-12 { grid-column: span 12; }
+
+  /* === Buttons gallery === */
+  .btn-gallery {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-lg);
+    background: var(--surface-1); border-radius: var(--r-xl); padding: var(--s-xl);
+  }
+  .btn-cell { display: flex; flex-direction: column; gap: var(--s-sm); align-items: flex-start; }
+  .btn-cell-label { color: var(--ink-muted); font-size: 12px; letter-spacing: -0.12px; }
+
+  /* === Form === */
+  .form-card {
+    background: var(--surface-1); border-radius: var(--r-xl); padding: var(--s-xl);
+    max-width: 520px;
+  }
+  .form-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: var(--s-md); }
+  label { color: var(--ink-muted); font-size: 13px; font-weight: 500; letter-spacing: -0.13px; }
+  .text-input, select, textarea {
+    background: var(--canvas); color: var(--ink);
+    border: 1px solid var(--hairline);
+    padding: 10px 14px; border-radius: var(--r-md);
+    font-family: 'Inter', sans-serif; font-size: 15px; letter-spacing: -0.15px; line-height: 1.30;
+    outline: none;
+    transition: box-shadow .15s ease;
+  }
+  .text-input:focus, select:focus, textarea:focus {
+    box-shadow: var(--shadow-level3);
+    border-color: rgba(0,153,255,0.4);
+  }
+
+  /* === Stats === */
+  .stats-row {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s-lg);
+  }
+  .stat-tile {
+    background: var(--surface-1); border-radius: var(--r-xl); padding: var(--s-xl);
+  }
+  .stat-tile .num {
+    font-family: 'Mona Sans', sans-serif; font-size: 62px; font-weight: 500;
+    line-height: 1.00; letter-spacing: -3.1px; margin-bottom: var(--s-sm);
+  }
+  .stat-tile .label { color: var(--ink-muted); font-size: 14px; letter-spacing: -0.14px; }
+
+  /* === Table === */
+  .compare-table {
+    width: 100%; border-collapse: collapse;
+    background: var(--canvas);
+  }
+  .compare-table th, .compare-table td {
+    padding: 18px 16px; text-align: left;
+    border-bottom: 1px solid var(--hairline-soft);
+    font-size: 14px; font-weight: 500; letter-spacing: -0.14px; line-height: 1.40;
+  }
+  .compare-table thead th {
+    color: var(--ink); font-family: 'Inter'; font-size: 15px; font-weight: 700;
+  }
+  .compare-table tbody td { color: var(--ink-muted); }
+  .compare-table tbody td:first-child { color: var(--ink); }
+  .check { color: var(--semantic-success); font-weight: 600; }
+
+  /* === Type ramp === */
+  .ramp-table { width: 100%; }
+  .ramp-row {
+    display: grid; grid-template-columns: 220px 1fr;
+    align-items: baseline; gap: var(--s-lg);
+    padding: var(--s-lg) 0;
+    border-bottom: 1px solid var(--hairline-soft);
+  }
+  .ramp-meta { color: var(--ink-muted); font-size: 13px; font-weight: 500; letter-spacing: -0.13px; }
+  .ramp-meta code { color: var(--ink); }
+  .ramp-meta small { display: block; margin-top: 6px; opacity: 0.7; font-weight: 400; }
+
+  /* === Palette === */
+  .palette-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s-md);
+  }
+  .swatch {
+    background: var(--surface-1); border-radius: var(--r-lg); padding: var(--s-sm);
+  }
+  .swatch-chip {
+    height: 110px; border-radius: var(--r-md);
+    border: 1px solid var(--hairline-soft);
+    margin-bottom: var(--s-sm);
+  }
+  .swatch-name { color: var(--ink); font-size: 13px; font-weight: 500; letter-spacing: -0.13px; }
+  .swatch-hex { color: var(--ink-muted); font-size: 12px; letter-spacing: -0.12px; }
+
+  /* === Radii showcase === */
+  .radii-grid {
+    display: grid; grid-template-columns: repeat(8, 1fr); gap: var(--s-md);
+  }
+  .radius-cell { display: flex; flex-direction: column; align-items: center; gap: var(--s-xs); }
+  .radius-box {
+    width: 96px; height: 96px;
+    background: linear-gradient(135deg, var(--surface-2), var(--surface-1));
+    border: 1px solid var(--hairline);
+  }
+  .radius-name { color: var(--ink); font-size: 12px; letter-spacing: -0.12px; font-weight: 500; }
+  .radius-val  { color: var(--ink-muted); font-size: 11px; letter-spacing: -0.11px; }
+
+  /* === Spacing rhythm === */
+  .spacing-list { display: flex; flex-direction: column; gap: var(--s-sm); }
+  .spacing-row {
+    display: grid; grid-template-columns: 130px 60px 1fr; align-items: center; gap: var(--s-md);
+  }
+  .spacing-row .name { color: var(--ink); font-size: 13px; font-weight: 500; letter-spacing: -0.13px; }
+  .spacing-row .val { color: var(--ink-muted); font-size: 12px; letter-spacing: -0.12px; }
+  .spacing-bar { height: 14px; background: var(--surface-2); border-radius: var(--r-xs); }
+
+  /* === Pricing tabs === */
+  .pricing-tabs {
+    display: inline-flex; gap: 4px; padding: 4px; background: var(--surface-1);
+    border-radius: var(--r-pill);
+  }
+  .pricing-tab {
+    padding: 8px 18px; border-radius: var(--r-pill);
+    font-size: 14px; font-weight: 500; letter-spacing: -0.14px; cursor: pointer;
+    color: var(--ink-muted); background: transparent;
+  }
+  .pricing-tab.selected { background: var(--surface-2); color: var(--ink); }
+
+  /* === FAQ === */
+  .faq-row {
+    background: var(--canvas); color: var(--ink);
+    border-radius: var(--r-md); padding: 24px;
+    border-bottom: 1px solid var(--hairline-soft);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .faq-row .q { font-size: 15px; font-weight: 500; letter-spacing: -0.15px; }
+  .faq-row .icon { color: var(--ink-muted); font-size: 18px; }
+
+  /* === Footer === */
+  footer {
+    background: var(--canvas); padding: 64px 32px 40px;
+    border-top: 1px solid var(--hairline-soft);
+  }
+  .footer-inner { max-width: 1199px; margin: 0 auto; }
+  .footer-grid {
+    display: grid; grid-template-columns: 2fr repeat(5, 1fr); gap: var(--s-xl);
+    margin-bottom: var(--s-xxl);
+  }
+  .footer-col h4 {
+    color: var(--ink); font-size: 13px; font-weight: 500; letter-spacing: -0.13px;
+    margin-bottom: var(--s-md);
+  }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .footer-col li a {
+    color: var(--ink-muted); font-size: 13px; font-weight: 500; letter-spacing: -0.13px;
+    text-decoration: none;
+  }
+  .footer-col li a:hover { color: var(--ink); }
+  .footer-bottom {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: var(--s-lg); border-top: 1px solid var(--hairline-soft);
+    color: var(--ink-muted); font-size: 12px; letter-spacing: -0.12px;
+  }
+
+  /* responsive */
+  @media (max-width: 1000px) {
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .btn-gallery { grid-template-columns: repeat(2, 1fr); }
+    .palette-grid { grid-template-columns: repeat(2, 1fr); }
+    .radii-grid { grid-template-columns: repeat(4, 1fr); }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .spotlight-grid > * { grid-column: span 12 !important; }
+  }
+  @media (max-width: 600px) {
+    .t-display-xxl { font-size: 56px; letter-spacing: -2.8px; }
+    .t-display-xl  { font-size: 44px; letter-spacing: -2.2px; }
+    .t-display-lg  { font-size: 36px; letter-spacing: -1.8px; }
+    .nav-links { display: none; }
+    .top-nav-inner { grid-template-columns: 1fr auto; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="top-nav-inner">
+    <div class="logo">
+      <span class="logo-mark"></span>
+      <span>Framer</span>
+    </div>
+    <div class="nav-links">
+      <a href="#">Product</a>
+      <a href="#">AI</a>
+      <a href="#">Templates</a>
+      <a href="#">Marketplace</a>
+      <a href="#">Pricing</a>
+      <a href="#">Learn</a>
+    </div>
+    <div class="nav-cta-cluster">
+      <button class="btn btn-secondary">Sign in</button>
+      <button class="btn btn-primary">Get started for free</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow"><span class="dot"></span> Now in public beta — Framer AI 2.0</div>
+    <h1 class="t-display-xxl">The internet<br>is your canvas.</h1>
+    <p class="t-body-lg hero-sub">Framer is where teams design and publish stunning sites. From your first idea to your final launch — no developer required.</p>
+    <div class="hero-cta">
+      <button class="btn btn-primary btn-lg">Start for free</button>
+      <button class="btn btn-secondary btn-lg">Watch the film</button>
+    </div>
+  </div>
+</header>
+
+<!-- SPOTLIGHT + MOCKUP GRID -->
+<section class="container">
+  <div class="section-head">
+    <div class="t-caption eyebrow">SHOWCASE</div>
+    <h2 class="t-display-lg">Built with Framer.</h2>
+    <p class="t-body-lg" style="color: var(--ink-muted);">A dark canvas with a single living poster. Atmosphere cards drop into otherwise monochrome grids.</p>
+  </div>
+
+  <div class="spotlight-grid">
+    <div class="col-8">
+      <div class="card-mockup">
+        <div class="browser-frame">
+          <div class="browser-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+          <div class="browser-body">framer.com/preview</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-4">
+      <div class="spot spot-violet">
+        <div class="t-caption" style="opacity: 0.8;">SPOTLIGHT · VIOLET</div>
+        <h3>Designed in Framer. Published in seconds.</h3>
+        <div class="spot-foot">
+          <span class="t-body-sm" style="opacity: 0.85;">Explore the gallery</span>
+          <button class="btn-icon-circular" aria-label="Go">→</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-4">
+      <div class="spot spot-magenta">
+        <div class="t-caption" style="opacity: 0.85;">SPOTLIGHT · MAGENTA</div>
+        <h3>Ship the brand you imagined.</h3>
+        <div class="spot-foot">
+          <span class="t-body-sm" style="opacity: 0.85;">View case studies</span>
+          <button class="btn-icon-circular" aria-label="Go">→</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-4">
+      <div class="spot spot-orange">
+        <div class="t-caption" style="opacity: 0.85;">SPOTLIGHT · ORANGE</div>
+        <h3>A sunset wash for the page that opens your launch.</h3>
+        <div class="spot-foot">
+          <span class="t-body-sm" style="opacity: 0.85;">See templates</span>
+          <button class="btn-icon-circular" aria-label="Go">→</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-4">
+      <div class="spot spot-coral">
+        <div class="t-caption" style="opacity: 0.85;">SPOTLIGHT · CORAL</div>
+        <h3>Soft, warm, deliberate — one atmosphere at a time.</h3>
+        <div class="spot-foot">
+          <span class="t-body-sm" style="opacity: 0.85;">Read the manifesto</span>
+          <button class="btn-icon-circular" aria-label="Go">→</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BUTTONS GALLERY -->
+<section class="container">
+  <div class="section-head">
+    <div class="t-caption eyebrow" style="color: var(--ink-muted);">COMPONENTS · BUTTONS</div>
+    <h2 class="t-display-md">A pill is the only shape.</h2>
+  </div>
+
+  <div class="btn-gallery">
+    <div class="btn-cell"><span class="btn-cell-label">Primary · sm</span><button class="btn btn-primary btn-sm">Get started</button></div>
+    <div class="btn-cell"><span class="btn-cell-label">Secondary · sm</span><button class="btn btn-secondary btn-sm">Sign in</button></div>
+    <div class="btn-cell"><span class="btn-cell-label">Ghost · sm</span><button class="btn btn-ghost btn-sm">Learn more</button></div>
+
+    <div class="btn-cell"><span class="btn-cell-label">Primary · md</span><button class="btn btn-primary btn-md">Get started for free</button></div>
+    <div class="btn-cell"><span class="btn-cell-label">Secondary · md</span><button class="btn btn-secondary btn-md">Talk to sales</button></div>
+    <div class="btn-cell"><span class="btn-cell-label">Ghost · md</span><button class="btn btn-ghost btn-md">Read the docs</button></div>
+
+    <div class="btn-cell"><span class="btn-cell-label">Primary · lg</span><button class="btn btn-primary btn-lg">Start building</button></div>
+    <div class="btn-cell"><span class="btn-cell-label">Secondary · lg</span><button class="btn btn-secondary btn-lg">Watch the film</button></div>
+    <div class="btn-cell"><span class="btn-cell-label">Translucent</span><button class="btn btn-translucent">Floating action</button></div>
+  </div>
+</section>
+
+<!-- FORM + STATS -->
+<section class="container">
+  <div class="spotlight-grid">
+    <div class="col-6">
+      <div class="section-head">
+        <div class="t-caption eyebrow" style="color: var(--ink-muted);">FORMS</div>
+        <h2 class="t-display-md">Tell us about you.</h2>
+      </div>
+      <form class="form-card" onsubmit="event.preventDefault()">
+        <div class="form-row">
+          <label for="name">Full name</label>
+          <input class="text-input" id="name" type="text" placeholder="Ada Lovelace">
+        </div>
+        <div class="form-row">
+          <label for="email">Work email</label>
+          <input class="text-input" id="email" type="email" placeholder="ada@studio.com">
+        </div>
+        <div class="form-row">
+          <label for="seats">Seats</label>
+          <select class="text-input" id="seats">
+            <option>1 seat</option>
+            <option>5 seats</option>
+            <option>25 seats</option>
+            <option>Custom</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="notes">Project brief</label>
+          <textarea class="text-input" id="notes" rows="3" placeholder="A few lines about what you're building…"></textarea>
+        </div>
+        <button class="btn btn-primary btn-md" type="submit">Request access</button>
+      </form>
+    </div>
+
+    <div class="col-6">
+      <div class="section-head">
+        <div class="t-caption eyebrow" style="color: var(--ink-muted);">METRICS</div>
+        <h2 class="t-display-md">In numbers.</h2>
+      </div>
+      <div class="stats-row" style="grid-template-columns: repeat(2, 1fr);">
+        <div class="stat-tile">
+          <div class="num">2.4M</div>
+          <div class="label">Sites published</div>
+        </div>
+        <div class="stat-tile">
+          <div class="num">99.99</div>
+          <div class="label">Uptime, in percent</div>
+        </div>
+        <div class="stat-tile">
+          <div class="num">180+</div>
+          <div class="label">Countries shipping</div>
+        </div>
+        <div class="stat-tile">
+          <div class="num">0</div>
+          <div class="label">Lines of code required</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEMPLATE CARDS -->
+<section class="container">
+  <div class="section-head">
+    <div class="t-caption eyebrow" style="color: var(--ink-muted);">TEMPLATES</div>
+    <h2 class="t-display-md">A library to start from.</h2>
+  </div>
+  <div class="spotlight-grid">
+    <div class="col-4">
+      <div class="card" style="border-radius: var(--r-lg); padding: var(--s-sm);">
+        <div style="height: 180px; background: var(--gradient-violet); border-radius: var(--r-md); margin-bottom: var(--s-sm);"></div>
+        <div class="t-body-sm" style="margin-bottom: 4px;">Nudge — Editorial</div>
+        <div class="t-micro" style="color: var(--ink-muted);">Editorial · Long-form</div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="card" style="border-radius: var(--r-lg); padding: var(--s-sm);">
+        <div style="height: 180px; background: var(--gradient-orange); border-radius: var(--r-md); margin-bottom: var(--s-sm);"></div>
+        <div class="t-body-sm" style="margin-bottom: 4px;">Tonik — Agency</div>
+        <div class="t-micro" style="color: var(--ink-muted);">Agency · Portfolio</div>
+      </div>
+    </div>
+    <div class="col-4">
+      <div class="card" style="border-radius: var(--r-lg); padding: var(--s-sm);">
+        <div style="height: 180px; background: var(--gradient-coral); border-radius: var(--r-md); margin-bottom: var(--s-sm);"></div>
+        <div class="t-body-sm" style="margin-bottom: 4px;">Speedrun — SaaS</div>
+        <div class="t-micro" style="color: var(--ink-muted);">SaaS · Product</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING TABS + TABLE -->
+<section class="container">
+  <div class="section-head">
+    <div class="t-caption eyebrow" style="color: var(--ink-muted);">PRICING · COMPARE</div>
+    <h2 class="t-display-md">Plans for every studio.</h2>
+    <div style="margin-top: var(--s-lg);">
+      <div class="pricing-tabs">
+        <button class="pricing-tab">Basic</button>
+        <button class="pricing-tab selected">Pro</button>
+        <button class="pricing-tab">Business</button>
+        <button class="pricing-tab">Enterprise</button>
+      </div>
+    </div>
+  </div>
+
+  <div style="background: var(--canvas); border: 1px solid var(--hairline-soft); border-radius: var(--r-xl); overflow: hidden;">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Basic</th>
+          <th>Pro</th>
+          <th>Business</th>
+          <th>Enterprise</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Custom domain</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+        <tr><td>CMS collections</td><td>1</td><td>10</td><td>100</td><td>Unlimited</td></tr>
+        <tr><td>AI assist credits / mo</td><td>50</td><td>500</td><td>5,000</td><td>Custom</td></tr>
+        <tr><td>Team seats included</td><td>1</td><td>3</td><td>10</td><td>Custom</td></tr>
+        <tr><td>Password protection</td><td>—</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+        <tr><td>SSO &amp; SAML</td><td>—</td><td>—</td><td class="check">✓</td><td class="check">✓</td></tr>
+        <tr><td>SLA &amp; dedicated CSM</td><td>—</td><td>—</td><td>—</td><td class="check">✓</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- TYPE RAMP -->
+<section class="container">
+  <div class="section-head">
+    <div class="t-caption eyebrow" style="color: var(--ink-muted);">TYPOGRAPHY</div>
+    <h2 class="t-display-md">The type ramp.</h2>
+  </div>
+
+  <div class="ramp-table">
+    <div class="ramp-row">
+      <div class="ramp-meta"><code>display-xxl</code><small>110 / 0.85 / -5.5px · Mona Sans 500</small></div>
+      <div class="t-display-xxl">Canvas</div>
+    </div>
+    <div class="ramp-row">
+      <div class="ramp-meta"><code>display-xl</code><small>85 / 0.95 / -4.25px · Mona Sans 500</small></div>
+      <div class="t-display-xl">Section opener</div>
+    </div>
+    <div class="ramp-row">
+      <div class="ramp-meta"><code>display-lg</code><small>62 / 1.00 / -3.1px · Mona Sans 500</small></div>
+      <div class="t-display-lg">Sub-section opener</div>
+    </div>
+    <div class="ramp-row">
+      <div class="ramp-meta"><code>display-md</code><small>32 / 1.13 / -1.0px · Mona Sans 500</small></div>
+      <div class="t-display-md">Card title display</div>
+    </div>
+    <div class="ramp-row">
+      <div class="ramp-meta"><code>headline</code><small>22 / 1.20 / -0.8px · Inter 700</small></div>
+      <div class="t-headline">Pricing tier headline.</div>
+    </div>
+    <div class="ramp-row">
+      <div class="ramp-meta"><code>subhead</code><small>24 / 1.30 / -0.01px · Inter 400</small></div>
+      <div class="t-subhead">A lead body line next to display.</div>
+    </div>
+    <div class="ramp-row">
+      <div class="ramp-meta"><code>body-lg</code><small>18 / 1.30 / -0.18px · Inter 400</small></div>
+      <div class="t-body-lg">Hero subhead. Lead paragraphs. The voice when we have room.</div>
+    </div>
+    <div class="ramp-row">
+      <div class="ramp-meta"><code>body</code><small>15 / 1.30 / -0.15px · Inter 400</small></div>
+      <div class="t-body">Default body. Card descriptions. The everyday workhorse with cv01/05/09/11 and ss03/ss07 ligatures lit up.</div>
+    </div>
+    <div class="ramp-row">
+      <div class="ramp-meta"><code>body-sm</code><small>14 / 1.40 / -0.14px · Inter 500</small></div>
+      <div class="t-body-sm">Pricing comparison rows. Dense data lives at this tier.</div>
+    </div>
+    <div class="ramp-row">
+      <div class="ramp-meta"><code>caption</code><small>13 / 1.20 / -0.13px · Inter 500</small></div>
+      <div class="t-caption">EYEBROW · FOOTER COLUMN · META</div>
+    </div>
+    <div class="ramp-row">
+      <div class="ramp-meta"><code>micro</code><small>12 / 1.20 / -0.12px · Inter 400</small></div>
+      <div class="t-micro">Disclaimer. Footnote. The smallest legible line in the system.</div>
+    </div>
+    <div class="ramp-row">
+      <div class="ramp-meta"><code>button</code><small>14 / 1.0 / -0.14px · Inter 500</small></div>
+      <div class="t-button" style="display:inline-block;">Pill button label</div>
+    </div>
+  </div>
+</section>
+
+<!-- PALETTE -->
+<section class="container">
+  <div class="section-head">
+    <div class="t-caption eyebrow" style="color: var(--ink-muted);">PALETTE</div>
+    <h2 class="t-display-md">Two anchors, one accent, four atmospheres.</h2>
+  </div>
+
+  <div class="palette-grid">
+    <div class="swatch"><div class="swatch-chip" style="background:#FFFFFF;"></div><div class="swatch-name">primary / inverse-canvas</div><div class="swatch-hex">#FFFFFF</div></div>
+    <div class="swatch"><div class="swatch-chip" style="background:#0099FF;"></div><div class="swatch-name">accent-blue</div><div class="swatch-hex">#0099FF</div></div>
+    <div class="swatch"><div class="swatch-chip" style="background:#0A0908;"></div><div class="swatch-name">canvas</div><div class="swatch-hex">#0A0908</div></div>
+    <div class="swatch"><div class="swatch-chip" style="background:#161513;"></div><div class="swatch-name">surface-1</div><div class="swatch-hex">#161513</div></div>
+    <div class="swatch"><div class="swatch-chip" style="background:#242220;"></div><div class="swatch-name">surface-2</div><div class="swatch-hex">#242220</div></div>
+    <div class="swatch"><div class="swatch-chip" style="background:rgba(255,255,255,0.12);"></div><div class="swatch-name">hairline</div><div class="swatch-hex">rgba(255,255,255,.12)</div></div>
+    <div class="swatch"><div class="swatch-chip" style="background:rgba(255,255,255,0.06);"></div><div class="swatch-name">hairline-soft</div><div class="swatch-hex">rgba(255,255,255,.06)</div></div>
+    <div class="swatch"><div class="swatch-chip" style="background:#FFFFFF;"></div><div class="swatch-name">ink</div><div class="swatch-hex">#FFFFFF</div></div>
+    <div class="swatch"><div class="swatch-chip" style="background:#999999;"></div><div class="swatch-name">ink-muted</div><div class="swatch-hex">#999999</div></div>
+    <div class="swatch"><div class="swatch-chip" style="background:#2DCC70;"></div><div class="swatch-name">semantic-success</div><div class="swatch-hex">#2DCC70</div></div>
+    <div class="swatch"><div class="swatch-chip" style="background: var(--gradient-magenta);"></div><div class="swatch-name">gradient-magenta</div><div class="swatch-hex">#FF2E93 → #6D1149</div></div>
+    <div class="swatch"><div class="swatch-chip" style="background: var(--gradient-violet);"></div><div class="swatch-name">gradient-violet</div><div class="swatch-hex">#7A2BFF → #2A0975</div></div>
+    <div class="swatch"><div class="swatch-chip" style="background: var(--gradient-orange);"></div><div class="swatch-name">gradient-orange</div><div class="swatch-hex">#FF8A3D → #C9356E</div></div>
+    <div class="swatch"><div class="swatch-chip" style="background: var(--gradient-coral);"></div><div class="swatch-name">gradient-coral</div><div class="swatch-hex">#FF8A9E → #B82E58</div></div>
+  </div>
+</section>
+
+<!-- RADII -->
+<section class="container">
+  <div class="section-head">
+    <div class="t-caption eyebrow" style="color: var(--ink-muted);">RADII</div>
+    <h2 class="t-display-md">Corners at true scale.</h2>
+  </div>
+
+  <div class="radii-grid">
+    <div class="radius-cell"><div class="radius-box" style="border-radius:4px;"></div><div class="radius-name">rounded.xs</div><div class="radius-val">4px</div></div>
+    <div class="radius-cell"><div class="radius-box" style="border-radius:6px;"></div><div class="radius-name">rounded.sm</div><div class="radius-val">6px</div></div>
+    <div class="radius-cell"><div class="radius-box" style="border-radius:10px;"></div><div class="radius-name">rounded.md</div><div class="radius-val">10px</div></div>
+    <div class="radius-cell"><div class="radius-box" style="border-radius:15px;"></div><div class="radius-name">rounded.lg</div><div class="radius-val">15px</div></div>
+    <div class="radius-cell"><div class="radius-box" style="border-radius:20px;"></div><div class="radius-name">rounded.xl</div><div class="radius-val">20px</div></div>
+    <div class="radius-cell"><div class="radius-box" style="border-radius:30px;"></div><div class="radius-name">rounded.xxl</div><div class="radius-val">30px</div></div>
+    <div class="radius-cell"><div class="radius-box" style="border-radius:100px;"></div><div class="radius-name">rounded.pill</div><div class="radius-val">100px</div></div>
+    <div class="radius-cell"><div class="radius-box" style="border-radius:9999px;"></div><div class="radius-name">rounded.full</div><div class="radius-val">9999px</div></div>
+  </div>
+</section>
+
+<!-- SPACING -->
+<section class="container">
+  <div class="section-head">
+    <div class="t-caption eyebrow" style="color: var(--ink-muted);">SPACING</div>
+    <h2 class="t-display-md">Base unit is 5.</h2>
+    <p class="t-body" style="color: var(--ink-muted); margin-top: var(--s-md);">Framer uses 5/10/15/20/30 increments rather than the more common 4/8/16/24 ramp.</p>
+  </div>
+
+  <div class="spacing-list">
+    <div class="spacing-row"><div class="name">spacing.hair</div><div class="val">1px</div><div class="spacing-bar" style="width: 1px;"></div></div>
+    <div class="spacing-row"><div class="name">spacing.xxs</div><div class="val">4px</div><div class="spacing-bar" style="width: 4px;"></div></div>
+    <div class="spacing-row"><div class="name">spacing.xs</div><div class="val">8px</div><div class="spacing-bar" style="width: 8px;"></div></div>
+    <div class="spacing-row"><div class="name">spacing.sm</div><div class="val">12px</div><div class="spacing-bar" style="width: 12px;"></div></div>
+    <div class="spacing-row"><div class="name">spacing.md</div><div class="val">15px</div><div class="spacing-bar" style="width: 15px;"></div></div>
+    <div class="spacing-row"><div class="name">spacing.lg</div><div class="val">20px</div><div class="spacing-bar" style="width: 20px;"></div></div>
+    <div class="spacing-row"><div class="name">spacing.xl</div><div class="val">30px</div><div class="spacing-bar" style="width: 30px;"></div></div>
+    <div class="spacing-row"><div class="name">spacing.xxl</div><div class="val">40px</div><div class="spacing-bar" style="width: 40px;"></div></div>
+    <div class="spacing-row"><div class="name">spacing.section</div><div class="val">96px</div><div class="spacing-bar" style="width: 96px;"></div></div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="container">
+  <div class="section-head">
+    <div class="t-caption eyebrow" style="color: var(--ink-muted);">FAQ</div>
+    <h2 class="t-display-md">Frequently asked.</h2>
+  </div>
+  <div>
+    <div class="faq-row"><span class="q">What's the difference between Basic and Pro?</span><span class="icon">+</span></div>
+    <div class="faq-row"><span class="q">Can I use my own domain?</span><span class="icon">+</span></div>
+    <div class="faq-row"><span class="q">Does Framer support CMS collections?</span><span class="icon">+</span></div>
+    <div class="faq-row"><span class="q">How does AI assist count credits?</span><span class="icon">+</span></div>
+    <div class="faq-row"><span class="q">Do you offer non-profit or education pricing?</span><span class="icon">+</span></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="logo" style="margin-bottom: var(--s-md);">
+          <span class="logo-mark"></span><span>Framer</span>
+        </div>
+        <p class="t-caption" style="color: var(--ink-muted); max-width: 280px;">The internet is your canvas. Design and ship a beautiful website without writing code.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#">Features</a></li>
+          <li><a href="#">AI</a></li>
+          <li><a href="#">Templates</a></li>
+          <li><a href="#">Marketplace</a></li>
+          <li><a href="#">Pricing</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="#">Docs</a></li>
+          <li><a href="#">Help center</a></li>
+          <li><a href="#">Releases</a></li>
+          <li><a href="#">Status</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Press</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Community</h4>
+        <ul>
+          <li><a href="#">Twitter</a></li>
+          <li><a href="#">YouTube</a></li>
+          <li><a href="#">Discord</a></li>
+          <li><a href="#">Newsletter</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Terms</a></li>
+          <li><a href="#">Security</a></li>
+          <li><a href="#">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Framer B.V. — Amsterdam, Netherlands</span>
+      <span>Made on Framer</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude — Anthropic Marketing Design System</title>
+<!-- Copernicus and StyreneB are commercial faces; using Cormorant Garamond and Inter as nearest Google Fonts equivalents. JetBrains Mono for code. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Colors */
+    --c-primary: #cc785c;
+    --c-primary-active: #a9583e;
+    --c-primary-disabled: #e6dfd8;
+    --c-accent-teal: #5db8a6;
+    --c-accent-amber: #e8a55a;
+    --c-canvas: #faf9f5;
+    --c-surface-soft: #f5f0e8;
+    --c-surface-card: #efe9de;
+    --c-surface-cream-strong: #e8e0d2;
+    --c-surface: #efe9de;
+    --c-surface-dark: #181715;
+    --c-surface-dark-elevated: #252320;
+    --c-surface-dark-soft: #1f1e1b;
+    --c-hairline: #e6dfd8;
+    --c-hairline-soft: #ebe6df;
+    --c-ink: #141413;
+    --c-body-strong: #252523;
+    --c-body: #3d3d3a;
+    --c-muted: #6c6a64;
+    --c-muted-soft: #8e8b82;
+    --c-on-primary: #ffffff;
+    --c-on-surface: #141413;
+    --c-on-dark: #faf9f5;
+    --c-on-dark-soft: #a09d96;
+    --c-success: #5db872;
+    --c-warning: #d4a017;
+    --c-error: #c64545;
+
+    /* Radii */
+    --r-xs: 4px;
+    --r-sm: 6px;
+    --r-md: 8px;
+    --r-lg: 12px;
+    --r-xl: 16px;
+    --r-pill: 9999px;
+    --r-full: 9999px;
+
+    /* Spacing */
+    --s-xxs: 4px;
+    --s-xs: 8px;
+    --s-sm: 12px;
+    --s-md: 16px;
+    --s-lg: 24px;
+    --s-xl: 32px;
+    --s-xxl: 48px;
+    --s-section: 96px;
+
+    /* Fonts */
+    --f-display: "Cormorant Garamond", Copernicus, "Tiempos Headline", "EB Garamond", Georgia, serif;
+    --f-ui: Inter, StyreneB, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --f-code: "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--c-canvas);
+    color: var(--c-body);
+    font-family: var(--f-ui);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-left: var(--s-lg);
+    padding-right: var(--s-lg);
+  }
+
+  /* Typography tokens */
+  .t-display-xl { font-family: var(--f-display); font-size: 64px; font-weight: 400; line-height: 1.05; letter-spacing: -1.5px; color: var(--c-ink); }
+  .t-display-lg { font-family: var(--f-display); font-size: 48px; font-weight: 400; line-height: 1.1; letter-spacing: -1px; color: var(--c-ink); }
+  .t-display-md { font-family: var(--f-display); font-size: 36px; font-weight: 400; line-height: 1.15; letter-spacing: -0.5px; color: var(--c-ink); }
+  .t-display-sm { font-family: var(--f-display); font-size: 28px; font-weight: 400; line-height: 1.2; letter-spacing: -0.3px; color: var(--c-ink); }
+  .t-title-lg { font-family: var(--f-ui); font-size: 22px; font-weight: 500; line-height: 1.3; color: var(--c-ink); }
+  .t-title-md { font-family: var(--f-ui); font-size: 18px; font-weight: 500; line-height: 1.4; color: var(--c-ink); }
+  .t-title-sm { font-family: var(--f-ui); font-size: 16px; font-weight: 500; line-height: 1.4; color: var(--c-ink); }
+  .t-body-md { font-family: var(--f-ui); font-size: 16px; font-weight: 400; line-height: 1.55; color: var(--c-body); }
+  .t-body-sm { font-family: var(--f-ui); font-size: 14px; font-weight: 400; line-height: 1.55; color: var(--c-body); }
+  .t-caption { font-family: var(--f-ui); font-size: 13px; font-weight: 500; line-height: 1.4; color: var(--c-muted); }
+  .t-label-caps { font-family: var(--f-ui); font-size: 12px; font-weight: 500; line-height: 1.4; letter-spacing: 1.5px; text-transform: uppercase; color: var(--c-muted); }
+  .t-code { font-family: var(--f-code); font-size: 14px; font-weight: 400; line-height: 1.6; }
+
+  /* Nav */
+  .nav {
+    background: var(--c-canvas);
+    height: 64px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--c-hairline-soft);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--s-lg);
+    gap: var(--s-xl);
+  }
+  .wordmark {
+    display: flex;
+    align-items: center;
+    gap: var(--s-xs);
+    font-family: var(--f-ui);
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--c-ink);
+    letter-spacing: -0.2px;
+  }
+  .spike {
+    width: 20px;
+    height: 20px;
+    color: var(--c-primary);
+  }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: var(--s-lg);
+    margin-left: var(--s-xl);
+    flex: 1;
+  }
+  .nav-link {
+    font-family: var(--f-ui);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--c-body-strong);
+    text-decoration: none;
+  }
+  .nav-link:hover { color: var(--c-ink); }
+  .nav-cta {
+    display: flex;
+    align-items: center;
+    gap: var(--s-md);
+  }
+  .nav-text-link {
+    font-family: var(--f-ui);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--c-ink);
+    text-decoration: none;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--f-ui);
+    font-weight: 500;
+    line-height: 1;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 120ms ease;
+    white-space: nowrap;
+  }
+  .btn-md { font-size: 14px; height: 40px; padding: 12px 20px; border-radius: var(--r-md); }
+  .btn-sm { font-size: 13px; height: 32px; padding: 8px 14px; border-radius: var(--r-md); }
+  .btn-lg { font-size: 15px; height: 48px; padding: 14px 24px; border-radius: var(--r-md); }
+  .btn-primary { background: var(--c-primary); color: var(--c-on-primary); }
+  .btn-primary:hover { background: var(--c-primary-active); }
+  .btn-secondary { background: var(--c-canvas); color: var(--c-ink); border: 1px solid var(--c-hairline); }
+  .btn-secondary:hover { background: var(--c-surface-soft); }
+  .btn-ghost { background: transparent; color: var(--c-ink); }
+  .btn-ghost:hover { background: var(--c-surface-soft); }
+  .btn-on-dark { background: var(--c-surface-dark-elevated); color: var(--c-on-dark); }
+  .btn-icon-circular {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--r-full);
+    background: var(--c-canvas);
+    color: var(--c-ink);
+    border: 1px solid var(--c-hairline);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  /* Hero */
+  .hero {
+    padding: var(--s-section) 0;
+    background: var(--c-canvas);
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s-xxl);
+    align-items: center;
+  }
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-xs);
+    margin-bottom: var(--s-lg);
+  }
+  .hero h1 { margin-bottom: var(--s-lg); }
+  .hero-sub { font-size: 18px; line-height: 1.55; color: var(--c-body); max-width: 520px; margin-bottom: var(--s-xl); }
+  .hero-cta { display: flex; gap: var(--s-md); align-items: center; }
+  .hero-illustration {
+    background: var(--c-surface-card);
+    border-radius: var(--r-xl);
+    aspect-ratio: 1 / 1;
+    padding: var(--s-xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-illustration svg { width: 100%; height: auto; max-width: 380px; }
+
+  /* Sections */
+  section { padding: var(--s-section) 0; }
+  .band-soft { background: var(--c-surface-soft); }
+  .band-canvas { background: var(--c-canvas); }
+  .band-dark { background: var(--c-surface-dark); color: var(--c-on-dark); }
+  .band-cream-strong { background: var(--c-surface-cream-strong); }
+
+  .section-eyebrow {
+    margin-bottom: var(--s-md);
+    color: var(--c-primary);
+  }
+  .section-head { margin-bottom: var(--s-xxl); max-width: 720px; }
+  .section-head p { margin-top: var(--s-md); font-size: 18px; color: var(--c-body); }
+
+  /* Buttons gallery */
+  .btn-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-lg);
+    background: var(--c-canvas);
+    padding: var(--s-xl);
+    border-radius: var(--r-lg);
+    border: 1px solid var(--c-hairline);
+  }
+  .btn-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--s-sm);
+  }
+  .btn-cell .t-label-caps { color: var(--c-muted-soft); }
+
+  /* Form */
+  .form-card {
+    background: var(--c-surface-card);
+    border-radius: var(--r-lg);
+    padding: var(--s-xxl);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s-lg);
+  }
+  .form-card .full { grid-column: 1 / -1; }
+  .form-field { display: flex; flex-direction: column; gap: var(--s-xs); }
+  .form-field label { font-size: 13px; font-weight: 500; color: var(--c-body-strong); }
+  .input, .textarea, .select {
+    background: var(--c-canvas);
+    color: var(--c-ink);
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-md);
+    padding: 10px 14px;
+    height: 40px;
+    font-family: var(--f-ui);
+    font-size: 14px;
+    width: 100%;
+    outline: none;
+    transition: border-color 120ms ease, box-shadow 120ms ease;
+  }
+  .textarea { height: auto; min-height: 96px; padding: 12px 14px; resize: vertical; }
+  .input:focus, .textarea:focus, .select:focus {
+    border-color: var(--c-primary);
+    box-shadow: 0 0 0 3px rgba(204, 120, 92, 0.15);
+  }
+
+  /* Content cards */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-lg);
+  }
+  .feature-card {
+    background: var(--c-surface-card);
+    border-radius: var(--r-lg);
+    padding: var(--s-xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-md);
+  }
+  .feature-card .icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--r-md);
+    background: var(--c-canvas);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--c-primary);
+    margin-bottom: var(--s-xs);
+  }
+  .feature-card p { color: var(--c-body); }
+
+  /* Product mockup card (dark) */
+  .product-mockup {
+    background: var(--c-surface-dark);
+    color: var(--c-on-dark);
+    border-radius: var(--r-lg);
+    padding: var(--s-lg);
+    margin-top: var(--s-xxl);
+  }
+  .code-window-header {
+    display: flex;
+    align-items: center;
+    gap: var(--s-xs);
+    padding-bottom: var(--s-md);
+    border-bottom: 1px solid var(--c-surface-dark-elevated);
+    margin-bottom: var(--s-md);
+  }
+  .dot { width: 10px; height: 10px; border-radius: var(--r-full); }
+  .dot-r { background: #ff5f56; }
+  .dot-y { background: #ffbd2e; }
+  .dot-g { background: #27c93f; }
+  .code-tab {
+    margin-left: var(--s-md);
+    font-family: var(--f-ui);
+    font-size: 13px;
+    color: var(--c-on-dark-soft);
+  }
+  .code-body {
+    background: var(--c-surface-dark-soft);
+    border-radius: var(--r-md);
+    padding: var(--s-lg);
+    font-family: var(--f-code);
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--c-on-dark);
+    overflow-x: auto;
+  }
+  .code-body .ln { color: var(--c-on-dark-soft); user-select: none; display: inline-block; width: 28px; }
+  .code-body .kw { color: #e8a55a; }
+  .code-body .st { color: #5db8a6; }
+  .code-body .fn { color: #cc785c; }
+  .code-body .cm { color: var(--c-on-dark-soft); font-style: italic; }
+
+  /* Stats */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s-lg);
+  }
+  .stat-tile {
+    background: var(--c-canvas);
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-lg);
+    padding: var(--s-xl);
+  }
+  .stat-tile .num {
+    font-family: var(--f-display);
+    font-size: 48px;
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    color: var(--c-ink);
+    margin-bottom: var(--s-xs);
+  }
+  .stat-tile .lbl {
+    font-size: 14px;
+    color: var(--c-muted);
+  }
+
+  /* Table */
+  .table-wrap {
+    background: var(--c-canvas);
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--f-ui);
+    font-size: 14px;
+  }
+  thead th {
+    background: var(--c-surface-soft);
+    text-align: left;
+    padding: var(--s-md) var(--s-lg);
+    font-weight: 500;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--c-muted);
+    border-bottom: 1px solid var(--c-hairline);
+  }
+  tbody td {
+    padding: var(--s-md) var(--s-lg);
+    color: var(--c-body);
+    border-bottom: 1px solid var(--c-hairline-soft);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody td.model-name { color: var(--c-ink); font-weight: 500; }
+
+  /* Badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    border-radius: var(--r-pill);
+    padding: 4px 12px;
+    font-family: var(--f-ui);
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .badge-pill { background: var(--c-surface-card); color: var(--c-ink); }
+  .badge-coral { background: var(--c-primary); color: var(--c-on-primary); letter-spacing: 1.5px; text-transform: uppercase; font-size: 11px; }
+  .badge-teal { background: rgba(93, 184, 166, 0.18); color: #2f7a6a; }
+  .badge-amber { background: rgba(232, 165, 90, 0.18); color: #8a5a1f; }
+
+  /* Pricing */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-lg);
+  }
+  .pricing-tier {
+    background: var(--c-canvas);
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-lg);
+    padding: var(--s-xl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-md);
+  }
+  .pricing-tier.featured {
+    background: var(--c-surface-dark);
+    color: var(--c-on-dark);
+    border-color: var(--c-surface-dark);
+  }
+  .pricing-tier.featured .t-display-sm,
+  .pricing-tier.featured .price-num { color: var(--c-on-dark); }
+  .pricing-tier.featured .price-sub,
+  .pricing-tier.featured li { color: var(--c-on-dark-soft); }
+  .price-num { font-family: var(--f-display); font-size: 48px; font-weight: 400; line-height: 1.1; letter-spacing: -1px; color: var(--c-ink); }
+  .price-sub { color: var(--c-muted); font-size: 14px; }
+  .pricing-tier ul { list-style: none; display: flex; flex-direction: column; gap: var(--s-xs); margin: var(--s-md) 0; }
+  .pricing-tier li { display: flex; gap: var(--s-xs); align-items: center; color: var(--c-body); font-size: 14px; }
+  .pricing-tier li::before { content: "✓"; color: var(--c-primary); font-weight: 500; }
+  .pricing-tier.featured li::before { color: var(--c-accent-amber); }
+
+  /* Callout coral */
+  .callout-coral {
+    background: var(--c-primary);
+    color: var(--c-on-primary);
+    border-radius: var(--r-lg);
+    padding: var(--s-xxl);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-md);
+  }
+  .callout-coral .t-display-sm { color: var(--c-on-primary); }
+  .callout-coral .cta-row { margin-top: var(--s-md); display: flex; gap: var(--s-md); }
+  .callout-coral .btn-secondary { background: rgba(255,255,255,0.12); color: var(--c-on-primary); border-color: rgba(255,255,255,0.25); }
+  .callout-coral .btn-primary { background: var(--c-canvas); color: var(--c-ink); }
+
+  /* CTA bands */
+  .cta-band {
+    border-radius: var(--r-lg);
+    padding: 64px var(--s-xl);
+    text-align: center;
+  }
+  .cta-band-coral { background: var(--c-primary); color: var(--c-on-primary); }
+  .cta-band-coral .t-display-md { color: var(--c-on-primary); }
+  .cta-band-dark { background: var(--c-surface-dark); color: var(--c-on-dark); }
+  .cta-band-dark .t-display-md { color: var(--c-on-dark); }
+  .cta-band-dark p { color: var(--c-on-dark-soft); margin: var(--s-md) auto var(--s-lg); max-width: 540px; }
+  .cta-band-coral p { color: var(--c-on-primary); opacity: 0.92; margin: var(--s-md) auto var(--s-lg); max-width: 540px; }
+
+  /* Type ramp */
+  .type-ramp {
+    background: var(--c-canvas);
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .ramp-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    padding: var(--s-lg);
+    border-bottom: 1px solid var(--c-hairline-soft);
+    align-items: baseline;
+    gap: var(--s-lg);
+  }
+  .ramp-row:last-child { border-bottom: none; }
+  .ramp-meta { display: flex; flex-direction: column; gap: 2px; }
+  .ramp-meta .name { font-family: var(--f-code); font-size: 12px; color: var(--c-primary); }
+  .ramp-meta .spec { font-family: var(--f-code); font-size: 11px; color: var(--c-muted-soft); }
+
+  /* Palette */
+  .palette {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--s-md);
+  }
+  .swatch {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-xs);
+  }
+  .swatch .chip {
+    height: 88px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--c-hairline);
+  }
+  .swatch .name {
+    font-family: var(--f-ui);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--c-ink);
+  }
+  .swatch .hex {
+    font-family: var(--f-code);
+    font-size: 11px;
+    color: var(--c-muted);
+  }
+
+  /* Radii */
+  .radii-row { display: flex; gap: var(--s-lg); flex-wrap: wrap; }
+  .radius-cell { display: flex; flex-direction: column; gap: var(--s-xs); align-items: center; }
+  .radius-box {
+    width: 96px;
+    height: 96px;
+    background: var(--c-surface-card);
+    border: 1px solid var(--c-hairline);
+  }
+  .radius-cell .name { font-family: var(--f-code); font-size: 12px; color: var(--c-primary); margin-top: var(--s-xs); }
+  .radius-cell .val { font-family: var(--f-code); font-size: 11px; color: var(--c-muted-soft); }
+
+  /* Spacing */
+  .spacing-list { display: flex; flex-direction: column; gap: var(--s-md); }
+  .spacing-row { display: grid; grid-template-columns: 120px 80px 1fr; align-items: center; gap: var(--s-md); }
+  .spacing-row .name { font-family: var(--f-code); font-size: 12px; color: var(--c-primary); }
+  .spacing-row .val { font-family: var(--f-code); font-size: 12px; color: var(--c-muted); text-align: right; }
+  .spacing-bar { height: 14px; background: var(--c-primary); border-radius: var(--r-xs); }
+
+  /* Connector tiles */
+  .connector-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s-md);
+  }
+  .connector-tile {
+    background: var(--c-canvas);
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-lg);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-xs);
+  }
+  .connector-tile .ico {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--r-sm);
+    background: var(--c-surface-card);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--c-primary);
+    margin-bottom: var(--s-xs);
+  }
+
+  /* Tabs */
+  .tabs { display: flex; gap: var(--s-xs); background: var(--c-surface-soft); padding: 4px; border-radius: var(--r-md); width: fit-content; }
+  .tab {
+    padding: 8px 14px;
+    border-radius: var(--r-md);
+    background: transparent;
+    color: var(--c-muted);
+    font-family: var(--f-ui);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+  }
+  .tab.active { background: var(--c-surface-card); color: var(--c-ink); }
+
+  /* Footer */
+  footer {
+    background: var(--c-surface-dark);
+    color: var(--c-on-dark-soft);
+    padding: 64px 0;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    gap: var(--s-xl);
+  }
+  .footer-col h4 {
+    color: var(--c-on-dark);
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: var(--s-md);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .footer-col a {
+    display: block;
+    color: var(--c-on-dark-soft);
+    text-decoration: none;
+    font-size: 14px;
+    margin-bottom: var(--s-xs);
+  }
+  .footer-col a:hover { color: var(--c-on-dark); }
+  .footer-wordmark {
+    color: var(--c-on-dark);
+    display: flex;
+    align-items: center;
+    gap: var(--s-xs);
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: var(--s-md);
+  }
+  .footer-bottom {
+    border-top: 1px solid var(--c-surface-dark-elevated);
+    margin-top: var(--s-xxl);
+    padding-top: var(--s-lg);
+    display: flex;
+    justify-content: space-between;
+    color: var(--c-muted-soft);
+    font-size: 13px;
+  }
+
+  /* misc */
+  .section-divider { height: 1px; background: var(--c-hairline-soft); margin: 0; }
+  .pill-row { display: flex; gap: var(--s-xs); flex-wrap: wrap; }
+  .row-flex { display: flex; gap: var(--s-md); align-items: center; flex-wrap: wrap; }
+
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="wordmark" href="#">
+      <svg class="spike" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 2 L13 11 L22 12 L13 13 L12 22 L11 13 L2 12 L11 11 Z" fill="currentColor"/>
+      </svg>
+      Claude
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" href="#">Claude</a>
+      <a class="nav-link" href="#">Code</a>
+      <a class="nav-link" href="#">API</a>
+      <a class="nav-link" href="#">Solutions</a>
+      <a class="nav-link" href="#">Research</a>
+      <a class="nav-link" href="#">Pricing</a>
+    </div>
+    <div class="nav-cta">
+      <a class="nav-text-link" href="#">Sign in</a>
+      <a class="btn btn-md btn-primary" href="#">Try Claude</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <div class="hero-eyebrow">
+          <span class="badge badge-coral">NEW</span>
+          <span class="t-caption">Introducing Claude Opus 4.7</span>
+        </div>
+        <h1 class="t-display-xl">Meet your thinking partner.</h1>
+        <p class="hero-sub">Claude is a next-generation AI assistant built for work and trained to be safe, accurate, and secure. A literary mind in a developer's editor — fluent in code, careful with context, and patient with hard problems.</p>
+        <div class="hero-cta">
+          <a class="btn btn-lg btn-primary" href="#">Start building</a>
+          <a class="btn btn-lg btn-secondary" href="#">Talk to sales</a>
+        </div>
+      </div>
+      <div class="hero-illustration">
+        <svg viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <!-- atmospheric line-art spike + orbit motif -->
+          <circle cx="200" cy="200" r="160" stroke="#cc785c" stroke-width="1.5" opacity="0.4"/>
+          <circle cx="200" cy="200" r="110" stroke="#181715" stroke-width="1" opacity="0.5"/>
+          <circle cx="200" cy="200" r="60" stroke="#cc785c" stroke-width="1.5"/>
+          <!-- spike-mark -->
+          <path d="M200 60 L210 195 L340 200 L210 205 L200 340 L190 205 L60 200 L190 195 Z" fill="#cc785c"/>
+          <!-- floating dots -->
+          <circle cx="80" cy="120" r="3" fill="#181715"/>
+          <circle cx="320" cy="140" r="4" fill="#cc785c"/>
+          <circle cx="310" cy="300" r="3" fill="#181715"/>
+          <circle cx="90" cy="290" r="5" fill="#cc785c"/>
+          <!-- whisper marks -->
+          <path d="M40 80 Q60 70 80 80" stroke="#181715" stroke-width="1" opacity="0.4"/>
+          <path d="M320 60 Q340 50 360 60" stroke="#cc785c" stroke-width="1.5"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- FEATURE CARDS (cream cards on cream canvas-soft) -->
+<section class="band-soft">
+  <div class="container">
+    <div class="section-head">
+      <div class="t-label-caps section-eyebrow">Capabilities</div>
+      <h2 class="t-display-lg">A model that reasons, writes, and ships.</h2>
+      <p>Claude pairs careful long-form reasoning with first-class tool use, so the same model that drafts a memo can refactor a monorepo or query your warehouse.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h10M4 18h16"/></svg>
+        </div>
+        <h3 class="t-title-lg">Long-context analysis</h3>
+        <p class="t-body-sm">Process entire codebases, contracts, or research libraries in a single prompt — up to 1M tokens with focused recall.</p>
+        <a class="nav-text-link" href="#" style="color: var(--c-primary);">Read the paper →</a>
+      </div>
+      <div class="feature-card">
+        <div class="icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 4l-4 8 4 8M16 4l4 8-4 8"/></svg>
+        </div>
+        <h3 class="t-title-lg">Agentic coding</h3>
+        <p class="t-body-sm">Claude Code runs in your terminal, edits files, runs tests, opens PRs — and gracefully cedes control when the diff gets risky.</p>
+        <a class="nav-text-link" href="#" style="color: var(--c-primary);">Install Claude Code →</a>
+      </div>
+      <div class="feature-card">
+        <div class="icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>
+        </div>
+        <h3 class="t-title-lg">Computer use</h3>
+        <p class="t-body-sm">Give Claude a desktop and it will navigate apps, fill spreadsheets, and ship the work — auditable, reversible, supervised.</p>
+        <a class="nav-text-link" href="#" style="color: var(--c-primary);">See it in action →</a>
+      </div>
+    </div>
+
+    <!-- Dark product mockup card directly inside cream band -->
+    <div class="product-mockup">
+      <div class="code-window-header">
+        <span class="dot dot-r"></span>
+        <span class="dot dot-y"></span>
+        <span class="dot dot-g"></span>
+        <span class="code-tab">claude-agent.ts — Claude Code</span>
+      </div>
+      <pre class="code-body"><span class="ln">1</span> <span class="cm">// Refactor: extract pricing logic into a Workflow step.</span>
+<span class="ln">2</span> <span class="kw">import</span> { workflow, step } <span class="kw">from</span> <span class="st">"@vercel/workflow"</span>;
+<span class="ln">3</span>
+<span class="ln">4</span> <span class="kw">export const</span> <span class="fn">priceQuote</span> = workflow(<span class="st">"price-quote"</span>, <span class="kw">async</span> (ctx, input) =&gt; {
+<span class="ln">5</span>   <span class="kw">const</span> base = <span class="kw">await</span> step(<span class="st">"base"</span>, () =&gt; <span class="fn">getBaseRate</span>(input.sku));
+<span class="ln">6</span>   <span class="kw">const</span> disc = <span class="kw">await</span> step(<span class="st">"discount"</span>, () =&gt; <span class="fn">resolveDiscount</span>(input.userId));
+<span class="ln">7</span>   <span class="kw">return</span> { total: base * (<span class="st">1</span> - disc), currency: <span class="st">"USD"</span> };
+<span class="ln">8</span> });
+<span class="ln">9</span>
+<span class="ln">10</span> <span class="cm">// Claude: ✓ tests pass · ✓ types clean · opening PR #482</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- DARK BAND: model showcase + tabs -->
+<section class="band-dark">
+  <div class="container">
+    <div class="section-head">
+      <div class="t-label-caps section-eyebrow" style="color: var(--c-accent-amber);">Model family</div>
+      <h2 class="t-display-lg" style="color: var(--c-on-dark);">Three minds, one shared character.</h2>
+      <p style="color: var(--c-on-dark-soft);">Pick the model that matches the moment — from instant chat to deep autonomous research. They share the same training philosophy, so your prompts port cleanly.</p>
+    </div>
+
+    <div class="tabs" style="background: var(--c-surface-dark-elevated); margin-bottom: var(--s-xl);">
+      <button class="tab active" style="background: var(--c-surface-dark-soft); color: var(--c-on-dark);">Opus</button>
+      <button class="tab" style="color: var(--c-on-dark-soft);">Sonnet</button>
+      <button class="tab" style="color: var(--c-on-dark-soft);">Haiku</button>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-card" style="background: var(--c-surface-dark-elevated); color: var(--c-on-dark);">
+        <div class="pill-row" style="margin-bottom: var(--s-xs);">
+          <span class="badge badge-coral">FLAGSHIP</span>
+        </div>
+        <h3 class="t-title-lg" style="color: var(--c-on-dark);">Claude Opus 4.7</h3>
+        <p class="t-body-sm" style="color: var(--c-on-dark-soft);">Our most capable model for complex, agentic, long-horizon work. Built for research, multi-step reasoning, and autonomous coding.</p>
+        <div class="row-flex" style="margin-top: var(--s-xs);">
+          <span class="badge badge-amber">200K context</span>
+          <span class="badge badge-teal">Tool use</span>
+        </div>
+      </div>
+      <div class="feature-card" style="background: var(--c-surface-dark-elevated); color: var(--c-on-dark);">
+        <div class="pill-row" style="margin-bottom: var(--s-xs);">
+          <span class="badge badge-pill" style="background: var(--c-surface-dark-soft); color: var(--c-on-dark-soft);">BALANCED</span>
+        </div>
+        <h3 class="t-title-lg" style="color: var(--c-on-dark);">Claude Sonnet 4.6</h3>
+        <p class="t-body-sm" style="color: var(--c-on-dark-soft);">The everyday workhorse — fast, accurate, and economical enough to power high-volume production traffic.</p>
+        <div class="row-flex" style="margin-top: var(--s-xs);">
+          <span class="badge badge-amber">200K context</span>
+          <span class="badge badge-teal">Vision</span>
+        </div>
+      </div>
+      <div class="feature-card" style="background: var(--c-surface-dark-elevated); color: var(--c-on-dark);">
+        <div class="pill-row" style="margin-bottom: var(--s-xs);">
+          <span class="badge badge-pill" style="background: var(--c-surface-dark-soft); color: var(--c-on-dark-soft);">INSTANT</span>
+        </div>
+        <h3 class="t-title-lg" style="color: var(--c-on-dark);">Claude Haiku 4.5</h3>
+        <p class="t-body-sm" style="color: var(--c-on-dark-soft);">Sub-second latency for real-time agents, classification, and high-throughput interfaces.</p>
+        <div class="row-flex" style="margin-top: var(--s-xs);">
+          <span class="badge badge-amber">100K context</span>
+          <span class="badge badge-teal">Edge-ready</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS ROW on cream -->
+<section class="band-canvas">
+  <div class="container">
+    <div class="section-head">
+      <div class="t-label-caps section-eyebrow">By the numbers</div>
+      <h2 class="t-display-lg">Trusted at the scale of real work.</h2>
+    </div>
+    <div class="stats-row">
+      <div class="stat-tile">
+        <div class="num">94.6%</div>
+        <div class="lbl">SWE-bench Verified — agentic coding accuracy</div>
+      </div>
+      <div class="stat-tile">
+        <div class="num">1M</div>
+        <div class="lbl">Token context window on Opus 4.7</div>
+      </div>
+      <div class="stat-tile">
+        <div class="num">300k+</div>
+        <div class="lbl">Businesses building with the Claude API</div>
+      </div>
+      <div class="stat-tile">
+        <div class="num">SOC 2</div>
+        <div class="lbl">Type II, HIPAA, and ISO 27001 certified</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FORM on surface-card -->
+<section class="band-soft">
+  <div class="container">
+    <div class="section-head">
+      <div class="t-label-caps section-eyebrow">Get in touch</div>
+      <h2 class="t-display-lg">Tell us about your team.</h2>
+      <p>Production access, custom rate limits, dedicated support, and on-premises deployment — we'll route you to the right specialist.</p>
+    </div>
+    <form class="form-card" onsubmit="return false;">
+      <div class="form-field">
+        <label for="fname">First name</label>
+        <input class="input" id="fname" type="text" placeholder="Ada" />
+      </div>
+      <div class="form-field">
+        <label for="lname">Last name</label>
+        <input class="input" id="lname" type="text" placeholder="Andrade" />
+      </div>
+      <div class="form-field">
+        <label for="email">Work email</label>
+        <input class="input" id="email" type="email" placeholder="you@company.com" />
+      </div>
+      <div class="form-field">
+        <label for="company">Company</label>
+        <input class="input" id="company" type="text" placeholder="HYVE" />
+      </div>
+      <div class="form-field full">
+        <label for="use">Use case</label>
+        <select class="select" id="use">
+          <option>Customer-facing assistant</option>
+          <option>Internal knowledge base</option>
+          <option>Agentic workflows</option>
+          <option>Code generation & review</option>
+        </select>
+      </div>
+      <div class="form-field full">
+        <label for="msg">What are you building?</label>
+        <textarea class="textarea" id="msg" placeholder="A few sentences is plenty — we'll follow up to learn more."></textarea>
+      </div>
+      <div class="full row-flex" style="justify-content: space-between;">
+        <span class="t-caption">By submitting you agree to Anthropic's <a href="#" style="color: var(--c-primary);">Privacy Policy</a>.</span>
+        <button class="btn btn-md btn-primary" type="submit">Request access</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- DATA TABLE on cream canvas -->
+<section class="band-canvas">
+  <div class="container">
+    <div class="section-head">
+      <div class="t-label-caps section-eyebrow">Model comparison</div>
+      <h2 class="t-display-lg">Pick the right tool for the task.</h2>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Context</th>
+            <th>Best for</th>
+            <th>Input / 1M</th>
+            <th>Output / 1M</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="model-name">Claude Opus 4.7</td>
+            <td>1M tokens</td>
+            <td>Agentic research, autonomous coding</td>
+            <td>$15.00</td>
+            <td>$75.00</td>
+            <td><span class="badge badge-teal">Available</span></td>
+          </tr>
+          <tr>
+            <td class="model-name">Claude Sonnet 4.6</td>
+            <td>200K tokens</td>
+            <td>Production assistants, RAG</td>
+            <td>$3.00</td>
+            <td>$15.00</td>
+            <td><span class="badge badge-teal">Available</span></td>
+          </tr>
+          <tr>
+            <td class="model-name">Claude Haiku 4.5</td>
+            <td>100K tokens</td>
+            <td>Real-time UX, classification</td>
+            <td>$0.80</td>
+            <td>$4.00</td>
+            <td><span class="badge badge-teal">Available</span></td>
+          </tr>
+          <tr>
+            <td class="model-name">Claude Opus 4.5</td>
+            <td>200K tokens</td>
+            <td>Long-form analysis</td>
+            <td>$15.00</td>
+            <td>$75.00</td>
+            <td><span class="badge badge-amber">Legacy</span></td>
+          </tr>
+          <tr>
+            <td class="model-name">Claude Haiku 3.5</td>
+            <td>200K tokens</td>
+            <td>Cost-sensitive workloads</td>
+            <td>$0.25</td>
+            <td>$1.25</td>
+            <td><span class="badge badge-amber">Legacy</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING + CONNECTOR TILES -->
+<section class="band-soft">
+  <div class="container">
+    <div class="section-head">
+      <div class="t-label-caps section-eyebrow">Pricing</div>
+      <h2 class="t-display-lg">Start free, scale to production.</h2>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-tier">
+        <h3 class="t-display-sm">Free</h3>
+        <div class="price-num">$0</div>
+        <div class="price-sub">For exploring Claude.</div>
+        <ul>
+          <li>Chat with Claude on the web</li>
+          <li>Sonnet 4.6 model access</li>
+          <li>Limited messages per day</li>
+          <li>Community support</li>
+        </ul>
+        <button class="btn btn-md btn-secondary" style="margin-top: auto;">Get started</button>
+      </div>
+      <div class="pricing-tier featured">
+        <div class="pill-row"><span class="badge badge-coral">MOST POPULAR</span></div>
+        <h3 class="t-display-sm">Pro</h3>
+        <div class="price-num">$20</div>
+        <div class="price-sub">per person / month</div>
+        <ul>
+          <li>5× more messages than Free</li>
+          <li>Opus 4.7 and Sonnet 4.6</li>
+          <li>Projects and custom instructions</li>
+          <li>Early access to new features</li>
+        </ul>
+        <button class="btn btn-md btn-primary" style="margin-top: auto;">Upgrade to Pro</button>
+      </div>
+      <div class="pricing-tier">
+        <h3 class="t-display-sm">Team</h3>
+        <div class="price-num">$30</div>
+        <div class="price-sub">per person / month</div>
+        <ul>
+          <li>Everything in Pro</li>
+          <li>Shared projects & artifacts</li>
+          <li>Central billing & admin console</li>
+          <li>SSO and SCIM provisioning</li>
+        </ul>
+        <button class="btn btn-md btn-secondary" style="margin-top: auto;">Start a team</button>
+      </div>
+    </div>
+
+    <div class="section-head" style="margin-top: var(--s-section);">
+      <div class="t-label-caps section-eyebrow">Connectors</div>
+      <h2 class="t-display-md">Bring Claude into your stack.</h2>
+    </div>
+    <div class="connector-grid">
+      <div class="connector-tile">
+        <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/></svg></div>
+        <div class="t-title-sm">GitHub</div>
+        <div class="t-body-sm">Review PRs, triage issues, refactor across repos.</div>
+      </div>
+      <div class="connector-tile">
+        <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+        <div class="t-title-sm">Slack</div>
+        <div class="t-body-sm">Summarize threads and answer with org context.</div>
+      </div>
+      <div class="connector-tile">
+        <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v6H4zM4 14h16v6H4z"/></svg></div>
+        <div class="t-title-sm">Linear</div>
+        <div class="t-body-sm">Convert customer signal into tracked work.</div>
+      </div>
+      <div class="connector-tile">
+        <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9-9 9z"/></svg></div>
+        <div class="t-title-sm">Notion</div>
+        <div class="t-body-sm">Search the wiki and draft new docs.</div>
+      </div>
+      <div class="connector-tile">
+        <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg></div>
+        <div class="t-title-sm">Gmail</div>
+        <div class="t-body-sm">Draft replies and schedule follow-ups.</div>
+      </div>
+      <div class="connector-tile">
+        <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18"/></svg></div>
+        <div class="t-title-sm">Drive</div>
+        <div class="t-body-sm">Ground answers in your docs and decks.</div>
+      </div>
+      <div class="connector-tile">
+        <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg></div>
+        <div class="t-title-sm">Asana</div>
+        <div class="t-body-sm">Plan sprints from inbox to backlog.</div>
+      </div>
+      <div class="connector-tile">
+        <div class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <div class="t-title-sm">Zapier</div>
+        <div class="t-body-sm">7,000+ apps through one trusted bridge.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CORAL CALLOUT BAND -->
+<section class="band-canvas">
+  <div class="container">
+    <div class="callout-coral">
+      <div class="t-label-caps" style="color: rgba(255,255,255,0.85);">Anthropic API</div>
+      <h2 class="t-display-md" style="color: var(--c-on-primary); max-width: 760px;">Ship safer AI faster — start building with Claude in less than five minutes.</h2>
+      <p style="max-width: 640px; opacity: 0.92;">Free credits to get you started, native streaming, tool use, and prompt caching out of the box. Designed for developers who like their abstractions thin and their guarantees thick.</p>
+      <div class="cta-row">
+        <a class="btn btn-md btn-primary" href="#">Get API keys</a>
+        <a class="btn btn-md btn-secondary" href="#">Read the docs</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BUTTONS GALLERY -->
+<section class="band-soft">
+  <div class="container">
+    <div class="section-head">
+      <div class="t-label-caps section-eyebrow">System</div>
+      <h2 class="t-display-lg">Buttons.</h2>
+      <p>Coral primary carries the action voltage. Secondary recedes into cream. Ghost disappears until needed. Geometry holds across three sizes.</p>
+    </div>
+    <div class="btn-gallery">
+      <div class="btn-cell"><span class="t-label-caps">Primary · sm</span><button class="btn btn-sm btn-primary">Try Claude</button></div>
+      <div class="btn-cell"><span class="t-label-caps">Primary · md</span><button class="btn btn-md btn-primary">Try Claude</button></div>
+      <div class="btn-cell"><span class="t-label-caps">Primary · lg</span><button class="btn btn-lg btn-primary">Try Claude</button></div>
+      <div class="btn-cell"><span class="t-label-caps">Secondary · sm</span><button class="btn btn-sm btn-secondary">Read docs</button></div>
+      <div class="btn-cell"><span class="t-label-caps">Secondary · md</span><button class="btn btn-md btn-secondary">Read docs</button></div>
+      <div class="btn-cell"><span class="t-label-caps">Secondary · lg</span><button class="btn btn-lg btn-secondary">Read docs</button></div>
+      <div class="btn-cell"><span class="t-label-caps">Ghost · sm</span><button class="btn btn-sm btn-ghost">Learn more</button></div>
+      <div class="btn-cell"><span class="t-label-caps">Ghost · md</span><button class="btn btn-md btn-ghost">Learn more</button></div>
+      <div class="btn-cell"><span class="t-label-caps">Ghost · lg</span><button class="btn btn-lg btn-ghost">Learn more</button></div>
+    </div>
+
+    <div style="margin-top: var(--s-xl); display: flex; gap: var(--s-md); align-items: center;">
+      <button class="btn btn-md btn-primary" style="background: var(--c-primary-disabled); color: var(--c-muted);" disabled>Disabled</button>
+      <button class="btn btn-md btn-primary" style="background: var(--c-primary-active);">Active / pressed</button>
+      <button class="btn-icon-circular" aria-label="More">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
+      </button>
+      <button class="btn-icon-circular" aria-label="Arrow">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- TYPE RAMP -->
+<section class="band-canvas">
+  <div class="container">
+    <div class="section-head">
+      <div class="t-label-caps section-eyebrow">Typography</div>
+      <h2 class="t-display-lg">A literary voice for a developer's tool.</h2>
+      <p>Copernicus serif at weight 400 with negative tracking handles every display token. StyreneB / Inter carries the entire UI layer. Weight never exceeds 500.</p>
+    </div>
+    <div class="type-ramp">
+      <div class="ramp-row">
+        <div class="ramp-meta"><span class="name">display-xl</span><span class="spec">Serif 64 / 1.05 / -1.5</span></div>
+        <div class="t-display-xl">Meet your thinking partner.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-meta"><span class="name">display-lg</span><span class="spec">Serif 48 / 1.1 / -1</span></div>
+        <div class="t-display-lg">A model that reasons & writes.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-meta"><span class="name">display-md</span><span class="spec">Serif 36 / 1.15 / -0.5</span></div>
+        <div class="t-display-md">Three minds, one character.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-meta"><span class="name">display-sm</span><span class="spec">Serif 28 / 1.2 / -0.3</span></div>
+        <div class="t-display-sm">Start free, scale to production.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-meta"><span class="name">h1</span><span class="spec">Serif 64 / 1.05 / -1.5</span></div>
+        <div class="t-display-xl">A careful, capable assistant.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-meta"><span class="name">title-lg</span><span class="spec">Sans 22 / 500</span></div>
+        <div class="t-title-lg">Long-context analysis</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-meta"><span class="name">title-md</span><span class="spec">Sans 18 / 500</span></div>
+        <div class="t-title-md">Claude Opus 4.7</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-meta"><span class="name">title-sm</span><span class="spec">Sans 16 / 500</span></div>
+        <div class="t-title-sm">Connector — GitHub</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-meta"><span class="name">body-md</span><span class="spec">Sans 16 / 400 / 1.55</span></div>
+        <div class="t-body-md">Claude is a next-generation AI assistant built for work — trained to be safe, accurate, and secure.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-meta"><span class="name">body-sm</span><span class="spec">Sans 14 / 400 / 1.55</span></div>
+        <div class="t-body-sm">Process entire codebases, contracts, or research libraries in a single prompt with focused recall.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-meta"><span class="name">caption</span><span class="spec">Sans 13 / 500</span></div>
+        <div class="t-caption">Introducing Claude Opus 4.7 — available today.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-meta"><span class="name">label-caps</span><span class="spec">Sans 12 / 500 / +1.5</span></div>
+        <div class="t-label-caps">New · Available now</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-meta"><span class="name">button</span><span class="spec">Sans 14 / 500 / 1.0</span></div>
+        <div><button class="btn btn-md btn-primary">Try Claude</button></div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-meta"><span class="name">nav-link</span><span class="spec">Sans 14 / 500 / 1.4</span></div>
+        <div><a class="nav-link" href="#">Pricing</a></div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-meta"><span class="name">code</span><span class="spec">Mono 14 / 400 / 1.6</span></div>
+        <div class="t-code" style="background: var(--c-surface-dark-soft); color: var(--c-on-dark); padding: 12px 16px; border-radius: var(--r-md);">const claude = await anthropic.messages.create({ model: "claude-opus-4-7" });</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PALETTE -->
+<section class="band-soft">
+  <div class="container">
+    <div class="section-head">
+      <div class="t-label-caps section-eyebrow">Palette</div>
+      <h2 class="t-display-lg">Cream, coral, and dark navy — nothing else.</h2>
+      <p>The complete surface trinity. No fourth tone. Accent teal and amber are confined to secondary product surfaces; coral remains the sole brand voltage.</p>
+    </div>
+
+    <h3 class="t-title-md" style="margin-bottom: var(--s-md);">Brand</h3>
+    <div class="palette" style="margin-bottom: var(--s-xl);">
+      <div class="swatch"><div class="chip" style="background: #cc785c"></div><div class="name">primary</div><div class="hex">#cc785c</div></div>
+      <div class="swatch"><div class="chip" style="background: #a9583e"></div><div class="name">primary-active</div><div class="hex">#a9583e</div></div>
+      <div class="swatch"><div class="chip" style="background: #e6dfd8"></div><div class="name">primary-disabled</div><div class="hex">#e6dfd8</div></div>
+      <div class="swatch"><div class="chip" style="background: #5db8a6"></div><div class="name">accent-teal</div><div class="hex">#5db8a6</div></div>
+      <div class="swatch"><div class="chip" style="background: #e8a55a"></div><div class="name">accent-amber</div><div class="hex">#e8a55a</div></div>
+      <div class="swatch"><div class="chip" style="background: #ffffff"></div><div class="name">on-primary</div><div class="hex">#ffffff</div></div>
+    </div>
+
+    <h3 class="t-title-md" style="margin-bottom: var(--s-md);">Canvas & surfaces</h3>
+    <div class="palette" style="margin-bottom: var(--s-xl);">
+      <div class="swatch"><div class="chip" style="background: #faf9f5"></div><div class="name">canvas</div><div class="hex">#faf9f5</div></div>
+      <div class="swatch"><div class="chip" style="background: #f5f0e8"></div><div class="name">surface-soft</div><div class="hex">#f5f0e8</div></div>
+      <div class="swatch"><div class="chip" style="background: #efe9de"></div><div class="name">surface-card</div><div class="hex">#efe9de</div></div>
+      <div class="swatch"><div class="chip" style="background: #e8e0d2"></div><div class="name">surface-cream-strong</div><div class="hex">#e8e0d2</div></div>
+      <div class="swatch"><div class="chip" style="background: #efe9de"></div><div class="name">surface</div><div class="hex">#efe9de</div></div>
+      <div class="swatch"><div class="chip" style="background: #e6dfd8"></div><div class="name">hairline</div><div class="hex">#e6dfd8</div></div>
+      <div class="swatch"><div class="chip" style="background: #ebe6df"></div><div class="name">hairline-soft</div><div class="hex">#ebe6df</div></div>
+    </div>
+
+    <h3 class="t-title-md" style="margin-bottom: var(--s-md);">Dark surfaces</h3>
+    <div class="palette" style="margin-bottom: var(--s-xl);">
+      <div class="swatch"><div class="chip" style="background: #181715"></div><div class="name">surface-dark</div><div class="hex">#181715</div></div>
+      <div class="swatch"><div class="chip" style="background: #252320"></div><div class="name">surface-dark-elevated</div><div class="hex">#252320</div></div>
+      <div class="swatch"><div class="chip" style="background: #1f1e1b"></div><div class="name">surface-dark-soft</div><div class="hex">#1f1e1b</div></div>
+      <div class="swatch"><div class="chip" style="background: #faf9f5"></div><div class="name">on-dark</div><div class="hex">#faf9f5</div></div>
+      <div class="swatch"><div class="chip" style="background: #a09d96"></div><div class="name">on-dark-soft</div><div class="hex">#a09d96</div></div>
+    </div>
+
+    <h3 class="t-title-md" style="margin-bottom: var(--s-md);">Text & semantic</h3>
+    <div class="palette">
+      <div class="swatch"><div class="chip" style="background: #141413"></div><div class="name">ink</div><div class="hex">#141413</div></div>
+      <div class="swatch"><div class="chip" style="background: #252523"></div><div class="name">body-strong</div><div class="hex">#252523</div></div>
+      <div class="swatch"><div class="chip" style="background: #3d3d3a"></div><div class="name">body</div><div class="hex">#3d3d3a</div></div>
+      <div class="swatch"><div class="chip" style="background: #6c6a64"></div><div class="name">muted</div><div class="hex">#6c6a64</div></div>
+      <div class="swatch"><div class="chip" style="background: #8e8b82"></div><div class="name">muted-soft</div><div class="hex">#8e8b82</div></div>
+      <div class="swatch"><div class="chip" style="background: #141413"></div><div class="name">on-surface</div><div class="hex">#141413</div></div>
+      <div class="swatch"><div class="chip" style="background: #5db872"></div><div class="name">success</div><div class="hex">#5db872</div></div>
+      <div class="swatch"><div class="chip" style="background: #d4a017"></div><div class="name">warning</div><div class="hex">#d4a017</div></div>
+      <div class="swatch"><div class="chip" style="background: #c64545"></div><div class="name">error</div><div class="hex">#c64545</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- RADII -->
+<section class="band-canvas">
+  <div class="container">
+    <div class="section-head">
+      <div class="t-label-caps section-eyebrow">Radii</div>
+      <h2 class="t-display-lg">Graduated softness.</h2>
+      <p>Sharper at small UI elements, rounder at content containers, pill-only for label objects. Never fully sharp — even the smallest token carries 4px.</p>
+    </div>
+    <div class="radii-row">
+      <div class="radius-cell"><div class="radius-box" style="border-radius: 4px;"></div><span class="name">rounded.xs</span><span class="val">4px</span></div>
+      <div class="radius-cell"><div class="radius-box" style="border-radius: 6px;"></div><span class="name">rounded.sm</span><span class="val">6px</span></div>
+      <div class="radius-cell"><div class="radius-box" style="border-radius: 8px;"></div><span class="name">rounded.md</span><span class="val">8px</span></div>
+      <div class="radius-cell"><div class="radius-box" style="border-radius: 12px;"></div><span class="name">rounded.lg</span><span class="val">12px</span></div>
+      <div class="radius-cell"><div class="radius-box" style="border-radius: 16px;"></div><span class="name">rounded.xl</span><span class="val">16px</span></div>
+      <div class="radius-cell"><div class="radius-box" style="border-radius: 9999px;"></div><span class="name">rounded.pill</span><span class="val">9999px</span></div>
+      <div class="radius-cell"><div class="radius-box" style="border-radius: 9999px;"></div><span class="name">rounded.full</span><span class="val">9999px</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- SPACING -->
+<section class="band-soft">
+  <div class="container">
+    <div class="section-head">
+      <div class="t-label-caps section-eyebrow">Spacing</div>
+      <h2 class="t-display-lg">A 4px base with editorial pacing.</h2>
+      <p>Major bands separated by 96px create long-form magazine cadence. Internal card padding stays at 32px for editorial breath.</p>
+    </div>
+    <div class="spacing-list">
+      <div class="spacing-row"><span class="name">spacing.xxs</span><span class="val">4px</span><div class="spacing-bar" style="width: 4px;"></div></div>
+      <div class="spacing-row"><span class="name">spacing.xs</span><span class="val">8px</span><div class="spacing-bar" style="width: 8px;"></div></div>
+      <div class="spacing-row"><span class="name">spacing.sm</span><span class="val">12px</span><div class="spacing-bar" style="width: 12px;"></div></div>
+      <div class="spacing-row"><span class="name">spacing.md</span><span class="val">16px</span><div class="spacing-bar" style="width: 16px;"></div></div>
+      <div class="spacing-row"><span class="name">spacing.lg</span><span class="val">24px</span><div class="spacing-bar" style="width: 24px;"></div></div>
+      <div class="spacing-row"><span class="name">spacing.xl</span><span class="val">32px</span><div class="spacing-bar" style="width: 32px;"></div></div>
+      <div class="spacing-row"><span class="name">spacing.xxl</span><span class="val">48px</span><div class="spacing-bar" style="width: 48px;"></div></div>
+      <div class="spacing-row"><span class="name">spacing.section</span><span class="val">96px</span><div class="spacing-bar" style="width: 96px;"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- DARK CTA BAND -->
+<section class="band-canvas">
+  <div class="container">
+    <div class="cta-band cta-band-dark">
+      <h2 class="t-display-md">Ready when you are.</h2>
+      <p>Spin up a free Claude account, drop into the API console, or talk to our team about a deployment that fits your security posture.</p>
+      <div class="row-flex" style="justify-content: center;">
+        <a class="btn btn-md btn-primary" href="#">Try Claude free</a>
+        <a class="btn btn-md btn-on-dark" href="#">Contact sales</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div class="footer-wordmark">
+          <svg class="spike" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 2 L13 11 L22 12 L13 13 L12 22 L11 13 L2 12 L11 11 Z" fill="#cc785c"/>
+          </svg>
+          Claude
+        </div>
+        <p style="color: var(--c-on-dark-soft); max-width: 320px; font-size: 14px;">Claude is built by Anthropic, an AI safety company headquartered in San Francisco.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <a href="#">Claude</a>
+        <a href="#">Claude Code</a>
+        <a href="#">API</a>
+        <a href="#">Pricing</a>
+        <a href="#">Enterprise</a>
+      </div>
+      <div class="footer-col">
+        <h4>Research</h4>
+        <a href="#">Overview</a>
+        <a href="#">Publications</a>
+        <a href="#">Constitutional AI</a>
+        <a href="#">Responsible scaling</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#">About</a>
+        <a href="#">News</a>
+        <a href="#">Careers</a>
+        <a href="#">Customers</a>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Usage policy</a>
+        <a href="#">Trust center</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Anthropic PBC</span>
+      <span>San Francisco · London · Dublin · Tokyo</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

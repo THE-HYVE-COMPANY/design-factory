@@ -1,0 +1,98 @@
+Design Factory
+Copyright 2026 The HYVE Company
+
+This product includes software developed by The HYVE Company
+(https://hyve.company) and the Design Factory contributors.
+
+Licensed under the Apache License, Version 2.0 (the "License").
+The full text of the License is included in the LICENSE file at the
+root of this repository and is also available at:
+http://www.apache.org/licenses/LICENSE-2.0
+
+------------------------------------------------------------------------
+Trademark notice
+------------------------------------------------------------------------
+
+The Apache 2.0 License grants rights to the code and documentation in
+this repository. It does not grant any right to use the trade names,
+trademarks, service marks, or product names of The HYVE Company,
+including but not limited to:
+
+- "HYVE" and the HYVE wordmark
+- "Design Factory" and the Design Factory wordmark
+- The HYVE logo
+- The Design Factory logo
+- Any composite or stylised marks derived from the above
+
+Forks, derivatives, and downstream distributions are welcome and
+encouraged under the License — but they must rename themselves and
+adopt their own branding. Use of the HYVE or Design Factory marks for
+a forked or derivative product is not granted by this License and
+requires written permission from The HYVE Company.
+
+The above restriction is consistent with Section 6 of the Apache 2.0
+License, which explicitly excludes trademark rights from the License
+grant.
+
+------------------------------------------------------------------------
+Third-party software
+------------------------------------------------------------------------
+
+Design Factory depends on a number of open-source packages distributed
+under their own licenses. The composite dependency tree is dominated
+by MIT, Apache-2.0, ISC, and BSD-3-Clause. The `package.json` manifest
+and the `package-lock.json` resolution are the authoritative record of
+each dependency, its version, and its licence at install time.
+
+To enumerate every dependency licence after `npm install`:
+
+    find node_modules -maxdepth 2 -name package.json | \
+      xargs -I{} node -e "const p=require('./{}'); \
+        console.log((p.name||'?')+'@'+(p.version||'?')+' '+\
+          (p.license||p.licenses||'UNKNOWN'))"
+
+No copyleft (AGPL, LGPL, SSPL, GPL-2, GPL-3) dependency is currently
+present in the resolved tree. Re-check dependency licenses before every
+`v*.0.0` tag.
+
+------------------------------------------------------------------------
+Third-party bundled skills
+------------------------------------------------------------------------
+
+The `skills/` directory ships a curated set of design skills authored by
+third parties. They are bundled under their own licenses; Design Factory
+claims no authorship of them. Where an upstream LICENSE was provided it
+is preserved alongside the skill.
+
+  impeccable (skills/impeccable-main/)
+    Apache License 2.0 — Copyright 2025-2026 Paul Bakaus.
+    Builds on Anthropic's frontend-design skill (Apache-2.0,
+    Copyright 2025 Anthropic, PBC) and the Typecraft guide.
+    License + NOTICE preserved at skills/impeccable-main/.
+
+  taste-skill (skills/taste-skill-main/)
+    MIT License — Copyright (c) 2026 Leonxlnx.
+    License preserved at skills/taste-skill-main/LICENSE.
+
+  ui-skills (skills/ui-skills-main/)
+    MIT License — Copyright (c) 2026 Julien Thibeaut.
+    License preserved at skills/ui-skills-main/LICENSE.
+
+  frontend-design (skills/frontend-design/)
+    Anthropic frontend-design skill — Apache License 2.0,
+    Copyright 2025 Anthropic, PBC.
+    Source: https://github.com/anthropics/skills
+
+  frontend-guidelines-master (skills/frontend-guidelines-master/)
+    Adapted from Ben Delarre's "frontend-guidelines".
+    Source: https://github.com/bendc/frontend-guidelines
+
+  emil-design-eng (skills/emil-design-eng/)
+    Emil Kowalski's design-engineering skill, distilled from his writing
+    at https://emilkowal.ski and the animations.dev course.
+    Source: https://github.com/emilkowalski/skill
+
+  make-interfaces-feel-better (skills/make-interfaces-feel-better-main/)
+    MIT License — Jakub Krehel. Based on the article "Details that make
+    interfaces feel better" (https://jakub.kr).
+    Source: https://github.com/jakubkrehel/make-interfaces-feel-better

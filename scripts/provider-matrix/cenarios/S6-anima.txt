@@ -1,0 +1,21 @@
+Build a multi-stage cinematic intro sequence as a single self-contained HTML file.
+
+The sequence runs once on load (total ~6 seconds), coordinated via a master timeline.
+
+Stages (in order):
+1. (0.0-0.8s) Black screen. A single thin horizontal line draws from left to right across the middle (using SVG path stroke-dashoffset animation).
+2. (0.8-1.6s) The line splits into two and slides apart vertically, revealing space between.
+3. (1.6-2.8s) In the revealed space, a wordmark "HYVE" types in character-by-character with a blinking caret. Font monospace, large. Tabular-nums for any digit.
+4. (2.8-4.0s) Behind the wordmark, 30 small dots fade in at randomized positions in a soft orange (#FF5524 at varying opacity), with subtle parallax bobbing.
+5. (4.0-5.2s) A short tagline "Design Factory" cross-fades in below the wordmark with letter-spacing animation (from 0.5em → 0.05em).
+6. (5.2-6.0s) Hold on the final composition. Cursor click anywhere restarts the sequence.
+
+Constraints:
+- All timing via a single master clock (requestAnimationFrame + elapsed ms). No setTimeout chains.
+- CSS animations OK for individual element transitions, but stage triggering happens in JS.
+- Background warm olive grey #2A2826. Text #F5EFE8. Accents only HYVE orange #FF5524.
+- Respect prefers-reduced-motion: skip to final composition, no animations.
+- Inline everything. No external fonts (use system monospace + sans).
+- Start with <!DOCTYPE html>.
+
+Output: single HTML file via Write/artifact. Then reply with 2-3 sentences describing the timing strategy.

@@ -1,0 +1,431 @@
+/* np-d.css — Verb-Led wizard (Lab D).
+ *
+ * Two screens:
+ *   1. Verb picker — 5 large cards in a 3-col grid (free is bottom-right
+ *      and visually slightly different — accent border to distinguish).
+ *   2. Form screen — back-to-verbs link + verb name + tailored fields.
+ *
+ * Tokens only. Works dark + light.
+ */
+
+.np-verb-root {
+  min-height: 100vh;
+  background: var(--df-bg-base);
+  color: var(--df-text-primary);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== Topbar ===== */
+.np-verb-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--df-sp-3) var(--df-sp-5);
+  border-bottom: 1px solid var(--df-border-subtle);
+  background: var(--df-bg-section);
+}
+
+.np-verb-back {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--df-text-secondary);
+  font: inherit;
+  font-size: var(--df-text-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: var(--df-r-md);
+  cursor: pointer;
+  transition: background var(--df-motion-quick) var(--df-ease-standard),
+              color var(--df-motion-quick) var(--df-ease-standard);
+}
+.np-verb-back:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+}
+.np-verb-back-arrow {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.np-verb-topbar-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--df-text-muted);
+  font-size: var(--df-text-xs);
+  letter-spacing: var(--df-tracking-loose);
+  text-transform: uppercase;
+}
+.np-verb-topbar-label {
+  font-family: var(--df-font-mono);
+}
+
+.np-verb-theme-toggle {
+  appearance: none;
+  background: var(--df-surface-raised);
+  color: var(--df-text-secondary);
+  border: 1px solid var(--df-border-subtle);
+  font: inherit;
+  font-size: var(--df-text-xs);
+  letter-spacing: var(--df-tracking-loose);
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: var(--df-r-full);
+  cursor: pointer;
+  transition: background var(--df-motion-quick) var(--df-ease-standard),
+              border-color var(--df-motion-quick) var(--df-ease-standard);
+}
+.np-verb-theme-toggle:hover {
+  background: var(--df-surface-elevated);
+  border-color: var(--df-border-strong);
+  color: var(--df-text-primary);
+}
+
+/* ===== Main ===== */
+.np-verb-main {
+  flex: 1;
+  width: min(880px, calc(100% - 2 * var(--df-sp-5)));
+  margin: 0 auto;
+  padding: var(--df-sp-7) 0 var(--df-sp-10);
+  display: flex;
+  flex-direction: column;
+  gap: var(--df-sp-5);
+}
+
+.np-verb-section-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--df-sp-1);
+}
+.np-verb-h1 {
+  margin: 0;
+  font-size: var(--df-text-xl);
+  font-weight: var(--df-fw-medium);
+  letter-spacing: var(--df-tracking-tight);
+  line-height: 1.2;
+}
+.np-verb-h1-sub {
+  margin: 0;
+  font-size: var(--df-text-sm);
+  color: var(--df-text-muted);
+}
+
+/* ===== Verb picker grid ===== */
+.np-verb-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--df-sp-3);
+}
+@media (max-width: 700px) {
+  .np-verb-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 460px) {
+  .np-verb-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.np-verb-card {
+  appearance: none;
+  background: var(--df-surface-raised);
+  border: 1px solid var(--df-border-subtle);
+  color: var(--df-text-primary);
+  font: inherit;
+  text-align: left;
+  padding: var(--df-sp-4);
+  border-radius: var(--df-r-2xl);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: var(--df-sp-2);
+  min-height: 160px;
+  transition: border-color var(--df-motion-quick) var(--df-ease-standard),
+              background var(--df-motion-quick) var(--df-ease-standard),
+              transform var(--df-motion-quick) var(--df-ease-standard);
+}
+.np-verb-card:hover {
+  border-color: var(--df-border-strong);
+  background: var(--df-surface-elevated);
+  transform: translateY(1px);
+}
+.np-verb-card--free {
+  border-style: dashed;
+  background: transparent;
+}
+.np-verb-card--free:hover {
+  border-style: dashed;
+  background: var(--df-interactive-hover);
+}
+
+.np-verb-card-label {
+  font-size: var(--df-text-lg);
+  font-weight: var(--df-fw-medium);
+  letter-spacing: var(--df-tracking-tight);
+  color: var(--df-text-primary);
+}
+.np-verb-card-hint {
+  font-size: var(--df-text-sm);
+  color: var(--df-text-secondary);
+  line-height: 1.45;
+}
+.np-verb-card-example {
+  margin-top: auto;
+  font-size: var(--df-text-2xs);
+  color: var(--df-text-muted);
+  font-family: var(--df-font-mono);
+  font-style: italic;
+}
+
+/* ===== Form stage ===== */
+.np-verb-formstage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--df-sp-5);
+  animation: npVerbFormIn 220ms var(--df-ease-out);
+}
+@keyframes npVerbFormIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.np-verb-formhead {
+  display: flex;
+  align-items: center;
+  gap: var(--df-sp-4);
+}
+
+.np-verb-swap {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--df-border-subtle);
+  color: var(--df-text-secondary);
+  font: inherit;
+  font-size: var(--df-text-xs);
+  padding: 6px 12px;
+  border-radius: var(--df-r-full);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: background var(--df-motion-quick) var(--df-ease-standard),
+              color var(--df-motion-quick) var(--df-ease-standard);
+}
+.np-verb-swap:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+}
+
+.np-verb-formtitle {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.np-verb-formtitle-eyebrow {
+  font-size: var(--df-text-2xs);
+  letter-spacing: var(--df-tracking-loose);
+  text-transform: uppercase;
+  color: var(--df-text-muted);
+}
+.np-verb-formtitle-h2 {
+  margin: 0;
+  font-size: var(--df-text-xl);
+  font-weight: var(--df-fw-medium);
+  letter-spacing: var(--df-tracking-tight);
+}
+
+/* ===== Form fields ===== */
+.np-verb-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--df-sp-4);
+  background: var(--df-surface-raised);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-2xl);
+  padding: var(--df-sp-5);
+  box-shadow: var(--df-shadow-card);
+}
+
+.np-verb-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--df-sp-2);
+}
+.np-verb-field-label {
+  font-size: var(--df-text-2xs);
+  letter-spacing: var(--df-tracking-loose);
+  text-transform: uppercase;
+  color: var(--df-text-muted);
+  font-weight: var(--df-fw-medium);
+}
+
+.np-verb-input,
+.np-verb-textarea {
+  appearance: none;
+  width: 100%;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  color: var(--df-text-primary);
+  font: inherit;
+  font-size: var(--df-text-sm);
+  padding: 9px 12px;
+  outline: 0;
+  transition: border-color var(--df-motion-quick) var(--df-ease-standard);
+}
+.np-verb-textarea {
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 64px;
+}
+.np-verb-input::placeholder,
+.np-verb-textarea::placeholder {
+  color: var(--df-text-faint);
+}
+.np-verb-input:focus,
+.np-verb-textarea:focus {
+  border-color: var(--df-border-strong);
+}
+
+.np-verb-range {
+  width: 100%;
+  appearance: none;
+  background: var(--df-bg-section);
+  height: 6px;
+  border-radius: var(--df-r-full);
+  cursor: pointer;
+  outline: none;
+  border: 1px solid var(--df-border-subtle);
+}
+.np-verb-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--df-r-full);
+  background: var(--df-text-primary);
+  cursor: grab;
+  border: 0;
+}
+.np-verb-range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: var(--df-r-full);
+  background: var(--df-text-primary);
+  cursor: grab;
+  border: 0;
+}
+
+.np-verb-chiprow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.np-verb-chip {
+  appearance: none;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  color: var(--df-text-secondary);
+  font: inherit;
+  font-size: var(--df-text-sm);
+  padding: 6px 14px;
+  border-radius: var(--df-r-full);
+  cursor: pointer;
+  transition: background var(--df-motion-quick) var(--df-ease-standard),
+              color var(--df-motion-quick) var(--df-ease-standard),
+              border-color var(--df-motion-quick) var(--df-ease-standard);
+}
+.np-verb-chip:hover {
+  background: var(--df-surface-elevated);
+  color: var(--df-text-primary);
+  border-color: var(--df-border-strong);
+}
+.np-verb-chip--active {
+  background: var(--df-text-primary);
+  color: var(--df-text-inverse);
+  border-color: var(--df-text-primary);
+}
+.np-verb-chip--active:hover {
+  background: var(--df-text-primary);
+  color: var(--df-text-inverse);
+  border-color: var(--df-text-primary);
+}
+
+.np-verb-formfoot {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--df-sp-2);
+  border-top: 1px solid var(--df-border-subtle);
+  margin-top: var(--df-sp-2);
+}
+
+.np-verb-begin {
+  appearance: none;
+  background: var(--df-text-primary);
+  color: var(--df-text-inverse);
+  border: 0;
+  font: inherit;
+  font-size: var(--df-text-sm);
+  font-weight: var(--df-fw-medium);
+  padding: 10px 22px;
+  border-radius: var(--df-r-full);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity var(--df-motion-quick) var(--df-ease-standard),
+              transform var(--df-motion-quick) var(--df-ease-standard);
+}
+.np-verb-begin:hover:not(:disabled) {
+  opacity: 0.9;
+}
+.np-verb-begin:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.np-verb-begin:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.np-verb-begin-arrow {
+  font-size: 14px;
+}
+
+/* ===== Toast ===== */
+.np-verb-toast {
+  position: fixed;
+  left: 50%;
+  bottom: var(--df-sp-5);
+  transform: translateX(-50%);
+  background: var(--df-surface-elevated);
+  border: 1px solid var(--df-border-strong);
+  color: var(--df-text-primary);
+  font-size: var(--df-text-sm);
+  padding: 10px 18px;
+  border-radius: var(--df-r-full);
+  box-shadow: var(--df-shadow-lg);
+  z-index: 50;
+  max-width: 90vw;
+  text-align: center;
+  animation: npVerbToastIn 220ms var(--df-ease-out);
+}
+@keyframes npVerbToastIn {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ===== Accessibility ===== */
+.np-verb-back:focus-visible,
+.np-verb-card:focus-visible,
+.np-verb-swap:focus-visible,
+.np-verb-input:focus-visible,
+.np-verb-textarea:focus-visible,
+.np-verb-chip:focus-visible,
+.np-verb-begin:focus-visible,
+.np-verb-theme-toggle:focus-visible {
+  outline: 0;
+  box-shadow: var(--df-focus-ring);
+}

@@ -1,0 +1,528 @@
+/* ════════════════════════════════════════════════════════════════════════
+ *  Settings · Comandos — flat list + structured form
+ * ════════════════════════════════════════════════════════════════════════
+ *
+ * Anatomy:
+ *   ┌─ kicker ──────────────────────────────────────────────────┐
+ *   │ DESIGN FACTORY · COMANDOS │
+ *   │ Comandos │
+ *   │ subtitle prose │
+ *   ├─ Directions block (whole-panel guidance) ─────────────────│
+ *   ├─ Toolbar: count + [+ Novo comando] ──────────────────────│
+ *   ├─ (optional) Create form card ─────────────────────────────│
+ *   ├─ Flat list (builtin/override/custom badges, no headers)──│
+ *   │ ▸ row head: toggle · name · trigger · pill · chev │
+ *   │ ▸ row body (when open): structured form + actions │
+ *   └────────────────────────────────────────────────────────────┘
+ *
+ * Editorial respiro: 24px section gaps, flat 1px borders, no triple
+ * bezel, generous padding.
+ */
+
+/* ─── Container ──────────────────────────────────────────────── */
+.cmd-panel {
+  /* Wider envelope for settings pages (1400px). */
+  max-width: 1400px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 56px;
+}
+
+.cmd-panel > .settings-kicker {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+}
+.cmd-panel > .settings-title {
+  font-size: 32px;
+  letter-spacing: -0.02em;
+  margin-top: 4px;
+  margin-bottom: 6px;
+  line-height: 1.1;
+}
+.cmd-panel > .settings-group-sub {
+  font-size: 14.5px;
+  line-height: 1.6;
+  max-width: 64ch;
+  color: var(--df-text-secondary);
+  margin: 0;
+}
+
+/* ─── Directions block (matches Padrões pattern) ────────────── */
+.cmd-directions {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 14px;
+  align-items: start;
+  padding: 18px 22px;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-left: 3px solid var(--df-accent-user, #8ab06b);
+  border-radius: var(--df-r-md);
+  box-shadow: none;
+}
+.cmd-directions-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 10%, transparent);
+  color: var(--df-accent-user, #8ab06b);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.cmd-directions-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.cmd-directions-title {
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--df-text-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+.cmd-directions-body {
+  font-family: var(--df-font-sans);
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--df-text-secondary);
+  margin: 0;
+  letter-spacing: -0.005em;
+  max-width: 70ch;
+}
+.cmd-directions-body strong {
+  font-weight: 600;
+  color: var(--df-text-primary);
+}
+[data-theme="light"] .cmd-directions {
+  background: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 4%, transparent);
+}
+[data-theme="light"] .cmd-directions-mark {
+  background: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 14%, transparent);
+}
+
+/* ─── Toolbar: count + create CTA ─────────────────────────── */
+.cmd-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 4px 0;
+}
+.cmd-toolbar-count {
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--df-text-muted);
+}
+
+/* ─── Flat list (no category headers) ──────────────────────── */
+.cmd-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cmd-row {
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  transition: border-color 120ms var(--df-ease-out), box-shadow 120ms var(--df-ease-out);
+}
+.cmd-row:hover {
+  border-color: var(--df-border-strong);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+.cmd-row.is-open {
+  border-color: var(--df-border-strong);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.cmd-row-head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 16px;
+}
+
+.cmd-row-headbtn {
+  background: transparent;
+  border: 0;
+  text-align: left;
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 12px;
+  align-items: center;
+  width: 100%;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+}
+
+.cmd-row-id {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.cmd-row-name {
+  font-family: var(--df-font-sans);
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--df-text-primary);
+}
+.cmd-row-trigger {
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--df-text-muted);
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-xs, 3px);
+  padding: 1px 6px;
+}
+.cmd-row-pill {
+  font-family: var(--df-font-mono);
+  font-size: 9px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--df-border-subtle);
+}
+.cmd-row-pill--builtin {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--df-text-faint);
+}
+[data-theme="light"] .cmd-row-pill--builtin {
+  background: rgba(60, 50, 40, 0.04);
+  color: var(--df-text-faint);
+}
+.cmd-row-pill--override {
+  background: rgba(216, 168, 107, 0.12);
+  color: var(--df-accent-warn, #d8a86b);
+  border-color: rgba(216, 168, 107, 0.22);
+}
+.cmd-row-pill--custom {
+  background: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 10%, transparent);
+  color: var(--df-accent-user, #8ab06b);
+  border-color: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 22%, transparent);
+}
+
+.cmd-row-desc {
+  grid-column: 1;
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--df-text-muted);
+  line-height: 1.45;
+}
+
+.cmd-row-chev {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  align-self: center;
+  flex-shrink: 0;
+  color: var(--df-text-muted);
+  transition: transform 160ms var(--df-ease-out);
+}
+.cmd-row-chev.is-open {
+  transform: rotate(180deg);
+}
+
+.cmd-row-body {
+  border-top: 1px solid var(--df-border-subtle);
+  padding: 22px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* ─── Empty state ──────────────────────────────────────────── */
+.cmd-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 72px 24px;
+  background: var(--df-bg-section);
+  border: 1px dashed var(--df-border-subtle);
+  border-radius: var(--df-r-lg);
+  text-align: center;
+}
+.cmd-empty-mark {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--df-r-md);
+  background: var(--df-bg-base);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--df-text-faint);
+  border: 1px solid var(--df-border-subtle);
+  margin-bottom: 6px;
+}
+.cmd-empty-title {
+  font-family: var(--df-font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--df-text-primary);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+.cmd-empty-body {
+  font-size: 13px;
+  color: var(--df-text-muted);
+  margin: 0;
+  max-width: 36ch;
+  line-height: 1.55;
+}
+
+/* ─── Create form card ─────────────────────────────────────── */
+.cmd-form-card {
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-lg);
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* ─── Form anatomy ─────────────────────────────────────────── */
+.cmd-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cmd-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.cmd-form-row--three {
+  grid-template-columns: 1fr 1fr auto;
+  align-items: end;
+}
+
+.cmd-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.cmd-field-label {
+  font-family: var(--df-font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--df-text-secondary);
+}
+
+.cmd-field-input {
+  height: 40px;
+  padding: 0 12px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  color: var(--df-text-primary);
+  font-family: var(--df-font-sans);
+  font-size: 14px;
+  letter-spacing: -0.005em;
+  outline: 0;
+  transition: border-color 120ms var(--df-ease-out), box-shadow 120ms var(--df-ease-out);
+}
+.cmd-field-input:focus {
+  border-color: var(--df-accent-user, var(--df-text-primary));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 10%, transparent);
+}
+.cmd-field-input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: var(--df-bg-section);
+}
+.cmd-field-input.is-invalid {
+  border-color: var(--df-accent-danger, #d05858);
+  box-shadow: 0 0 0 1px rgba(208, 88, 88, 0.20) inset;
+}
+.cmd-field-input--mono {
+  font-family: var(--df-font-mono);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+select.cmd-field-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none' stroke='%23999' stroke-width='1.6'><polyline points='1 1 5 5 9 1'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 9px 5px;
+  padding-right: 32px;
+  cursor: pointer;
+}
+
+.cmd-field-help {
+  font-size: 11px;
+  color: var(--df-text-muted);
+  line-height: 1.4;
+}
+
+.cmd-field--checkbox {
+  align-self: end;
+}
+.cmd-checkbox-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 12px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+}
+.cmd-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--df-accent-user, #8ab06b);
+  cursor: pointer;
+}
+.cmd-checkbox-label {
+  font-size: 13px;
+  color: var(--df-text-secondary);
+  cursor: pointer;
+  letter-spacing: -0.005em;
+}
+
+.cmd-field-textarea {
+  padding: 12px 14px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  color: var(--df-text-primary);
+  font-family: var(--df-font-mono);
+  font-size: 13px;
+  line-height: 1.55;
+  resize: vertical;
+  min-height: 200px;
+  outline: 0;
+  transition: border-color 120ms var(--df-ease-out), box-shadow 120ms var(--df-ease-out);
+}
+.cmd-field-textarea:focus {
+  border-color: var(--df-accent-user, var(--df-text-primary));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 10%, transparent);
+}
+
+/* ─── Frontmatter preview disclosure ──────────────────────── */
+.cmd-frontmatter-disclosure {
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  padding: 12px 16px;
+}
+.cmd-frontmatter-summary {
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--df-text-secondary);
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cmd-frontmatter-summary::-webkit-details-marker {
+  display: none;
+}
+.cmd-frontmatter-summary::before {
+  content: "›";
+  font-size: 14px;
+  transition: transform 160ms var(--df-ease-out);
+  display: inline-block;
+}
+.cmd-frontmatter-disclosure[open] .cmd-frontmatter-summary::before {
+  transform: rotate(90deg);
+}
+
+.cmd-frontmatter-preview {
+  margin: 12px 0 0;
+  padding: 14px 16px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--df-text-secondary);
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.cmd-frontmatter-note {
+  margin: 8px 0 0;
+  font-size: 11.5px;
+  color: var(--df-text-muted);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* ─── Form actions row ─────────────────────────────────────── */
+.cmd-form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding-top: 4px;
+}
+.cmd-form-actions > *:first-child:not(:only-child) {
+  margin-right: auto;
+}
+
+.cmd-form-error {
+  margin: 0;
+  padding: 10px 12px;
+  background: rgba(208, 88, 88, 0.06);
+  border: 1px solid rgba(208, 88, 88, 0.30);
+  border-radius: var(--df-r-sm);
+  color: var(--df-accent-danger, #d05858);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+/* ─── Reduced motion ──────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .cmd-row,
+  .cmd-row-chev,
+  .cmd-field-input,
+  .cmd-field-textarea,
+  .cmd-frontmatter-summary::before {
+    transition: none !important;
+  }
+}
+
+/* ─── Narrow viewports ────────────────────────────────────── */
+@media (max-width: 720px) {
+  .cmd-form-row,
+  .cmd-form-row--three {
+    grid-template-columns: 1fr;
+  }
+}

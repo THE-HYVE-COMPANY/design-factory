@@ -1,0 +1,14 @@
+# SPIKE scaffold — minimal Tauri 2 shell. Not compiled in the container (no Rust
+# toolchain + no webkit2gtk). Compiles on CI / a dev machine with `cargo`.
+[package]
+name = "design-factory"
+version = "0.0.0"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["devtools"] }
+tauri-plugin-shell = "2"               # spawn the daemon sidecar
+tauri-plugin-single-instance = "2"     # native start-fresh / focus (retires the lockfile path for the app)

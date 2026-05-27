@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 600" width="1600" height="600">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0e0f12"/>
+      <stop offset="100%" stop-color="#1a1d24"/>
+    </linearGradient>
+    <radialGradient id="warm" cx="80%" cy="20%" r="40%">
+      <stop offset="0%" stop-color="#d88a6b" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#d88a6b" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="600" fill="url(#bg)"/>
+  <rect width="1600" height="600" fill="url(#warm)"/>
+  <g transform="translate(120,300)">
+    <text x="0" y="-30" font-family="-apple-system,Inter,sans-serif" font-size="72" font-weight="700" fill="#f6f7fb" letter-spacing="-3">Design Factory</text>
+    <text x="0" y="20" font-family="-apple-system,Inter,sans-serif" font-size="22" font-weight="400" fill="#9aa1ad">A multi-provider AI design workspace.</text>
+  </g>
+</svg>

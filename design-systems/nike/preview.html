@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nike Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  background-color: #ffffff;
+  color: #111111;
+}
+
+.type-display-campaign {
+  font-family: 'Bebas Neue', Helvetica, Arial, sans-serif;
+  font-size: 96px;
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.type-heading-xl {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.type-heading-lg {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.type-heading-md {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.75;
+  letter-spacing: 0;
+}
+
+.type-body-md {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+.type-body-strong {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+.type-button-lg {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.type-button-md {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+.type-button-sm {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+.type-link-md {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.75;
+  letter-spacing: 0;
+  text-decoration: underline;
+}
+
+.type-caption-md {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+.type-caption-sm {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+.type-utility-xs {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1.75;
+  letter-spacing: 0;
+}
+
+.utility-bar {
+  background-color: #f5f5f5;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 24px;
+  gap: 12px;
+}
+
+.utility-bar a {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #111111;
+  text-decoration: none;
+}
+
+.utility-divider {
+  color: #cacacb;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.primary-nav {
+  background-color: #ffffff;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+}
+
+.nav-center {
+  display: flex;
+  gap: 24px;
+  flex: 1;
+  justify-content: center;
+}
+
+.nav-center a {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #111111;
+  text-decoration: none;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.search-pill {
+  background-color: #f5f5f5;
+  color: #111111;
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  border-radius: 24px;
+  padding: 8px 16px;
+  height: 40px;
+  border: none;
+  outline: none;
+  width: 180px;
+}
+
+.btn-icon-circular {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero {
+  position: relative;
+  width: 100%;
+  background-color: #1a1a1a;
+  background-image: radial-gradient(circle at 20% 50%, rgba(50,50,50,0.7) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(70,70,70,0.5) 0%, transparent 40%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 48px;
+  min-height: 640px;
+}
+
+.hero-headline {
+  color: #ffffff;
+  margin-bottom: 12px;
+}
+
+.hero-subhead {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #ffffff;
+  margin-bottom: 24px;
+  max-width: 480px;
+}
+
+.hero-ctas {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-primary {
+  background-color: #111111;
+  color: #ffffff;
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-weight: 500;
+  border-radius: 30px;
+  padding: 16px 32px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background-color: #f5f5f5;
+  color: #111111;
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-weight: 500;
+  border-radius: 30px;
+  padding: 16px 32px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-ghost {
+  background-color: #ffffff;
+  color: #111111;
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-weight: 500;
+  border-radius: 30px;
+  padding: 16px 32px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #cacacb;
+  cursor: pointer;
+}
+
+.btn-lg { font-size: 24px; line-height: 1.2; height: 56px; }
+.btn-md { font-size: 16px; line-height: 1.5; height: 48px; }
+.btn-sm { font-size: 14px; line-height: 1.5; height: 40px; padding: 8px 20px; }
+
+.section {
+  padding: 48px 24px;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.section + .section {
+  padding-top: 0;
+}
+
+h1, h2, h3, h4 { margin-top: 0; }
+
+.buttons-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group label {
+  display: block;
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.75;
+  color: #111111;
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  max-width: 400px;
+  background-color: #f5f5f5;
+  color: #111111;
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  border-radius: 24px;
+  padding: 8px 16px;
+  height: 40px;
+  border: none;
+  outline: none;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.product-card {
+  background-color: #ffffff;
+  border-radius: 0;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+}
+
+.product-card-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.product-card-meta {
+  padding-top: 8px;
+}
+
+.swatch-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.swatch-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+}
+
+.badge-promo {
+  display: inline-block;
+  background-color: #ffffff;
+  border: 1px solid #cacacb;
+  color: #111111;
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  border-radius: 30px;
+  padding: 4px 12px;
+  margin-bottom: 8px;
+}
+
+.price-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.price-sale {
+  color: #d30005;
+}
+
+.price-original {
+  color: #707072;
+  text-decoration: line-through;
+}
+
+.stats-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.stat-tile {
+  flex: 1;
+  background-color: #f5f5f5;
+  border-radius: 0;
+  padding: 24px;
+  text-align: center;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 24px;
+}
+
+.data-table th,
+.data-table td {
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid #cacacb;
+}
+
+.data-table th {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #111111;
+}
+
+.data-table td {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #111111;
+}
+
+.type-ramp-row {
+  display: flex;
+  align-items: baseline;
+  gap: 24px;
+  padding: 12px 0;
+  border-bottom: 1px solid #cacacb;
+}
+
+.type-ramp-token {
+  width: 220px;
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #707072;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.swatches-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.swatch-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.swatch-color {
+  width: 100%;
+  height: 80px;
+  border-radius: 0;
+  border: 1px solid #e5e5e5;
+}
+
+.swatch-info {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #111111;
+}
+
+.swatch-hex {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #707072;
+}
+
+.radii-row {
+  display: flex;
+  gap: 24px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.radius-box {
+  width: 96px;
+  height: 96px;
+  background-color: #111111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.spacing-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.spacing-bar {
+  height: 24px;
+  background-color: #111111;
+}
+
+.spacing-label {
+  width: 120px;
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #707072;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.footer {
+  background-color: #ffffff;
+  border-top: 1px solid #cacacb;
+  padding: 48px 24px 24px;
+  margin-top: 48px;
+}
+
+.footer-columns {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.footer-col h4 {
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #111111;
+  margin-bottom: 12px;
+}
+
+.footer-col a {
+  display: block;
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #707072;
+  text-decoration: none;
+  margin-bottom: 8px;
+}
+
+.footer-fine-print {
+  max-width: 1440px;
+  margin: 24px auto 0;
+  padding-top: 24px;
+  border-top: 1px solid #cacacb;
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1.75;
+  color: #707072;
+}
+
+@media (max-width: 1023px) {
+  .cards-grid { grid-template-columns: repeat(2, 1fr); }
+  .type-display-campaign { font-size: 64px; }
+  .footer-columns { grid-template-columns: repeat(2, 1fr); }
+  .nav-center { display: none; }
+}
+
+@media (max-width: 599px) {
+  .cards-grid { grid-template-columns: 1fr; }
+  .type-display-campaign { font-size: 48px; }
+  .stats-row { flex-direction: column; }
+  .footer-columns { grid-template-columns: 1fr; }
+  .section { padding: 24px 16px; }
+  .hero { padding: 24px; min-height: 480px; }
+}
+</style>
+</head>
+<body>
+
+<div class="utility-bar">
+  <a href="#">Find a Store</a>
+  <span class="utility-divider">·</span>
+  <a href="#">Help</a>
+  <span class="utility-divider">·</span>
+  <a href="#">Join Us</a>
+  <span class="utility-divider">·</span>
+  <a href="#">Sign In</a>
+</div>
+
+<nav class="primary-nav">
+  <div style="display:flex;align-items:center;">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="#111111" xmlns="http://www.w3.org/2000/svg">
+      <path d="M21 8.719L7.836 14.303C6.74 14.768 5.818 15 5.075 15c-.836 0-1.445-.295-1.819-.884-.485-.76-.273-1.982.559-3.272.494-.754 1.122-1.446 1.734-2.108-.144.234-1.415 2.349-.025 3.345.275.2.666.298 1.147.298.386 0 .829-.063 1.316-.19L21 8.719z"/>
+    </svg>
+  </div>
+  <div class="nav-center">
+    <a href="#">New & Featured</a>
+    <a href="#">Men</a>
+    <a href="#">Women</a>
+    <a href="#">Kids</a>
+    <a href="#">Jordan</a>
+    <a href="#">Nike SKIMS</a>
+    <a href="#">Sport</a>
+  </div>
+  <div class="nav-right">
+    <input type="text" class="search-pill" placeholder="Search">
+    <button class="btn-icon-circular" aria-label="Wishlist">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+    </button>
+    <button class="btn-icon-circular" aria-label="Bag">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111111" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+    </button>
+  </div>
+</nav>
+
+<section class="hero">
+  <h1 class="type-display-campaign hero-headline">AIR MAX DN<br>TRAIL RUNNING</h1>
+  <p class="hero-subhead">Engineered for the wild. Built for the pace that moves you.</p>
+  <div class="hero-ctas">
+    <button class="btn-secondary btn-lg">Shop Now</button>
+    <button class="btn-primary btn-lg">Explore ACG</button>
+  </div>
+</section>
+
+<section class="section">
+  <h2 class="type-heading-xl" style="margin-bottom:8px;">Buttons</h2>
+  <p class="type-body-md" style="color:#707072;">Primary / Secondary / Ghost × Large / Medium / Small</p>
+  <div class="buttons-grid">
+    <button class="btn-primary btn-lg">Primary Large</button>
+    <button class="btn-primary btn-md">Primary Medium</button>
+    <button class="btn-primary btn-sm">Primary Small</button>
+    <button class="btn-secondary btn-lg">Secondary Large</button>
+    <button class="btn-secondary btn-md">Secondary Medium</button>
+    <button class="btn-secondary btn-sm">Secondary Small</button>
+    <button class="btn-ghost btn-lg">Ghost Large</button>
+    <button class="btn-ghost btn-md">Ghost Medium</button>
+    <button class="btn-ghost btn-sm">Ghost Small</button>
+  </div>
+</section>
+
+<section class="section">
+  <h2 class="type-heading-xl" style="margin-bottom:24px;">Join Us</h2>
+  <div style="max-width:600px;">
+    <div class="form-group">
+      <label>Email Address</label>
+      <input type="email" class="form-input" placeholder="you@example.com">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" class="form-input" placeholder="••••••••">
+    </div>
+    <button class="btn-primary btn-md">Sign Up</button>
+  </div>
+</section>
+
+<section class="section">
+  <h2 class="type-heading-xl" style="margin-bottom:24px;">Featured Footwear</h2>
+  <div class="cards-grid">
+    <div class="product-card">
+      <div class="product-card-image">
+        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#cacacb" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+      </div>
+      <div class="product-card-meta">
+        <div class="swatch-row">
+          <div class="swatch-dot" style="background-color:#111111;"></div>
+          <div class="swatch-dot" style="background-color:#9e9ea0;"></div>
+          <div class="swatch-dot" style="background-color:#ffffff;border:1px solid #cacacb;"></div>
+        </div>
+        <div class="badge-promo">Just In</div>
+        <div class="type-body-strong" style="margin-bottom:8px;">Nike Air Max Dn</div>
+        <div class="type-caption-md" style="color:#707072;margin-bottom:8px;">Men's Shoes</div>
+        <div class="price-row type-body-strong">
+          <span>$160</span>
+        </div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-card-image">
+        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#cacacb" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+      </div>
+      <div class="product-card-meta">
+        <div class="swatch-row">
+          <div class="swatch-dot" style="background-color:#007d48;"></div>
+          <div class="swatch-dot" style="background-color:#0a7281;"></div>
+        </div>
+        <div class="type-body-strong" style="margin-bottom:8px;">Nike Pegasus Trail 5</div>
+        <div class="type-caption-md" style="color:#707072;margin-bottom:8px;">Men's Trail-Running Shoes</div>
+        <div class="price-row type-body-strong">
+          <span class="price-sale">$112.97</span>
+          <span class="price-original">$150</span>
+          <span class="price-sale">24% off</span>
+        </div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-card-image">
+        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#cacacb" stroke-width="1"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>
+      </div>
+      <div class="product-card-meta">
+        <div class="swatch-row">
+          <div class="swatch-dot" style="background-color:#d30005;"></div>
+          <div class="swatch-dot" style="background-color:#111111;"></div>
+        </div>
+        <div class="badge-promo">Member Exclusive</div>
+        <div class="type-body-strong" style="margin-bottom:8px;">Jordan Golf Retro 1</div>
+        <div class="type-caption-md" style="color:#707072;margin-bottom:8px;">Men's Golf Shoes</div>
+        <div class="price-row type-body-strong">
+          <span>$180</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <h2 class="type-heading-xl" style="margin-bottom:24px;">Performance</h2>
+  <div class="stats-row">
+    <div class="stat-tile">
+      <div class="type-heading-lg" style="margin-bottom:8px;">87%</div>
+      <div class="type-caption-md" style="color:#707072;">Energy Return</div>
+    </div>
+    <div class="stat-tile">
+      <div class="type-heading-lg" style="margin-bottom:8px;">4.2M</div>
+      <div class="type-caption-md" style="color:#707072;">Runners Tracked</div>
+    </div>
+    <div class="stat-tile">
+      <div class="type-heading-lg" style="margin-bottom:8px;">12%</div>
+      <div class="type-caption-md" style="color:#707072;">Weight Reduction</div>
+    </div>
+    <div class="stat-tile">
+      <div class="type-heading-lg" style="margin-bottom:8px;">0.3s</div>
+      <div class="type-caption-md" style="color:#707072;">Response Time</div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <h2 class="type-heading-xl" style="margin-bottom:24px;">Inventory</h2>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Category</th>
+        <th>Status</th>
+        <th>Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Air Max Dn</td>
+        <td>Lifestyle</td>
+        <td style="color:#007d48;">In Stock</td>
+        <td>$160.00</td>
+      </tr>
+      <tr>
+        <td>Pegasus Trail 5</td>
+        <td>Trail Running</td>
+        <td style="color:#007d48;">In Stock</td>
+        <td>$150.00</td>
+      </tr>
+      <tr>
+        <td>ACG Mountain Fly</td>
+        <td>Outdoor</td>
+        <td style="color:#707072;">Low Stock</td>
+        <td>$230.00</td>
+      </tr>
+      <tr>
+        <td>Metcon 9</td>
+        <td>Training</td>
+        <td style="color:#d30005;">Backorder</td>
+        <td>$130.00</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="section">
+  <h2 class="type-heading-xl" style="margin-bottom:24px;">Typography Ramp</h2>
+  <div>
+    <div class="type-ramp-row">
+      <div class="type-ramp-token">display-campaign</div>
+      <div class="type-display-campaign">RUN THE WORLD</div>
+    </div>
+    <div class="type-ramp-row">
+      <div class="type-ramp-token">heading-xl</div>
+      <div class="type-heading-xl">Featured Footwear</div>
+    </div>
+    <div class="type-ramp-row">
+      <div class="type-ramp-token">heading-lg</div>
+      <div class="type-heading-lg">Member Benefits</div>
+    </div>
+    <div class="type-ramp-row">
+      <div class="type-ramp-token">heading-md</div>
+      <div class="type-heading-md">Shipping & Returns</div>
+    </div>
+    <div class="type-ramp-row">
+      <div class="type-ramp-token">body-md</div>
+      <div class="type-body-md">The quick brown fox jumps over the lazy dog.</div>
+    </div>
+    <div class="type-ramp-row">
+      <div class="type-ramp-token">body-strong</div>
+      <div class="type-body-strong">The quick brown fox jumps over the lazy dog.</div>
+    </div>
+    <div class="type-ramp-row">
+      <div class="type-ramp-token">button-lg</div>
+      <div class="type-button-lg">Shop Now</div>
+    </div>
+    <div class="type-ramp-row">
+      <div class="type-ramp-token">button-md</div>
+      <div class="type-button-md">Add to Bag</div>
+    </div>
+    <div class="type-ramp-row">
+      <div class="type-ramp-token">button-sm</div>
+      <div class="type-button-sm">Notify Me</div>
+    </div>
+    <div class="type-ramp-row">
+      <div class="type-ramp-token">link-md</div>
+      <div class="type-link-md">View Product Details</div>
+    </div>
+    <div class="type-ramp-row">
+      <div class="type-ramp-token">caption-md</div>
+      <div class="type-caption-md">Men's Trail Running Shoes</div>
+    </div>
+    <div class="type-ramp-row">
+      <div class="type-ramp-token">caption-sm</div>
+      <div class="type-caption-sm">Just In · Recycled Materials</div>
+    </div>
+    <div class="type-ramp-row">
+      <div class="type-ramp-token">utility-xs</div>
+      <div class="type-utility-xs">© 2025 Nike, Inc. All Rights Reserved.</div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <h2 class="type-heading-xl" style="margin-bottom:24px;">Palette</h2>
+  <div class="swatches-grid">
+    <div class="swatch-item"><div class="swatch-color" style="background-color:#111111;"></div><div class="swatch-info">ink</div><div class="swatch-hex">#111111</div></div>
+    <div class="swatch-item"><div class="swatch-color" style="background-color:#ffffff;"></div><div class="swatch-info">canvas / on-primary</div><div class="swatch-hex">#ffffff</div></div>
+    <div class="swatch-item"><div class="swatch-color" style="background-color:#f5f5f5;"></div><div class="swatch-info">soft-cloud</div><div class="swatch-hex">#f5f5f5</div></div>
+    <div class="swatch-item"><div class="swatch-color" style="background-color:#cacacb;"></div><div class="swatch-info">hairline</div><div class="swatch-hex">#cacacb</div></div>
+    <div class="swatch-item"><div class="swatch-color" style="background-color:#e5e5e5;"></div><div class="swatch-info">hairline-soft</div><div class="swatch-hex">#e5e5e5</div></div>
+    <div class="swatch-item"><div class="swatch-color" style="background-color:#39393b;"></div><div class="swatch-info">charcoal</div><div class="swatch-hex">#39393b</div></div>
+    <div class="swatch-item"><div class="swatch-color" style="background-color:#4b4b4d;"></div><div class="swatch-info">ash</div><div class="swatch-hex">#4b4b4d</div></div>
+    <div class="swatch-item"><div class="swatch-color" style="background-color:#707072;"></div><div class="swatch-info">mute</div><div class="swatch-hex">#707072</div></div>
+    <div class="swatch-item"><div class="swatch-color" style="background-color:#9e9ea0;"></div><div class="swatch-info">stone</div><div class="swatch-hex">#9e9ea0</div></div>
+    <div class="swatch-item"><div class="swatch-color" style="background-color:#d30005;"></div><div class="swatch-info">sale</div><div class="swatch-hex">#d30005</div></div>
+    <div class="swatch-item"><div class="swatch-color" style="background-color:#780700;"></div><div class="swatch-info">sale-deep</div><div class="swatch-hex">#780700</div></div>
+    <div class="swatch-item"><div class="swatch-color" style="background-color:#007d48;"></div><div class="swatch-info">success</div><div class="swatch-hex">#007d48</div></div>
+    <div class="swatch-item"><div class="swatch-color" style="background-color:#1eaa52;"></div><div class="swatch-info">success-bright</div><div class="swatch-hex">#1eaa52</div></div>
+    <div class="swatch-item"><div class="swatch-color" style="background-color:#1151ff;"></div><div class="swatch-info">info</div><div class="swatch-hex">#1151ff</div></div>
+    <div class="swatch-item"><div class="swatch-color" style="background-color:#0034e3;"></div><div class="swatch-info">info-deep</div><div class="swatch-hex">#0034e3</div></div>
+    <div class="swatch-item"><div class="swatch-color" style="background-color:#ed1aa0;"></div><div class="swatch-info">accent-pink</div><div class="swatch-hex">#ed1aa0</div></div>
+    <div class="swatch-item"><div class="swatch-color" style="background-color:#ffb0dd;"></div><div class="swatch-info">accent-pink-soft</div><div class="swatch-hex">#ffb0dd</div></div>
+    <div class="swatch-item"><div class="swatch-color" style="background-color:#beaffd;"></div><div class="swatch-info">accent-purple-soft</div><div class="swatch-hex">#beaffd</div></div>
+    <div class="swatch-item"><div class="swatch-color" style="background-color:#d6d1ff;"></div><div class="swatch-info">accent-purple-pale</div><div class="swatch-hex">#d6d1ff</div></div>
+    <div class="swatch-item"><div class="swatch-color" style="background-color:#0a7281;"></div><div class="swatch-info">accent-teal</div><div class="swatch-hex">#0a7281</div></div>
+    <div class="swatch-item"><div class="swatch-color" style="background-color:#4c012d;"></div><div class="swatch-info">accent-pink-deep</div><div class="swatch-hex">#4c012d</div></div>
+  </div>
+</section>
+
+<section class="section">
+  <h2 class="type-heading-xl" style="margin-bottom:24px;">Border Radius</h2>
+  <div class="radii-row">
+    <div class="radius-box" style="border-radius:0px;">none<br>0px</div>
+    <div class="radius-box" style="border-radius:18px;">sm<br>18px</div>
+    <div class="radius-box" style="border-radius:24px;">md<br>24px</div>
+    <div class="radius-box" style="border-radius:30px;">lg<br>30px</div>
+    <div class="radius-box" style="border-radius:9999px;">full<br>9999px</div>
+  </div>
+</section>
+
+<section class="section">
+  <h2 class="type-heading-xl" style="margin-bottom:24px;">Spacing Rhythm</h2>
+  <div>
+    <div class="spacing-row"><div class="spacing-label">xxs · 2px</div><div class="spacing-bar" style="width:2px;"></div></div>
+    <div class="spacing-row"><div class="spacing-label">xs · 4px</div><div class="spacing-bar" style="width:4px;"></div></div>
+    <div class="spacing-row"><div class="spacing-label">sm · 8px</div><div class="spacing-bar" style="width:8px;"></div></div>
+    <div class="spacing-row"><div class="spacing-label">md · 12px</div><div class="spacing-bar" style="width:12px;"></div></div>
+    <div class="spacing-row"><div class="spacing-label">lg · 18px</div><div class="spacing-bar" style="width:18px;"></div></div>
+    <div class="spacing-row"><div class="spacing-label">xl · 24px</div><div class="spacing-bar" style="width:24px;"></div></div>
+    <div class="spacing-row"><div class="spacing-label">xxl · 30px</div><div class="spacing-bar" style="width:30px;"></div></div>
+    <div class="spacing-row"><div class="spacing-label">section · 48px</div><div class="spacing-bar" style="width:48px;"></div></div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-columns">
+    <div class="footer-col">
+      <h4>Resources</h4>
+      <a href="#">Find A Store</a>
+      <a href="#">Become A Member</a>
+      <a href="#">Send Us Feedback</a>
+    </div>
+    <div class="footer-col">
+      <h4>Help</h4>
+      <a href="#">Get Help</a>
+      <a href="#">Order Status</a>
+      <a href="#">Delivery</a>
+      <a href="#">Returns</a>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="#">About Nike</a>
+      <a href="#">News</a>
+      <a href="#">Careers</a>
+      <a href="#">Investors</a>
+    </div>
+    <div class="footer-col">
+      <h4>Promotions & Discounts</h4>
+      <a href="#">Student</a>
+      <a href="#">Military</a>
+      <a href="#">Teacher</a>
+      <a href="#">First Responders</a>
+    </div>
+  </div>
+  <div class="footer-fine-print">
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <span>© 2025 Nike, Inc. All Rights Reserved</span>
+      <span>Privacy Policy · Terms of Use · CA Supply Chains Act</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

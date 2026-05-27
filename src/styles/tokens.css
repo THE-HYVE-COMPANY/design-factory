@@ -1,0 +1,543 @@
+/* Design Factory — Tokens
+ *
+ * Factory-tactile skeumorphic. Monochrome shades-of-grey on a warm
+ * olive undertone. Realism comes from inset highlights at top edges,
+ * recessed inputs, layered drop shadows — not from gradients, glows,
+ * or spotlights.
+ *
+ * Principles:
+ *  · One palette: warm olive-grey, varied only in luminance.
+ *  · No hero color in surfaces. Color appears only as restrained focus
+ *    ring tint and semantic states (warn / danger / ok / info).
+ *  · Tactile depth: inset top hairline + outer drops. Real light
+ *    physics, not decorative glow.
+ *  · Buttons feel pressed/raised by shadow logic, not by gradient bg.
+ *  · No corner glows, no glass-edge highlights, no chromatic tints
+ *    on borders.
+ */
+
+:root, [data-theme="dark"] {
+  color-scheme: dark;
+
+  /* ===== Layer system — warm charcoal ===== */
+  --df-bg-sunken:        #0C0C0A;
+  --df-bg-base:          #161613;
+  --df-bg-section:       #1B1A17;
+  --df-surface-raised:   #232320;
+  --df-surface-elevated: #2C2C28;
+  --df-surface-overlay:  rgba(8, 8, 6, 0.62);
+
+  /* ===== Text — dimmed primary, less green-fluorescent =====
+   * Muted/faint alphas are calibrated so text stays readable in both
+   * dark and light modes. Targets WCAG AA: muted ≥ 4.5:1, faint ≥ 3:1
+   * over bg-base. With muted at 0.66 → 6.09:1 and faint at 0.50 →
+   * 4.00:1, both pass.
+   */
+  --df-text-primary:   #D0DBC4;
+  --df-text-secondary: rgba(208, 219, 196, 0.78);
+  --df-text-muted:     rgba(208, 219, 196, 0.66);
+  --df-text-faint:     rgba(208, 219, 196, 0.50);
+  --df-text-inverse:   #161613;
+  /* Text on top of tactile button bg. The button is always dark in both
+   * themes (pressed-key socket feel), so this color must always read as
+   * light — it is NOT theme-flipped. Keep it warm-light for legibility. */
+  --df-text-on-tactile: #DCEAD0;
+
+  /* ===== Borders — 2 levels only, always 1px solid =====
+   * subtle = default (panels, cards, static rows)
+   * strong = emphasized (hover, focus, selected, accent stripe, tactile edge)
+   * divider = same visual weight as subtle but SOLID — required for the
+   *   aqua tab corner radial-gradient (alpha gradients composite badly at
+   *   1px stops, the corner ring goes muddy). Use divider only for that
+   *   specific geometric case. Anywhere else, use subtle.
+   * hover/focus kept as aliases for migration; collapse over time. */
+  --df-border-subtle:  rgba(251, 252, 243, 0.10);
+  --df-border-strong:  rgba(251, 252, 243, 0.26);
+  --df-border-divider: #2C2D2A;
+  --df-border-hover:   var(--df-border-strong);
+  --df-border-focus:   var(--df-border-strong);
+
+  /* ===== Interactive ===== */
+  --df-interactive-hover:    rgba(251, 252, 243, 0.05);
+  --df-interactive-pressed:  rgba(251, 252, 243, 0.10);
+  --df-interactive-selected: rgba(251, 252, 243, 0.12);
+
+  /* ===== Tactile primitives — soft falloff, real-light physics =====
+   * Shadows distribute across many layers with low opacity each. The
+   * eye reads it as depth, not as a stroke.
+   * User ask 2026-05-21: "suavizar shadows no darkmode e refinar
+   * no geral toda jornada". Previous dark scale (0.28-0.58 ambient
+   * opacities) read as dramatic, almost stage-lit, when the warm
+   * charcoal surfaces already have natural contrast. This pass cuts
+   * every ambient layer by ~35% and nudges the top highlight up
+   * slightly to keep the edge readable. The skeu physics still
+   * compose — just at conversational volume instead of theatrical.
+   */
+  --df-skeu-top-light:   rgba(255, 255, 255, 0.14);
+  --df-skeu-bottom-edge: rgba(0, 0, 0, 0.30);
+  --df-skeu-contact:     rgba(0, 0, 0, 0.18);
+  --df-skeu-near:        rgba(0, 0, 0, 0.22);
+  --df-skeu-deep-near:   rgba(0, 0, 0, 0.30);
+  --df-skeu-deep-far:    rgba(0, 0, 0, 0.38);
+
+  /* Recessed input bowl — sunken inner shadow */
+  --df-skeu-recess:
+    inset 0 2px 4px rgba(0, 0, 0, 0.30),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.22);
+
+  /* ===== Shadows ===== */
+  --df-shadow-sm:
+    0 1px 2px rgba(0, 0, 0, 0.16),
+    0 0 0 1px rgba(255, 255, 255, 0.03);
+  --df-shadow-md:
+    0 2px 4px rgba(0, 0, 0, 0.18),
+    0 8px 20px rgba(0, 0, 0, 0.20);
+  --df-shadow-lg:
+    0 4px 8px rgba(0, 0, 0, 0.20),
+    0 18px 40px rgba(0, 0, 0, 0.24);
+  --df-shadow-xl:
+    0 6px 14px rgba(0, 0, 0, 0.22),
+    0 32px 72px rgba(0, 0, 0, 0.32);
+  --df-shadow-tab-inset: inset 0 -1px 0 rgba(251, 252, 243, 0.08);
+
+  /* Card — raised neutral surface. Top hairline + bottom dark inset +
+   * shadow drops. The bottom inset gives dark surfaces the carved/relief
+   * feel that the light theme gets for free from contrast.
+   * User ask 2026-05-21 (round 3): "acho todas shadows de cards
+   * exageradas em spread e opacidade". Trimmed the ambient stack from
+   * 4 layers (1+5+16+32 px blur) to 3 (1+3+10 px) and dropped the
+   * 32/70 px planet-sized halo entirely. Bottom inset opacity also
+   * eased. The inset relief still carries the depth; the drop is just
+   * enough to separate the surface from the page. */
+  --df-shadow-card:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 1px 2px var(--df-skeu-contact),
+    0 3px 8px -2px var(--df-skeu-near),
+    0 10px 22px -6px var(--df-skeu-deep-near);
+
+  --df-shadow-card-hover:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.22),
+    inset 0 0 0 1px var(--df-border-hover),
+    0 1px 2px var(--df-skeu-contact),
+    0 4px 12px -2px var(--df-skeu-near),
+    0 14px 30px -6px var(--df-skeu-deep-near);
+
+  /* Tactile button — pressed-key feel. Top hi + bottom dark + side rails
+   * darker than surface = sits inside its socket like a hardware key.
+   * Soften pass 2026-05-21: every black layer trimmed ~30%, top
+   * highlight bumped slightly so the key still reads as ridged. */
+  --df-bg-button-tactile:       #232320;
+  --df-bg-button-tactile-hover: #2A2A26;
+  --df-shadow-button-tactile:
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.40),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.36),
+    0 1px 2px rgba(0, 0, 0, 0.22),
+    0 5px 14px -2px rgba(0, 0, 0, 0.28);
+
+  /* Hover SHRINKS the key into the socket (user ask 2026-05-11:
+   * "hover em botao deve sempre pressionar levemente, nunca levantar
+   * botao"). Outer ambient collapses; inset deepens. */
+  --df-shadow-button-tactile-hover:
+    inset 0 1px 2px rgba(0, 0, 0, 0.30),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.10),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.40),
+    0 0.5px 0 rgba(0, 0, 0, 0.14);
+
+  --df-shadow-button-tactile-pressed:
+    inset 0 2px 5px rgba(0, 0, 0, 0.40),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.42);
+
+  /* Focus ring — neutral, no chroma */
+  --df-focus-ring: 0 0 0 3px rgba(251, 252, 243, 0.14);
+
+  /* ===== Skeu shadow scale v14 — Apple-grade subtle =====
+   * Layered shadows (close highlight + ambient depth). 2-3 layers max,
+   * alphas in 0.04-0.16 range. Each token = full {inset highlight} +
+   * {close shadow} + {ambient depth}. Keep snappy: no heavy black drops.
+   *
+   * Apply on buttons/cards/dropdowns. Existing --df-shadow-card and
+   * --df-shadow-button-tactile remain for high-tactility hardware-key feel.
+   */
+  --df-skeu-shadow-sm:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
+    0 1px 1px 0 rgba(0, 0, 0, 0.10),
+    0 1px 0 0 rgba(0, 0, 0, 0.05);
+
+  --df-skeu-shadow-md:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.07),
+    0 1px 2px 0 rgba(0, 0, 0, 0.10),
+    0 2px 4px -1px rgba(0, 0, 0, 0.10);
+
+  --df-skeu-shadow-lg:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+    0 2px 4px 0 rgba(0, 0, 0, 0.12),
+    0 8px 16px -4px rgba(0, 0, 0, 0.16);
+
+  --df-skeu-shadow-xl:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.10),
+    0 4px 8px 0 rgba(0, 0, 0, 0.14),
+    0 16px 32px -8px rgba(0, 0, 0, 0.22);
+
+  --df-skeu-shadow-press:
+    inset 0 1px 2px 0 rgba(0, 0, 0, 0.18),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+
+  /* Material surface gradient — 1.5% delta top→bottom, sutil */
+  --df-surface-raised-grad:
+    linear-gradient(180deg,
+      color-mix(in oklab, var(--df-surface-raised) 100%, white 1.5%) 0%,
+      var(--df-surface-raised) 100%);
+  --df-surface-elevated-grad:
+    linear-gradient(180deg,
+      color-mix(in oklab, var(--df-surface-elevated) 100%, white 2%) 0%,
+      var(--df-surface-elevated) 100%);
+
+  /* ===== Sunken surface tokens =====
+   * Two depth tiers below --df-bg-base so cavities (prompt textarea,
+   * dial wells, dropdown search inputs) read as physically recessed
+   * instead of floating flush with the surrounding plate. Combined
+   * with --df-bezel-recessed-* / --df-skeu-recess shadows, the effect
+   * is "engraved into the faceplate".
+   *
+   * sunken-1 = subtle recess (-4% black mix). Use on secondary UI:
+   *   search inputs, picker key inactive states, name input wrap.
+   * sunken-2 = deeper recess (-8% black mix). Use on hero cavities:
+   *   prompt textarea (user's primary ask), dial track wells.
+   *
+   * Light mode: "sunken" is not literally darker — it's slightly warmer
+   * (paper recess feel). Mixes with a warm umber tone so the cavity
+   * reads as "ink-stained paper recess" instead of "darker grey". */
+  --df-surface-sunken-1: color-mix(in oklab, var(--df-bg-base) 100%, black 4%);
+  --df-surface-sunken-2: color-mix(in oklab, var(--df-bg-base) 100%, black 8%);
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* ===== Layer system — warm olive-grey, expanded range (Lab 82 → 98) ===== */
+  --df-bg-sunken:        #D2D1C9;
+  --df-bg-base:          #DEDDD5;
+  --df-bg-section:       #E9E8E0;
+  --df-surface-raised:   #F1F0E8;
+  --df-surface-elevated: #F9F8EE;
+  --df-surface-overlay:  rgba(20, 18, 14, 0.42);
+
+  /* ===== Text — alphas calibrated for WCAG AA contrast =====
+   * muted 0.68 → 5.23:1 (PASS AA); faint 0.55 → 3.55:1 (PASS for large
+   * text and icons).
+   */
+  --df-text-primary:   #1A1A17;
+  --df-text-secondary: rgba(26, 26, 23, 0.78);
+  --df-text-muted:     rgba(26, 26, 23, 0.68);
+  --df-text-faint:     rgba(26, 26, 23, 0.55);
+  --df-text-inverse:   #FBFCF3;
+  /* User ask 2026-05-11: "no modal de novo projeto no modo light
+   * nao quero botoes pretos, quero q sigam o tema". Tactile buttons
+   * in light theme now use dark ink on a cream key (vs the
+   * black-on-cream brick the previous tokens shipped). The dark
+   * theme block above keeps the cream-on-dark pairing. */
+  --df-text-on-tactile: #1A1A17;
+
+  /* ===== Borders — 2 levels only, always 1px solid =====
+   * Same simplification as dark theme. See dark block for rationale. */
+  --df-border-subtle:  rgba(26, 26, 23, 0.16);
+  --df-border-strong:  rgba(26, 26, 23, 0.34);
+  --df-border-divider: #C9C8BF;
+  --df-border-hover:   var(--df-border-strong);
+  --df-border-focus:   var(--df-border-strong);
+
+  /* ===== Interactive ===== */
+  --df-interactive-hover:    rgba(26, 26, 23, 0.05);
+  --df-interactive-pressed:  rgba(26, 26, 23, 0.09);
+  --df-interactive-selected: rgba(26, 26, 23, 0.11);
+
+  /* ===== Tactile primitives — soft falloff for paper-on-desk feel ===== */
+  --df-skeu-top-light:   rgba(255, 255, 255, 0.85);
+  --df-skeu-bottom-edge: rgba(40, 30, 22, 0.08);
+  --df-skeu-contact:     rgba(40, 30, 22, 0.04);
+  --df-skeu-near:        rgba(40, 30, 22, 0.05);
+  --df-skeu-deep-near:   rgba(40, 30, 22, 0.07);
+  --df-skeu-deep-far:    rgba(40, 30, 22, 0.12);
+
+  --df-skeu-recess:
+    inset 0 1px 2px rgba(40, 30, 22, 0.08),
+    inset 0 0 0 1px rgba(40, 30, 22, 0.04);
+
+  /* ===== Shadows ===== */
+  --df-shadow-sm:
+    0 1px 2px rgba(40, 30, 22, 0.08),
+    0 0 0 1px rgba(40, 30, 22, 0.04);
+  --df-shadow-md:
+    0 2px 6px rgba(40, 30, 22, 0.10),
+    0 8px 20px rgba(40, 30, 22, 0.13);
+  --df-shadow-lg:
+    0 4px 10px rgba(40, 30, 22, 0.10),
+    0 18px 40px rgba(40, 30, 22, 0.16);
+  --df-shadow-xl:
+    0 8px 18px rgba(40, 30, 22, 0.12),
+    0 32px 72px rgba(40, 30, 22, 0.22);
+  --df-shadow-tab-inset: inset 0 -1px 0 rgba(26, 26, 23, 0.10);
+
+  /* Card shadow trim 2026-05-21 (round 3) — mirrors the dark trim above:
+   * drop the 28-56 px halo, keep the 3-layer ambient at 0.5/3/10 + a
+   * 10 px diffuse instead of 12/28 px. */
+  --df-shadow-card:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 0.5px 1px var(--df-skeu-contact),
+    0 2px 6px -2px var(--df-skeu-near),
+    0 8px 18px -6px var(--df-skeu-deep-near);
+
+  --df-shadow-card-hover:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    inset 0 0 0 1px var(--df-border-hover),
+    0 0.5px 1px var(--df-skeu-contact),
+    0 3px 8px -2px var(--df-skeu-near),
+    0 10px 24px -6px var(--df-skeu-deep-near);
+
+  /* Tactile button — light theme uses the HYVE DS warm-gray scale
+   * (hyve-ds/tokens/light.css) — NOT improvised cream/bege. User
+   * note 2026-05-11: "voce usou um bege ao inves de usar os tons do
+   * novo ds skeu da hyve, quero nossa escala de cinza nova".
+   *
+   * Surface scale lookup (light):
+   *   --lab-surface-elevated  = #F9F8EE  (highest)
+   *   --lab-surface-default   = #E9E8E0
+   *   --lab-surface-secondary = #DEDDD5
+   *   --lab-surface-sunken    = #D2D1C9  (deepest)
+   *
+   * Tactile key sits between default and sunken so it reads as a
+   * pressable instrument on top of the modal's elevated surface.
+   * Hover deepens to sunken — never lifts (user ask: "hover em
+   * botao deve sempre pressionar levemente, nunca levantar").
+   *
+   * Shadow stack: warm-dark ambient (no orange glow). PR #138 wired
+   * a warm-orange brand tint into the ambient drop per DESIGN.md §646
+   * — user reaction 2026-05-11: "colocou uma shadow/glow laranja
+   * nos botoes, que horror". Reverted to warm-dark neutral; the brand
+   * accent shows on dots/LEDs/active states, not on chrome shadows. */
+  --df-bg-button-tactile:       #E9E8E0;
+  --df-bg-button-tactile-hover: #D2D1C9;
+  --df-shadow-button-tactile:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -1px 0 rgba(40, 30, 22, 0.16),
+    inset 0 0 0 1px rgba(40, 30, 22, 0.14),
+    0 1px 1px rgba(40, 30, 22, 0.08),
+    0 4px 10px -2px rgba(40, 30, 22, 0.12);
+
+  /* Hover SHRINKS the key into the socket. Outer ambient collapses;
+   * inset deepens with a warm tone. NO outer drop expansion (that
+   * would read as "lift" — banned globally per user ask). */
+  --df-shadow-button-tactile-hover:
+    inset 0 1px 2px rgba(40, 30, 22, 0.18),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.30),
+    inset 0 0 0 1px rgba(40, 30, 22, 0.18),
+    0 0.5px 0 rgba(40, 30, 22, 0.08);
+
+  /* Light pressed — was alpha 0.22 which rendered as a barely-there hint
+   * and read as "broken" against the dark tactile fill. Bumped to a
+   * proper 3-layer inset (deeper top shadow, ambient interior, rim
+   * darken) so the key reads as "afundado" instead of "almost flat". */
+  --df-shadow-button-tactile-pressed:
+    inset 0 2px 4px rgba(40, 30, 22, 0.42),
+    inset 0 1px 0 rgba(40, 30, 22, 0.18),
+    inset 0 0 0 1px rgba(40, 30, 22, 0.34);
+
+  --df-focus-ring: 0 0 0 3px rgba(26, 26, 23, 0.10);
+
+  /* ===== Skeu shadow scale v14 — Light mode (warmer, softer alphas) ===== */
+  --df-skeu-shadow-sm:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.7),
+    0 1px 1px 0 rgba(60, 50, 40, 0.07),
+    0 1px 0 0 rgba(60, 50, 40, 0.04);
+
+  --df-skeu-shadow-md:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.78),
+    0 1px 2px 0 rgba(60, 50, 40, 0.06),
+    0 2px 4px -1px rgba(60, 50, 40, 0.06);
+
+  --df-skeu-shadow-lg:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.85),
+    0 2px 4px 0 rgba(60, 50, 40, 0.06),
+    0 8px 16px -4px rgba(60, 50, 40, 0.10);
+
+  --df-skeu-shadow-xl:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.9),
+    0 4px 8px 0 rgba(60, 50, 40, 0.07),
+    0 16px 32px -8px rgba(60, 50, 40, 0.14);
+
+  --df-skeu-shadow-press:
+    inset 0 1px 2px 0 rgba(60, 50, 40, 0.10),
+    inset 0 0 0 1px rgba(60, 50, 40, 0.06);
+
+  /* Material surface gradient — light variant, slightly lighter top */
+  --df-surface-raised-grad:
+    linear-gradient(180deg,
+      color-mix(in oklab, var(--df-surface-raised) 100%, white 0.8%) 0%,
+      color-mix(in oklab, var(--df-surface-raised) 100%, black 1%) 100%);
+  --df-surface-elevated-grad:
+    linear-gradient(180deg,
+      color-mix(in oklab, var(--df-surface-elevated) 100%, white 1%) 0%,
+      color-mix(in oklab, var(--df-surface-elevated) 100%, black 0.5%) 100%);
+
+  /* Sunken surface tokens v21 — light variant.
+   * In light mode "sunken" reads as paper that ink has stained — warmer
+   * + slightly darker rather than just black-mixed. Mix with #5a4a3a
+   * (warm umber) so the cavity has a paper-recess vibe. Tier 1 = 4% mix,
+   * tier 2 = 8% mix (matches the dark-mode delta ratio). */
+  --df-surface-sunken-1: color-mix(in oklab, var(--df-bg-base) 96%, #5a4a3a 4%);
+  --df-surface-sunken-2: color-mix(in oklab, var(--df-bg-base) 92%, #5a4a3a 8%);
+}
+
+/* ===== Terminal — always dark regardless of app theme ===== */
+/* Universal convention: shell output is "code domain" — dark is the
+ * mental model. VS Code, Warp, JetBrains all keep terminal dark in
+ * light themes too. These tokens live in :root (not in [data-theme]
+ * blocks) so they never flip. The terminal chrome is grayscale; ANSI
+ * codes still carry shell colors (red errors, green success). */
+:root {
+  --df-terminal-bg:        #0F0F0D;
+  --df-terminal-fg:        #D7E0CC;
+  --df-terminal-cursor:    #D7E0CC;
+  --df-terminal-selection: rgba(215, 224, 204, 0.22);
+}
+
+/* ===== Spacing ===== */
+:root {
+  --df-sp-1:  4px;
+  --df-sp-2:  8px;
+  --df-sp-3:  14px;
+  --df-sp-4:  18px;
+  --df-sp-5:  24px;
+  --df-sp-6:  30px;
+  --df-sp-7:  40px;
+  --df-sp-8:  52px;
+  --df-sp-10: 68px;
+  --df-sp-12: 88px;
+  --df-sp-14: 112px;
+
+  /* Radius — extended top end for tactile cards. Factory feels less
+   * rounded than fashion UIs, but still escape from cheap sharp edges. */
+  --df-r-xs:  4px;
+  --df-r-sm:  6px;
+  --df-r-md:  8px;
+  --df-r-lg:  10px;
+  --df-r-xl:  12px;
+  --df-r-2xl: 14px;
+  --df-r-3xl: 18px;
+  --df-r-4xl: 22px;
+  --df-r-tab: 12px 12px 0 0;
+  --df-r-tab-curve: 10px;
+  /* DEPRECATED v14 — pill radius. Spec 2026-05-05: "nao quero
+   * nenhum botao ou tag ou elemento em formato pill full arredondado".
+   * Active home + modal scope migrated to r-xs..r-3xl scale. Token kept
+   * ALIVE for legacy /np-* lab routes (np-b/c/d/e, prompt-first, hub,
+   * new-project-lab) which are preserved unchanged. NEVER use in new code. */
+  --df-r-full: 9999px;
+
+  /* Type — sizes */
+  --df-text-2xs:  11px;
+  --df-text-xs:   12px;
+  --df-text-sm:   15px;
+  --df-text-base: 17px;
+  --df-text-md:   19px;
+  --df-text-lg:   23px;
+  --df-text-xl:   28px;
+  --df-text-2xl:  36px;
+  --df-text-3xl:  52px;
+  --df-text-4xl:  68px;
+
+  /* Type — semantic weights and tracking */
+  --df-fw-regular:  400;
+  --df-fw-medium:   500;
+  --df-fw-semibold: 600;
+  --df-fw-bold:     700;
+  --df-fw-display:  800;
+
+  --df-tracking-display: -0.025em;
+  --df-tracking-tight:   -0.01em;
+  --df-tracking-normal:  0;
+  --df-tracking-loose:    0.04em;
+  --df-tracking-label:    0.08em;
+
+  --df-font-sans:    'Geist', system-ui, -apple-system, sans-serif;
+  --df-font-display: 'Geist', system-ui, -apple-system, sans-serif;
+  --df-font-body:    'Geist', system-ui, -apple-system, sans-serif;
+  --df-font-mono:    'Geist Mono', ui-monospace, 'SF Mono', monospace;
+
+  --df-motion-quick:  120ms;
+  --df-motion-ui:     180ms;
+  --df-motion-smooth: 280ms;
+  --df-motion-slow:   420ms;
+  --df-ease-out:        cubic-bezier(0.16, 1, 0.3, 1);
+  --df-ease-in:         cubic-bezier(0.4, 0, 1, 1);
+  --df-ease-standard:   cubic-bezier(0.4, 0, 0.2, 1);
+  --df-ease-emphasized: cubic-bezier(0.3, 0, 0.1, 1);
+  --df-ease-smooth:     cubic-bezier(0.45, 0, 0.15, 1);
+  --df-ease-spring:     cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ===== Semantic accents — restrained, used only for state signaling =====
+ *
+ * Single-accent rule: --df-accent-user is the ONE app-wide accent. Anything
+ * that isn't a warning/error or a shade-of-grey uses it. Defaults to olive
+ * #8ab06b; user can override in Settings → Appearance.
+ *
+ * The legacy semantic vars (ok / info / claude / tag-builtin / tag-global /
+ * tag-project) all alias --df-accent-user so the whole app picks up the
+ * change without per-file refactor. Only `warn` and `danger` keep their
+ * own colors — those are true system feedback, not decoration.
+ *
+ * Tints (--df-tint-*) follow the same rule: ok/info derived from user
+ * accent via color-mix; warn/danger keep their own.
+ */
+:root, [data-theme="dark"] {
+  --df-accent-user:    #8ab06b;
+  --df-accent-warn:    #c27c2c;
+  --df-accent-danger:  #ff6b6b;
+  --df-accent-ok:      var(--df-accent-user);
+  --df-accent-info:    var(--df-accent-user);
+  --df-accent-claude:  var(--df-accent-user);
+
+  --df-tint-warn:   rgba(229, 197, 123, 0.18);
+  --df-tint-danger: rgba(224, 120, 120, 0.18);
+  --df-tint-ok:     color-mix(in srgb, var(--df-accent-user) 18%, transparent);
+  --df-tint-info:   color-mix(in srgb, var(--df-accent-user) 18%, transparent);
+
+  --df-tag-project: var(--df-accent-user);
+  --df-tag-global:  var(--df-accent-user);
+  --df-tag-builtin: var(--df-accent-user);
+
+  /* Legacy ring — kept for back-compat with components still using it. */
+  --df-ring: var(--df-focus-ring);
+
+  /* Verb hues — used by the chat verb shimmer + category pills.
+     warm-coral is the export category (Hyperframes video render).
+     Calibrated by Canvas in anime-hyperframes-poc.md to oklch ~0.69 0.10 35. */
+  --df-hue-export:        #d88a6b;
+  --df-hue-export-rgba:   rgba(216, 138, 107, 0.92);
+  --df-hue-export-tint:   rgba(216, 138, 107, 0.16);
+}
+
+[data-theme="light"] {
+  --df-tint-warn:   rgba(194, 124, 44, 0.14);
+  --df-tint-danger: rgba(224, 90, 90, 0.14);
+  --df-tint-ok:     rgba(90, 140, 70, 0.14);
+  --df-tint-info:   rgba(70, 100, 140, 0.14);
+
+  /* Lighter tint on light theme so the export hue doesn't fight the page. */
+  --df-hue-export-tint: rgba(216, 138, 107, 0.10);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

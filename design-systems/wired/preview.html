@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wired — Design System Preview</title>
+<!-- WiredDisplay → Playfair Display (high-contrast didone fallback) -->
+<!-- BreveText → Source Serif Pro (humanist serif fallback) -->
+<!-- Apercu → Inter (humanist sans fallback) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Serif+Pro:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  /* ---------- Tokens ---------- */
+  :root {
+    /* Colors */
+    --color-primary: #000000;
+    --color-on-primary: #ffffff;
+    --color-canvas: #ffffff;
+    --color-canvas-soft: #f5f5f5;
+    --color-hairline: #e0e0e0;
+    --color-ink: #000000;
+    --color-ink-soft: #1a1a1a;
+    --color-body: #757575;
+    --color-link: #057dbc;
+
+    /* Spacing */
+    --space-xxs: 2px;
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 12px;
+    --space-lg: 16px;
+    --space-xl: 20px;
+    --space-2xl: 24px;
+    --space-3xl: 32px;
+    --space-4xl: 48px;
+
+    /* Radius */
+    --r-none: 0px;
+    --r-full: 9999px;
+
+    /* Type families */
+    --font-display: 'Playfair Display', 'Times New Roman', serif; /* WiredDisplay */
+    --font-serif: 'Source Serif Pro', Georgia, serif;             /* BreveText */
+    --font-sans: 'Inter', system-ui, sans-serif;                  /* Apercu */
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-serif);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--space-xl);
+  }
+
+  /* ---------- Masthead ---------- */
+  .masthead-band {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    padding: var(--space-md) var(--space-xl);
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .masthead-band .row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: var(--space-lg);
+  }
+  .masthead-band .left, .masthead-band .right {
+    display: flex;
+    gap: var(--space-2xl);
+    align-items: center;
+  }
+  .masthead-band .right { justify-content: flex-end; }
+  .wordmark {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 48px;
+    line-height: 1;
+    letter-spacing: -0.5px;
+    text-align: center;
+    color: var(--color-ink);
+  }
+  .nav-link {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+    letter-spacing: 0.4px;
+    color: var(--color-ink);
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+  .nav-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+  /* ---------- Top nav (sub-bar) ---------- */
+  .nav-bar {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    padding: var(--space-md) var(--space-xl);
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .nav-bar .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-lg);
+  }
+  .nav-bar .links {
+    display: flex;
+    gap: var(--space-3xl);
+    flex-wrap: wrap;
+  }
+  .nav-bar .ctas {
+    display: flex;
+    gap: var(--space-sm);
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    border-radius: var(--r-none);
+    border: 0;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    line-height: 20px;
+  }
+  /* sizes */
+  .btn-sm { font-size: 14px; line-height: 18px; padding: var(--space-sm) var(--space-lg); }
+  .btn-md { font-size: 16px; line-height: 20px; padding: var(--space-md) var(--space-xl); }
+  .btn-lg { font-size: 18px; line-height: 22px; padding: var(--space-lg) var(--space-2xl); }
+  /* variants */
+  .btn-primary {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    border: 1px solid var(--color-primary);
+  }
+  .btn-primary:hover { background: #1a1a1a; border-color: #1a1a1a; }
+  .btn-outline {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    border: 1px solid var(--color-ink);
+  }
+  .btn-outline:hover { background: var(--color-ink); color: var(--color-on-primary); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--color-ink);
+    border: 1px solid transparent;
+  }
+  .btn-ghost:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+  .btn-icon-circular {
+    width: 40px; height: 40px;
+    border-radius: var(--r-full);
+    border: 1px solid var(--color-ink);
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero-band {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    padding: var(--space-4xl) var(--space-xl);
+  }
+  .hero-grid {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--space-4xl);
+    align-items: start;
+  }
+  .hero-image {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background:
+      linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 40%, #555 80%, #888 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-image::after {
+    content: "";
+    position: absolute; inset: 0;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 2px, transparent 2px 18px),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0 1px, transparent 1px 22px);
+  }
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    display: inline-block;
+    margin-bottom: var(--space-md);
+  }
+  .display-hero {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 64px;
+    line-height: 59.5px;
+    letter-spacing: -0.5px;
+    color: var(--color-ink);
+    margin: var(--space-md) 0 var(--space-lg) 0;
+  }
+  .lead-paragraph {
+    font-family: var(--font-serif);
+    font-size: 19px;
+    font-weight: 400;
+    line-height: 27.93px;
+    letter-spacing: 0.108px;
+    color: var(--color-ink);
+    margin: 0 0 var(--space-2xl) 0;
+  }
+  .byline-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) 0;
+  }
+  .avatar {
+    width: 28px; height: 28px;
+    border-radius: var(--r-full);
+    background: linear-gradient(135deg, #444, #aaa);
+    flex: none;
+  }
+  .byline {
+    font-family: var(--font-serif);
+    font-weight: 700;
+    font-size: 12.73px;
+    line-height: 28px;
+    letter-spacing: 0.108px;
+    color: var(--color-body);
+  }
+  .byline strong { color: var(--color-ink-soft); font-weight: 700; }
+
+  .hero-cta-cluster {
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+    margin-top: var(--space-2xl);
+  }
+
+  /* Secondary stories in hero rail */
+  .hero-rail { display: flex; flex-direction: column; gap: var(--space-2xl); }
+  .story-card {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    padding: var(--space-md);
+  }
+  .story-card .img {
+    width: 100%; aspect-ratio: 4/3;
+    background: linear-gradient(120deg, #1f1f1f, #3a3a3a 60%, #777 100%);
+    margin-bottom: var(--space-md);
+  }
+  .story-card .img.alt2 { background: linear-gradient(160deg, #0a0a0a, #2b2b2b 50%, #999 100%); }
+  .story-card h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 26px;
+    line-height: 28px;
+    letter-spacing: 0;
+    margin: var(--space-sm) 0 var(--space-sm) 0;
+    color: var(--color-ink);
+  }
+  .story-card p {
+    font-family: var(--font-serif);
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: 0.09px;
+    color: var(--color-ink);
+    margin: 0;
+  }
+
+  /* ---------- Section ---------- */
+  section.block {
+    padding: var(--space-4xl) var(--space-xl);
+    border-top: 1px solid var(--color-hairline);
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 48px;
+    line-height: 50.4px;
+    letter-spacing: -0.4px;
+    color: var(--color-ink);
+    margin: 0 0 var(--space-3xl) 0;
+  }
+  .section-eyebrow {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    margin-bottom: var(--space-md);
+    display: block;
+  }
+  .sub-display {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 24px;
+    letter-spacing: -0.28px;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    margin: 0 0 var(--space-lg) 0;
+  }
+
+  /* ---------- Story Row Stack ---------- */
+  .story-row {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    border-bottom: 1px solid var(--color-hairline);
+    padding: var(--space-lg) 0;
+    display: grid;
+    grid-template-columns: 200px 1fr auto;
+    gap: var(--space-2xl);
+    align-items: center;
+  }
+  .story-row .thumb {
+    width: 200px; height: 130px;
+    background: linear-gradient(135deg, #1a1a1a, #3a3a3a 55%, #888);
+  }
+  .story-row .thumb.v2 { background: linear-gradient(135deg, #0d0d0d, #4a4a4a 50%, #999); }
+  .story-row .thumb.v3 { background: linear-gradient(135deg, #1f1f1f, #2a2a2a 60%, #777); }
+  .story-row .thumb.v4 { background: linear-gradient(135deg, #050505, #333 50%, #6a6a6a); }
+  .story-row h4 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 35.2px;
+    letter-spacing: -0.3px;
+    color: var(--color-ink);
+    margin: 0 0 var(--space-sm) 0;
+  }
+  .story-row p {
+    font-family: var(--font-sans);
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 22px;
+    letter-spacing: -0.144px;
+    color: var(--color-ink);
+    margin: 0 0 var(--space-sm) 0;
+  }
+  .story-row .meta {
+    font-family: var(--font-serif);
+    font-size: 12.73px;
+    font-weight: 700;
+    line-height: 28px;
+    letter-spacing: 0.108px;
+    color: var(--color-body);
+  }
+  .story-row .share {
+    display: flex; gap: var(--space-sm);
+  }
+
+  /* ---------- Form ---------- */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2xl);
+    max-width: 720px;
+  }
+  .form-row { display: flex; flex-direction: column; gap: var(--space-sm); }
+  .form-row.full { grid-column: 1 / -1; }
+  label {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+  .text-input {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    border: 1px solid var(--color-ink);
+    border-radius: var(--r-none);
+    padding: var(--space-md) var(--space-lg);
+    font-family: var(--font-sans);
+    font-size: 17px;
+    line-height: 20px;
+    width: 100%;
+    outline: none;
+  }
+  .text-input::placeholder { color: var(--color-body); }
+  .text-input:focus { border-color: var(--color-ink-soft); }
+  textarea.text-input { min-height: 120px; resize: vertical; font-family: var(--font-serif); }
+
+  .form-actions { display: flex; gap: var(--space-md); align-items: center; margin-top: var(--space-sm); }
+  .caption {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--color-body);
+  }
+
+  /* ---------- Stats ---------- */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--color-hairline);
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .stat {
+    padding: var(--space-3xl) var(--space-xl);
+    border-right: 1px solid var(--color-hairline);
+  }
+  .stat:last-child { border-right: 0; }
+  .stat .num {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 64px;
+    line-height: 59.5px;
+    letter-spacing: -0.5px;
+    color: var(--color-ink);
+    display: block;
+    margin-bottom: var(--space-md);
+  }
+  .stat .lbl {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--color-body);
+  }
+
+  /* ---------- Table ---------- */
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-sans);
+  }
+  table.data-table thead th {
+    text-align: left;
+    background: var(--color-canvas-soft);
+    color: var(--color-ink);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--color-ink);
+  }
+  table.data-table tbody td {
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--color-hairline);
+    font-size: 14px;
+    line-height: 18px;
+    letter-spacing: 0.4px;
+    color: var(--color-ink);
+  }
+  table.data-table tbody tr:hover { background: var(--color-canvas-soft); }
+  .tag {
+    display: inline-block;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border: 1px solid var(--color-ink);
+    color: var(--color-ink);
+  }
+
+  /* ---------- Type Ramp ---------- */
+  .ramp { display: flex; flex-direction: column; }
+  .ramp-row {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: var(--space-2xl);
+    padding: var(--space-lg) 0;
+    border-bottom: 1px solid var(--color-hairline);
+    align-items: baseline;
+  }
+  .ramp-row .token {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--color-body);
+  }
+  .ramp-row .token strong {
+    display: block;
+    color: var(--color-ink);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+
+  .t-display-hero { font-family: var(--font-display); font-weight: 400; font-size: 64px; line-height: 59.5px; letter-spacing: -0.5px; color: var(--color-ink); }
+  .t-display-lg   { font-family: var(--font-display); font-weight: 400; font-size: 48px; line-height: 50.4px; letter-spacing: -0.4px; color: var(--color-ink); }
+  .t-display-md   { font-family: var(--font-display); font-weight: 400; font-size: 32px; line-height: 35.2px; letter-spacing: -0.3px; color: var(--color-ink); }
+  .t-display-sm   { font-family: var(--font-display); font-weight: 400; font-size: 26px; line-height: 28px;   letter-spacing: 0;       color: var(--color-ink); }
+  .t-display-xs   { font-family: var(--font-sans);    font-weight: 700; font-size: 20px; line-height: 24px;   letter-spacing: -0.28px; color: var(--color-ink); text-transform: uppercase; }
+  .t-body-serif-lg{ font-family: var(--font-serif);   font-weight: 400; font-size: 19px; line-height: 27.93px; letter-spacing: 0.108px; color: var(--color-ink); }
+  .t-body-serif-md{ font-family: var(--font-serif);   font-weight: 400; font-size: 16px; line-height: 24px;   letter-spacing: 0.09px;  color: var(--color-ink); }
+  .t-body-md      { font-family: var(--font-sans);    font-weight: 400; font-size: 17px; line-height: 20px;   letter-spacing: 0;       color: var(--color-ink); }
+  .t-body-md-str  { font-family: var(--font-sans);    font-weight: 700; font-size: 17px; line-height: 22px;   letter-spacing: -0.144px; color: var(--color-ink); }
+  .t-body-sm      { font-family: var(--font-sans);    font-weight: 400; font-size: 14px; line-height: 18px;   letter-spacing: 0.4px;   color: var(--color-ink); }
+  .t-body-sm-str  { font-family: var(--font-sans);    font-weight: 700; font-size: 14px; line-height: 18px;   letter-spacing: 0.4px;   color: var(--color-ink); }
+  .t-byline       { font-family: var(--font-serif);   font-weight: 700; font-size: 12.73px; line-height: 28px; letter-spacing: 0.108px; color: var(--color-ink-soft); }
+  .t-caption      { font-family: var(--font-sans);    font-weight: 400; font-size: 12px; line-height: 16px;   letter-spacing: 0;       color: var(--color-body); }
+  .t-button-md    { font-family: var(--font-sans);    font-weight: 700; font-size: 16px; line-height: 20px;   letter-spacing: 0.3px;   color: var(--color-ink); }
+
+  /* ---------- Palette ---------- */
+  .palette-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-lg);
+  }
+  .swatch {
+    border: 1px solid var(--color-hairline);
+  }
+  .swatch .chip {
+    height: 120px;
+    width: 100%;
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .swatch .meta-row {
+    padding: var(--space-md) var(--space-lg);
+  }
+  .swatch .name {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    display: block;
+  }
+  .swatch .hex {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--color-body);
+  }
+
+  /* ---------- Radii ---------- */
+  .radii-row {
+    display: flex;
+    gap: var(--space-3xl);
+    flex-wrap: wrap;
+  }
+  .radius-demo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    align-items: center;
+  }
+  .radius-box {
+    width: 96px; height: 96px;
+    background: var(--color-ink);
+  }
+  .radius-box.full { border-radius: var(--r-full); }
+  .radius-label {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--color-ink);
+    text-align: center;
+  }
+  .radius-label small {
+    display: block;
+    font-weight: 400;
+    color: var(--color-body);
+    font-size: 12px;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  /* ---------- Spacing ---------- */
+  .spacing-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  .spacing-row {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: var(--space-lg);
+    align-items: center;
+  }
+  .spacing-row .label {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+  .spacing-row .label small {
+    display: block;
+    font-weight: 400;
+    color: var(--color-body);
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 12px;
+  }
+  .spacing-bar {
+    background: var(--color-ink);
+    height: 16px;
+  }
+
+  /* ---------- Button gallery ---------- */
+  .btn-gallery {
+    display: grid;
+    grid-template-columns: 200px repeat(3, 1fr);
+    gap: var(--space-lg);
+    align-items: center;
+  }
+  .btn-gallery .row-label {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+  .btn-gallery .cell {
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    padding: var(--space-4xl) var(--space-xl);
+    margin-top: var(--space-4xl);
+  }
+  footer .wordmark { color: var(--color-on-primary); margin-bottom: var(--space-3xl); }
+  footer .cols {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-3xl);
+    border-top: 1px solid #2a2a2a;
+    padding-top: var(--space-3xl);
+  }
+  footer h5 {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 18px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    margin: 0 0 var(--space-lg) 0;
+    color: var(--color-on-primary);
+  }
+  footer ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: var(--space-sm); }
+  footer ul a {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 18px;
+    letter-spacing: 0.4px;
+    color: var(--color-on-primary);
+    text-decoration: none;
+  }
+  footer ul a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  footer .fineprint {
+    margin-top: var(--space-4xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid #2a2a2a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-lg);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    line-height: 16px;
+    color: #b5b5b5;
+  }
+
+  /* ---------- Article body link demo ---------- */
+  .article-body p { font-family: var(--font-serif); font-size: 19px; line-height: 27.93px; letter-spacing: 0.108px; color: var(--color-ink); max-width: 680px; }
+  .article-body a { color: var(--color-link); text-decoration: underline; text-underline-offset: 3px; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1023px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .stat:nth-child(2) { border-right: 0; }
+    .stat { border-bottom: 1px solid var(--color-hairline); }
+    .form-grid { grid-template-columns: 1fr; }
+    .footer .cols { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 767px) {
+    .display-hero { font-size: 40px; line-height: 40px; }
+    .section-title { font-size: 32px; line-height: 35.2px; }
+    .stats-row { grid-template-columns: 1fr; }
+    .stat { border-right: 0; }
+    .story-row { grid-template-columns: 1fr; }
+    .story-row .thumb { width: 100%; aspect-ratio: 4/3; height: auto; }
+    .btn-gallery { grid-template-columns: 1fr; }
+    footer .cols { grid-template-columns: 1fr 1fr; }
+    .masthead-band .left, .masthead-band .right { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Masthead -->
+<div class="masthead-band">
+  <div class="row">
+    <div class="left">
+      <a class="nav-link" href="#">Menu</a>
+      <a class="nav-link" href="#">Search</a>
+    </div>
+    <div class="wordmark">WIRED</div>
+    <div class="right">
+      <a class="nav-link" href="#">Sign in</a>
+      <a class="btn btn-primary btn-sm" href="#">Subscribe</a>
+    </div>
+  </div>
+</div>
+
+<!-- Section Nav -->
+<nav class="nav-bar">
+  <div class="row">
+    <div class="links">
+      <a class="nav-link" href="#">Business</a>
+      <a class="nav-link" href="#">Culture</a>
+      <a class="nav-link" href="#">Gear</a>
+      <a class="nav-link" href="#">Ideas</a>
+      <a class="nav-link" href="#">Science</a>
+      <a class="nav-link" href="#">Security</a>
+      <a class="nav-link" href="#">Politics</a>
+    </div>
+    <div class="ctas">
+      <a class="btn btn-outline btn-sm" href="#">Newsletter</a>
+      <a class="btn btn-primary btn-sm" href="#">Subscribe</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero-band">
+  <div class="hero-grid">
+    <article>
+      <span class="eyebrow">The Big Story</span>
+      <h1 class="display-hero">The Quiet War for the Future of Human Attention</h1>
+      <p class="lead-paragraph">Inside the strange new alliance of neuroscientists, behavioral economists, and former platform engineers building the next generation of cognitive tools — and the fight over who gets to design the inside of your head.</p>
+      <div class="byline-row">
+        <div class="avatar"></div>
+        <span class="byline"><strong>By Lila Marchetti</strong>&nbsp;&nbsp;·&nbsp;&nbsp;May 14, 2026&nbsp;&nbsp;·&nbsp;&nbsp;22 min read</span>
+      </div>
+      <div class="hero-image" role="img" aria-label="Editorial cover image"></div>
+      <div class="hero-cta-cluster">
+        <a class="btn btn-primary btn-md" href="#">Read the Story</a>
+        <a class="btn btn-outline btn-md" href="#">Listen 22 min</a>
+        <button class="btn-icon-circular" aria-label="Share">↗</button>
+      </div>
+    </article>
+    <aside class="hero-rail">
+      <article class="story-card">
+        <div class="img"></div>
+        <span class="eyebrow">Business</span>
+        <h3>The Datacenter That Ate a County</h3>
+        <p>How a single hyperscale build is rewriting the politics of rural electricity in the American midwest.</p>
+      </article>
+      <article class="story-card">
+        <div class="img alt2"></div>
+        <span class="eyebrow">Science</span>
+        <h3>A New Map of the Deep Brain</h3>
+        <p>The most detailed cellular atlas ever assembled, and what it reveals about how memory actually forms.</p>
+      </article>
+    </aside>
+  </div>
+</section>
+
+<!-- Story Row Stack -->
+<section class="block">
+  <div class="container">
+    <span class="section-eyebrow">Latest</span>
+    <h2 class="section-title">From the newsroom</h2>
+
+    <article class="story-row">
+      <div class="thumb"></div>
+      <div>
+        <span class="eyebrow">Security</span>
+        <h4>The Phishing Kit That Speaks Twelve Languages</h4>
+        <p>A polyglot toolkit sold for $90 a month is industrializing credential theft for non-technical operators.</p>
+        <span class="meta">By Anya Roth · 8 min read</span>
+      </div>
+      <div class="share">
+        <button class="btn-icon-circular" aria-label="Share">↗</button>
+        <button class="btn-icon-circular" aria-label="Save">☆</button>
+      </div>
+    </article>
+
+    <article class="story-row">
+      <div class="thumb v2"></div>
+      <div>
+        <span class="eyebrow">Gear</span>
+        <h4>The Camera That Refuses to Be a Phone</h4>
+        <p>A new fixed-lens compact bets that photographers want fewer features, not more.</p>
+        <span class="meta">By Marco Vidal · 6 min read</span>
+      </div>
+      <div class="share">
+        <button class="btn-icon-circular" aria-label="Share">↗</button>
+        <button class="btn-icon-circular" aria-label="Save">☆</button>
+      </div>
+    </article>
+
+    <article class="story-row">
+      <div class="thumb v3"></div>
+      <div>
+        <span class="eyebrow">Ideas</span>
+        <h4>Against the Cult of the Productive Hour</h4>
+        <p>What three years of timesheet data from creative teams actually says about output and attention.</p>
+        <span class="meta">By Devon Hsu · 12 min read</span>
+      </div>
+      <div class="share">
+        <button class="btn-icon-circular" aria-label="Share">↗</button>
+        <button class="btn-icon-circular" aria-label="Save">☆</button>
+      </div>
+    </article>
+
+    <article class="story-row">
+      <div class="thumb v4"></div>
+      <div>
+        <span class="eyebrow">Politics</span>
+        <h4>The Quiet Standardization of City Sensors</h4>
+        <p>A two-year investigation into the procurement contracts shaping urban surveillance infrastructure.</p>
+        <span class="meta">By Hana Ostrowski · 18 min read</span>
+      </div>
+      <div class="share">
+        <button class="btn-icon-circular" aria-label="Share">↗</button>
+        <button class="btn-icon-circular" aria-label="Save">☆</button>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- Stats -->
+<section class="block">
+  <div class="container">
+    <span class="section-eyebrow">By the numbers</span>
+    <h2 class="section-title">The year in coverage</h2>
+    <div class="stats-row">
+      <div class="stat"><span class="num">1,284</span><span class="lbl">Original stories published</span></div>
+      <div class="stat"><span class="num">37</span><span class="lbl">Countries reported from</span></div>
+      <div class="stat"><span class="num">96</span><span class="lbl">Contributing writers</span></div>
+      <div class="stat"><span class="num">11M</span><span class="lbl">Subscribers worldwide</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- Buttons Gallery -->
+<section class="block">
+  <div class="container">
+    <span class="section-eyebrow">Components</span>
+    <h2 class="section-title">Buttons</h2>
+    <p class="lead-paragraph" style="max-width:680px; margin-bottom: var(--space-3xl);">Every button is square (<code>rounded.none</code>), set in Apercu 700 with 0.3 px tracking. Primary fills with ink black; outline uses a hairline border on canvas; ghost carries no chrome.</p>
+
+    <div class="btn-gallery">
+      <div class="row-label">Primary</div>
+      <div class="cell"><button class="btn btn-primary btn-sm">Read more</button></div>
+      <div class="cell"><button class="btn btn-primary btn-md">Subscribe</button></div>
+      <div class="cell"><button class="btn btn-primary btn-lg">Get the print issue</button></div>
+
+      <div class="row-label">Outline</div>
+      <div class="cell"><button class="btn btn-outline btn-sm">Sign in</button></div>
+      <div class="cell"><button class="btn btn-outline btn-md">Newsletter</button></div>
+      <div class="cell"><button class="btn btn-outline btn-lg">Browse archives</button></div>
+
+      <div class="row-label">Ghost</div>
+      <div class="cell"><button class="btn btn-ghost btn-sm">Cancel</button></div>
+      <div class="cell"><button class="btn btn-ghost btn-md">Skip for now</button></div>
+      <div class="cell"><button class="btn btn-ghost btn-lg">Continue without subscribing</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- Form -->
+<section class="block">
+  <div class="container">
+    <span class="section-eyebrow">Sign up</span>
+    <h2 class="section-title">Get the daily brief</h2>
+    <p class="lead-paragraph" style="max-width:680px; margin-bottom: var(--space-3xl);">A short, edited dispatch on the stories shaping technology, science, business, and culture. Delivered every weekday morning.</p>
+
+    <form class="form-grid" onsubmit="return false;">
+      <div class="form-row">
+        <label for="fname">First name</label>
+        <input id="fname" class="text-input" type="text" placeholder="Ada" />
+      </div>
+      <div class="form-row">
+        <label for="lname">Last name</label>
+        <input id="lname" class="text-input" type="text" placeholder="Lovelace" />
+      </div>
+      <div class="form-row full">
+        <label for="email">Email address</label>
+        <input id="email" class="text-input" type="email" placeholder="you@domain.com" />
+      </div>
+      <div class="form-row full">
+        <label for="msg">A note to the editors (optional)</label>
+        <textarea id="msg" class="text-input" placeholder="What stories should we be writing?"></textarea>
+      </div>
+      <div class="form-row full">
+        <div class="form-actions">
+          <button class="btn btn-primary btn-md" type="submit">Subscribe</button>
+          <button class="btn btn-outline btn-md" type="button">Privacy policy</button>
+          <span class="caption">You can unsubscribe at any time. We do not share your address.</span>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Cards -->
+<section class="block">
+  <div class="container">
+    <span class="section-eyebrow">Editor's picks</span>
+    <h2 class="section-title">Long reads</h2>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-2xl);">
+      <article class="story-card">
+        <div class="img"></div>
+        <span class="eyebrow">Culture</span>
+        <h3>The Last Bookstore on the Highway</h3>
+        <p>How an independent shop in rural Oregon became an unlikely hub for the AI-skeptic literary set.</p>
+      </article>
+      <article class="story-card">
+        <div class="img alt2"></div>
+        <span class="eyebrow">Science</span>
+        <h3>The Hunt for Earth's Original DNA</h3>
+        <p>A small lab in Reykjavik is sequencing four-billion-year-old rocks. What they're finding rewrites biology.</p>
+      </article>
+      <article class="story-card">
+        <div class="img"></div>
+        <span class="eyebrow">Business</span>
+        <h3>Inside the Quiet Empire of Industrial Sand</h3>
+        <p>The unsexy commodity behind every chip, every solar panel, and every fiber-optic backbone on the planet.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- Data Table -->
+<section class="block">
+  <div class="container">
+    <span class="section-eyebrow">Index</span>
+    <h2 class="section-title">Stories this week</h2>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Section</th>
+          <th>Author</th>
+          <th>Published</th>
+          <th>Length</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>The Quiet War for the Future of Human Attention</td>
+          <td>Ideas</td>
+          <td>Lila Marchetti</td>
+          <td>May 14, 2026</td>
+          <td>22 min</td>
+          <td><span class="tag">Feature</span></td>
+        </tr>
+        <tr>
+          <td>The Phishing Kit That Speaks Twelve Languages</td>
+          <td>Security</td>
+          <td>Anya Roth</td>
+          <td>May 13, 2026</td>
+          <td>8 min</td>
+          <td><span class="tag">News</span></td>
+        </tr>
+        <tr>
+          <td>The Camera That Refuses to Be a Phone</td>
+          <td>Gear</td>
+          <td>Marco Vidal</td>
+          <td>May 12, 2026</td>
+          <td>6 min</td>
+          <td><span class="tag">Review</span></td>
+        </tr>
+        <tr>
+          <td>Against the Cult of the Productive Hour</td>
+          <td>Ideas</td>
+          <td>Devon Hsu</td>
+          <td>May 11, 2026</td>
+          <td>12 min</td>
+          <td><span class="tag">Essay</span></td>
+        </tr>
+        <tr>
+          <td>The Quiet Standardization of City Sensors</td>
+          <td>Politics</td>
+          <td>Hana Ostrowski</td>
+          <td>May 10, 2026</td>
+          <td>18 min</td>
+          <td><span class="tag">Investigation</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Article body link demo -->
+<section class="block">
+  <div class="container">
+    <span class="section-eyebrow">In the article body</span>
+    <h2 class="section-title">The only blue you'll see</h2>
+    <div class="article-body">
+      <p>Wired reserves chromatic accent for one place and one place only: <a href="#">inline body links inside long-form articles</a>. The link blue is not a brand colour. It does not appear in navigation, in buttons, in tags, or in headings — only here, in the flowing serif of an editor-set paragraph.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Type Ramp -->
+<section class="block">
+  <div class="container">
+    <span class="section-eyebrow">Foundations</span>
+    <h2 class="section-title">Typography</h2>
+    <div class="ramp">
+      <div class="ramp-row">
+        <div class="token"><strong>display-hero</strong>64 / 59.5 / -0.5 · WiredDisplay 400</div>
+        <div class="t-display-hero">The proprietary serif at full scale</div>
+      </div>
+      <div class="ramp-row">
+        <div class="token"><strong>display-lg</strong>48 / 50.4 / -0.4 · WiredDisplay 400</div>
+        <div class="t-display-lg">Section headlines set with restraint</div>
+      </div>
+      <div class="ramp-row">
+        <div class="token"><strong>display-md</strong>32 / 35.2 / -0.3 · WiredDisplay 400</div>
+        <div class="t-display-md">Story-card large variant</div>
+      </div>
+      <div class="ramp-row">
+        <div class="token"><strong>display-sm</strong>26 / 28 / 0 · WiredDisplay 400</div>
+        <div class="t-display-sm">Sub-display heading inside long-form</div>
+      </div>
+      <div class="ramp-row">
+        <div class="token"><strong>display-xs</strong>20 / 24 / -0.28 · Apercu 700</div>
+        <div class="t-display-xs">Sans micro-heading for callouts</div>
+      </div>
+      <div class="ramp-row">
+        <div class="token"><strong>body-serif-lg</strong>19 / 27.93 / 0.108 · BreveText 400</div>
+        <div class="t-body-serif-lg">A lead paragraph reads at this rhythm, set in the humanist serif for the long-form reading column.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="token"><strong>body-serif-md</strong>16 / 24 / 0.09 · BreveText 400</div>
+        <div class="t-body-serif-md">The default article body — comfortable for sustained reading sessions, never compressed for density.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="token"><strong>body-md</strong>17 / 20 / 0 · Apercu 400</div>
+        <div class="t-body-md">Sans body used for navigation and metadata surfaces.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="token"><strong>body-md-strong</strong>17 / 22 / -0.144 · Apercu 700</div>
+        <div class="t-body-md-str">Bold sans body, used for emphatic supporting copy.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="token"><strong>body-sm</strong>14 / 18 / 0.4 · Apercu 400</div>
+        <div class="t-body-sm">Secondary sans body — captions, footer text, fine print.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="token"><strong>body-sm-strong</strong>14 / 18 / 0.4 · Apercu 700</div>
+        <div class="t-body-sm-str">BOLD CAPTION AND NAV-LINK SETTING</div>
+      </div>
+      <div class="ramp-row">
+        <div class="token"><strong>byline</strong>12.73 / 28 / 0.108 · BreveText 700</div>
+        <div class="t-byline">By Lila Marchetti · May 14, 2026</div>
+      </div>
+      <div class="ramp-row">
+        <div class="token"><strong>caption</strong>12 / 16 / 0 · Apercu 400</div>
+        <div class="t-caption">Image caption — the photograph above was taken in late March, 2026.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="token"><strong>button-md</strong>16 / 20 / 0.3 · Apercu 700</div>
+        <div class="t-button-md">SUBSCRIBE</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Palette -->
+<section class="block">
+  <div class="container">
+    <span class="section-eyebrow">Foundations</span>
+    <h2 class="section-title">Palette</h2>
+    <div class="palette-grid">
+      <div class="swatch"><div class="chip" style="background:#000000;"></div><div class="meta-row"><span class="name">Primary · Ink Black</span><span class="hex">#000000</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#ffffff;"></div><div class="meta-row"><span class="name">Canvas</span><span class="hex">#ffffff</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#f5f5f5;"></div><div class="meta-row"><span class="name">Canvas Soft</span><span class="hex">#f5f5f5</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#e0e0e0;"></div><div class="meta-row"><span class="name">Hairline</span><span class="hex">#e0e0e0</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#000000;"></div><div class="meta-row"><span class="name">Ink</span><span class="hex">#000000</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#1a1a1a;"></div><div class="meta-row"><span class="name">Ink Soft</span><span class="hex">#1a1a1a</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#757575;"></div><div class="meta-row"><span class="name">Body</span><span class="hex">#757575</span></div></div>
+      <div class="swatch"><div class="chip" style="background:#057dbc;"></div><div class="meta-row"><span class="name">Link</span><span class="hex">#057dbc</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Radii -->
+<section class="block">
+  <div class="container">
+    <span class="section-eyebrow">Foundations</span>
+    <h2 class="section-title">Radius</h2>
+    <p class="lead-paragraph" style="max-width:680px; margin-bottom: var(--space-3xl);">The brand uses two radii — and only two. Every interactive surface is square. Only icon containers are circular.</p>
+    <div class="radii-row">
+      <div class="radius-demo">
+        <div class="radius-box"></div>
+        <div class="radius-label">rounded.none<small>0px</small></div>
+      </div>
+      <div class="radius-demo">
+        <div class="radius-box full"></div>
+        <div class="radius-label">rounded.full<small>9999px · icons only</small></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Spacing -->
+<section class="block">
+  <div class="container">
+    <span class="section-eyebrow">Foundations</span>
+    <h2 class="section-title">Spacing rhythm</h2>
+    <p class="lead-paragraph" style="max-width:680px; margin-bottom: var(--space-3xl);">A 4 px base unit ladder governs every gap, padding, and inset on the page.</p>
+    <div class="spacing-grid">
+      <div class="spacing-row"><div class="label">xxs<small>2px</small></div><div class="spacing-bar" style="width:2px;"></div></div>
+      <div class="spacing-row"><div class="label">xs<small>4px</small></div><div class="spacing-bar" style="width:4px;"></div></div>
+      <div class="spacing-row"><div class="label">sm<small>8px</small></div><div class="spacing-bar" style="width:8px;"></div></div>
+      <div class="spacing-row"><div class="label">md<small>12px</small></div><div class="spacing-bar" style="width:12px;"></div></div>
+      <div class="spacing-row"><div class="label">lg<small>16px</small></div><div class="spacing-bar" style="width:16px;"></div></div>
+      <div class="spacing-row"><div class="label">xl<small>20px</small></div><div class="spacing-bar" style="width:20px;"></div></div>
+      <div class="spacing-row"><div class="label">2xl<small>24px</small></div><div class="spacing-bar" style="width:24px;"></div></div>
+      <div class="spacing-row"><div class="label">3xl<small>32px</small></div><div class="spacing-bar" style="width:32px;"></div></div>
+      <div class="spacing-row"><div class="label">4xl<small>48px</small></div><div class="spacing-bar" style="width:48px;"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="wordmark">WIRED</div>
+    <div class="cols">
+      <div>
+        <h5>Sections</h5>
+        <ul>
+          <li><a href="#">Business</a></li>
+          <li><a href="#">Culture</a></li>
+          <li><a href="#">Gear</a></li>
+          <li><a href="#">Ideas</a></li>
+          <li><a href="#">Science</a></li>
+          <li><a href="#">Security</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>More</h5>
+        <ul>
+          <li><a href="#">Newsletters</a></li>
+          <li><a href="#">Podcasts</a></li>
+          <li><a href="#">Video</a></li>
+          <li><a href="#">Archive</a></li>
+          <li><a href="#">Magazine</a></li>
+          <li><a href="#">Events</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Contact</h5>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Masthead</a></li>
+          <li><a href="#">Tips & Pitches</a></li>
+          <li><a href="#">Press Center</a></li>
+          <li><a href="#">Advertising</a></li>
+          <li><a href="#">Jobs</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Subscribe</h5>
+        <ul>
+          <li><a href="#">Print + Digital</a></li>
+          <li><a href="#">Digital only</a></li>
+          <li><a href="#">Gift a subscription</a></li>
+          <li><a href="#">Customer service</a></li>
+          <li><a href="#">Newsletter sign-up</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="fineprint">
+      <div>© 2026 Condé Nast. All rights reserved. Use of this site constitutes acceptance of our User Agreement and Privacy Policy.</div>
+      <div>WIRED · Magazine · Vol. 34 · No. 05</div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

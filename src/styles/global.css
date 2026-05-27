@@ -1,0 +1,3202 @@
+@import './tokens.css';
+@import './components.css';
+@import './oauth-device-flow.css';
+
+/* ============================================================ */
+/* RESET + BASE */
+/* ============================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-family: var(--df-font-sans);
+  font-size: var(--df-text-base);
+  line-height: 1.5;
+  color: var(--df-text-primary);
+  background: var(--df-bg-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "ss01" 1, "cv11" 1;
+}
+
+/* Opt UI chrome out of selection (tabs, icon buttons) — content like
+   chat messages, comments, debug logs stays copyable by default.
+   .pill / .btn-icon migrated to .df-btn (PR2); .df-btn base class already
+   declares user-select:none in components.css so no duplicate needed. */
+.topbar-chat-tab, .topbar-file-tab, .topbar-add, .topbar-home,
+.editor-avatar, .cli-circle,
+.statusbar-segment {
+  user-select: none;
+}
+
+button, input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+button {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+svg { display: block; flex-shrink: 0; }
+
+:focus-visible {
+  outline: 1px solid var(--df-border-focus);
+  outline-offset: 2px;
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track {
+  background: var(--df-bg-section);
+  box-shadow: var(--df-skeu-recess);
+}
+::-webkit-scrollbar-thumb {
+  /* color-mix on text-primary gives proper contrast in BOTH themes:
+     dark = warm-gray on warm-dark bg, light = warm-dark on warm-light bg.
+     Previous --df-surface-raised was nearly invisible on light mode. */
+  background: color-mix(in srgb, var(--df-text-primary) 22%, transparent);
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  /* v14: pill killed → r-sm (6px) — scrollbar thumb. */
+  border-radius: var(--df-r-sm);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--df-text-primary) 38%, transparent);
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-corner { background: transparent; }
+
+/* ============================================================ */
+/* SCREEN */
+/* ============================================================ */
+
+.screen {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: none;
+  background: var(--df-bg-base);
+}
+.screen[data-active="true"] {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ============================================================ */
+/* SHARED UI ATOMS — migrated to components.css in PR1 */
+/* ============================================================ */
+/*
+ * Legacy classes (.btn, .btn-primary, .btn-secondary, .btn-ghost, .btn-icon,
+ * .pill, .input) were deleted in PR2.5 Phase 6 cleanup. All consumers migrated
+ * to df-* canonical classes in PR2 (see components.css for definitions).
+ */
+
+/* ============================================================ */
+/* TOPBAR — Aqua tab pattern (shared by editor + home) */
+/* ============================================================ */
+
+.editor-topbar {
+  height: 56px;
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: 460px 1fr auto;
+  background: var(--df-bg-sunken);
+  align-items: stretch;
+  position: relative;
+  z-index: 2;
+}
+
+.topbar-floor {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: var(--df-border-divider);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--df-sp-3);
+  padding: 10px var(--df-sp-4) 0 var(--df-sp-5);
+  border-right: 1px solid var(--df-border-divider);
+}
+
+.topbar-home {
+  width: 32px; height: 32px;
+  display: grid; place-items: center;
+  border-radius: var(--df-r-md);
+  color: var(--df-text-secondary);
+  cursor: pointer;
+  transition-property: color, background, border-color, box-shadow, transform;
+  transition-duration: var(--df-motion-quick);
+  transition-timing-function: var(--df-ease-out);
+  flex-shrink: 0;
+  /* Align with the text baseline of the sibling chat tabs (align-items: flex-end) */
+  align-self: flex-end;
+  margin-bottom: 2px;
+}
+.topbar-home:hover { background: var(--df-interactive-hover); color: var(--df-text-primary); }
+
+.topbar-chat-tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  overflow: visible;
+  align-self: stretch;
+}
+
+.topbar-chat-tab {
+  display: flex;
+  align-items: center;
+  height: 38px;
+  padding: 0 16px;
+  font-family: var(--df-font-sans);
+  font-size: var(--df-text-base);
+  color: var(--df-text-muted);
+  cursor: pointer;
+  letter-spacing: -0.005em;
+  border-radius: var(--df-r-tab);
+  background: transparent;
+  transition: color var(--df-motion-quick) var(--df-ease-out),
+              background var(--df-motion-quick) var(--df-ease-out);
+  white-space: nowrap;
+  position: relative;
+}
+.topbar-chat-tab:hover:not([aria-selected="true"]) {
+  color: var(--df-text-secondary);
+  background: var(--df-interactive-hover);
+}
+.topbar-chat-tab[aria-selected="true"] {
+  color: var(--df-text-primary);
+  background: var(--df-bg-section);
+  font-weight: 500;
+  border: 1px solid var(--df-border-divider);
+  border-bottom-color: var(--df-bg-section);
+  box-shadow: inset 0 1px 0 var(--df-skeu-top-light);
+  margin-bottom: -1px;
+  z-index: 4;
+}
+.topbar-chat-tab:not([aria-selected="true"]) .tab-corner { display: none; }
+
+.topbar-add {
+  align-self: center;
+  width: 30px; height: 30px;
+  border-radius: var(--df-r-md);
+  display: grid; place-items: center;
+  color: var(--df-text-muted);
+  font-size: 18px;
+  cursor: pointer;
+  transition-property: color, background, border-color, box-shadow, transform;
+  transition-duration: var(--df-motion-quick);
+  transition-timing-function: var(--df-ease-out);
+  flex-shrink: 0;
+}
+.topbar-add:hover { background: var(--df-interactive-hover); color: var(--df-text-primary); }
+
+.topbar-center {
+  display: flex;
+  align-items: flex-end;
+  padding: 10px var(--df-sp-4) 0;
+  gap: 12px;
+  overflow: visible;
+  min-width: 0;
+}
+
+.topbar-file-tab {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 38px;
+  padding: 0 16px;
+  font-family: var(--df-font-mono);
+  font-size: var(--df-text-sm);
+  color: var(--df-text-muted);
+  cursor: pointer;
+  transition: color var(--df-motion-quick) var(--df-ease-out),
+              background var(--df-motion-quick) var(--df-ease-out);
+  white-space: nowrap;
+  border-radius: var(--df-r-tab);
+  background: transparent;
+  position: relative;
+  max-width: 240px;
+  letter-spacing: 0.01em;
+}
+.topbar-file-tab:hover:not([aria-selected="true"]) {
+  color: var(--df-text-secondary);
+  background: var(--df-interactive-hover);
+}
+.topbar-file-tab[aria-selected="true"] {
+  color: var(--df-text-primary);
+  background: var(--df-bg-base);
+  font-weight: 500;
+  border: 1px solid var(--df-border-divider);
+  border-bottom-color: var(--df-bg-base);
+  box-shadow: inset 0 1px 0 var(--df-skeu-top-light);
+  margin-bottom: -1px;
+  z-index: 4;
+}
+.topbar-file-tab:not([aria-selected="true"]) .tab-corner { display: none; }
+
+/* Aqua tab concave corners — pure CSS radial-gradient, no SVG.
+   Corner is 11x11. `left/right: -11px` + `bottom: 0` aligns to the tab's
+   border edge (not padding edge) AND to the floor line row exactly.
+   Ring (radius 10-11 from arc center) overlays:
+     - the tab's 1px side border at the top (col overlap)
+     - the 1px floor line at the bottom (row overlap)
+   Arc center = gradient center at corner's FAR side (away from tab). */
+.tab-corner {
+  position: absolute;
+  bottom: 0;
+  width: 11px; height: 11px;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.tab-corner--left {
+  left: -11px;
+  background:
+    radial-gradient(
+      circle 11px at 0% 0%,
+      transparent 10px,
+      var(--df-border-divider) 10px,
+      var(--df-border-divider) 11px,
+      transparent 11px
+    ),
+    radial-gradient(
+      circle 11px at 0% 0%,
+      transparent 11px,
+      var(--df-tab-outer, var(--df-bg-base)) 11px
+    );
+}
+
+.tab-corner--right {
+  right: -11px;
+  background:
+    radial-gradient(
+      circle 11px at 100% 0%,
+      transparent 10px,
+      var(--df-border-divider) 10px,
+      var(--df-border-divider) 11px,
+      transparent 11px
+    ),
+    radial-gradient(
+      circle 11px at 100% 0%,
+      transparent 11px,
+      var(--df-tab-outer, var(--df-bg-base)) 11px
+    );
+}
+
+.topbar-file-tab-icon { width: 14px; height: 14px; color: var(--df-text-faint); flex-shrink: 0; }
+.topbar-file-tab[aria-selected="true"] .topbar-file-tab-icon { color: var(--df-text-secondary); }
+.topbar-file-tab-name { overflow: hidden; text-overflow: ellipsis; }
+.topbar-file-tab-close {
+  width: 18px; height: 18px;
+  display: grid; place-items: center;
+  /* v14: 18×18 close — genuine circle. */
+  border-radius: 50%;
+  color: var(--df-text-faint);
+  transition-property: color, background, border-color, box-shadow, transform;
+  transition-duration: var(--df-motion-quick);
+  transition-timing-function: var(--df-ease-out);
+  font-size: 14px; line-height: 1;
+  margin-left: 2px; cursor: pointer;
+}
+.topbar-file-tab-close:hover { background: var(--df-interactive-pressed); color: var(--df-text-primary); }
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--df-sp-2);
+  padding: 0 var(--df-sp-5);
+}
+.topbar-right .btn { height: 32px; padding: 0 12px; font-size: var(--df-text-sm); gap: 6px; }
+.topbar-right .btn svg { width: 13px; height: 13px; }
+.topbar-right .btn .btn-chevron { opacity: 0.55; margin-left: 2px; }
+
+.editor-avatar {
+  width: 36px; height: 36px;
+  /* v14: 36×36 avatar — genuine circle. */
+  border-radius: 50%;
+  background: var(--df-surface-elevated);
+  border: none;
+  display: grid; place-items: center;
+  font-family: var(--df-font-mono);
+  font-size: var(--df-text-xs);
+  color: var(--df-text-secondary);
+  font-weight: 500;
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 1px 1px var(--df-skeu-near);
+}
+
+/* ============================================================ */
+/* EDITOR BODY */
+/* ============================================================ */
+
+.editor { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--df-bg-sunken); }
+
+.editor-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 460px 1fr;
+  overflow: hidden;
+}
+
+.editor-sidebar {
+  display: flex; flex-direction: column;
+  border-right: 1px solid var(--df-border-divider);
+  background: var(--df-bg-section);
+  overflow: visible;
+  position: relative;
+  /* min-height: 0 is mandatory here — without it, a flex child with
+     overflow:auto (chat-log below) cannot shrink below its content size,
+     which pushes chat-input off the bottom of the viewport once there
+     are enough messages. Classic flexbox-overflow gotcha. */
+  min-height: 0;
+}
+.editor-sidebar .chat-log { overflow-y: auto; min-height: 0; }
+/* The fade uses mask-image on the scroll container instead of a colored
+   ::before overlay. Overlays draw a solid color over the content;
+   against high-contrast thumbnails (black on black bg) the alpha
+   transition has no perceivable difference between "covered" and
+   "uncovered" — the kink stays visible because the thumbnail's actual
+   edge has a hard boundary in z-order. mask-image fades the content's
+   actual alpha — works identically on any bg. */
+.editor-sidebar::before {
+  /* Kept as no-op so any external rule overrides don't break. The
+     mask-image on .chat-log below is what does the fade work. */
+  content: none;
+}
+.editor-sidebar .chat-log {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    rgba(0, 0, 0, 0.05) 24px,
+    rgba(0, 0, 0, 0.4) 48px,
+    rgba(0, 0, 0, 0.85) 72px,
+    black 96px
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    rgba(0, 0, 0, 0.05) 24px,
+    rgba(0, 0, 0, 0.4) 48px,
+    rgba(0, 0, 0, 0.85) 72px,
+    black 96px
+  );
+}
+
+.chat-log {
+  flex: 1;
+  overflow-y: auto;
+  padding: 72px var(--df-sp-6) var(--df-sp-6);
+  display: flex; flex-direction: column;
+  gap: var(--df-sp-6);
+}
+
+.chat-empty {
+  flex: 1;
+  display: grid; place-items: center;
+  padding: var(--df-sp-6);
+  font-family: var(--df-font-mono);
+  font-size: var(--df-text-sm);
+  color: var(--df-text-faint);
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+/* Chat messages — claude stays plain prose, user gets a right-aligned bubble
+   so the source of every turn is unambiguous. */
+.chat-msg { display: flex; flex-direction: column; }
+.chat-msg--claude { align-items: stretch; }
+.chat-msg--user { align-items: flex-end; }
+
+.chat-msg-author {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  color: var(--df-text-muted);
+}
+.chat-msg-body { font-size: var(--df-text-base); line-height: 1.6; color: var(--df-text-primary); }
+
+/* Markdown prose rendering inside claude chat messages */
+.chat-prose { font-size: var(--df-text-sm); line-height: 1.65; color: var(--df-text-primary); }
+.chat-prose > :first-child { margin-top: 0; }
+.chat-prose > :last-child  { margin-bottom: 0; }
+.chat-prose p  { margin: 0 0 8px; }
+.chat-prose h1 { font-size: 17px; font-weight: 600; margin: 12px 0 6px; letter-spacing: -0.01em; }
+.chat-prose h2 { font-size: 15px; font-weight: 600; margin: 10px 0 5px; letter-spacing: -0.005em; }
+.chat-prose h3 { font-size: 13px; font-weight: 600; margin: 8px 0 4px; color: var(--df-text-secondary); }
+.chat-prose ul, .chat-prose ol { margin: 0 0 8px; padding-left: 22px; }
+.chat-prose li { margin: 2px 0; }
+.chat-prose strong { font-weight: 600; color: var(--df-text-primary); }
+.chat-prose em { color: var(--df-text-secondary); }
+.chat-prose a { color: #80a7ff; text-decoration: underline; text-underline-offset: 2px; }
+.chat-prose code {
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  padding: 1px 5px;
+  background: var(--df-surface-raised);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: 3px;
+  color: var(--df-text-secondary);
+}
+.chat-prose pre {
+  margin: 8px 0;
+  padding: 10px 12px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+  overflow-x: auto;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  line-height: 1.55;
+}
+.chat-prose pre code {
+  padding: 0; border: none; background: transparent; font-size: inherit;
+}
+
+/* highlight.js theme — matches dark app palette. Uses low-saturation hues
+   so code blocks read as muted prose, not a rainbow. */
+.chat-prose pre code.hljs { display: block; }
+.chat-prose .hljs-comment,
+.chat-prose .hljs-quote         { color: #6b6b66; font-style: italic; }
+.chat-prose .hljs-keyword,
+.chat-prose .hljs-selector-tag,
+.chat-prose .hljs-literal,
+.chat-prose .hljs-section,
+.chat-prose .hljs-link           { color: #c4a3e8; }   /* violets for control flow */
+.chat-prose .hljs-string,
+.chat-prose .hljs-attr,
+.chat-prose .hljs-regexp         { color: #9ec88e; }   /* soft green for strings */
+.chat-prose .hljs-number,
+.chat-prose .hljs-symbol,
+.chat-prose .hljs-bullet,
+.chat-prose .hljs-subst          { color: #e8b678; }   /* warm amber for numbers */
+.chat-prose .hljs-title,
+.chat-prose .hljs-function,
+.chat-prose .hljs-name,
+.chat-prose .hljs-selector-id,
+.chat-prose .hljs-selector-class,
+.chat-prose .hljs-type,
+.chat-prose .hljs-class,
+.chat-prose .hljs-title.class_   { color: #80a7ff; }   /* same blue as links */
+.chat-prose .hljs-variable,
+.chat-prose .hljs-template-variable,
+.chat-prose .hljs-params         { color: #d4d4d1; }
+.chat-prose .hljs-built_in,
+.chat-prose .hljs-builtin-name,
+.chat-prose .hljs-meta,
+.chat-prose .hljs-tag            { color: #8fb9d9; }
+.chat-prose .hljs-attribute      { color: #c4a3e8; }
+.chat-prose .hljs-emphasis       { font-style: italic; }
+.chat-prose .hljs-strong         { font-weight: 600; }
+.chat-prose .hljs-deletion       { background: rgba(239, 93, 59, 0.14); color: #ffb8a8; }
+.chat-prose .hljs-addition       { background: rgba(95, 170, 84, 0.14); color: #b2deab; }
+.chat-prose blockquote {
+  margin: 8px 0;
+  padding: 0 0 0 10px;
+  border-left: 1px solid var(--df-border-strong);
+  color: var(--df-text-secondary);
+  font-style: italic;
+}
+.chat-prose hr { border: none; border-top: 1px solid var(--df-border-subtle); margin: 12px 0; }
+.chat-prose table { border-collapse: collapse; margin: 8px 0; font-size: 11px; }
+.chat-prose th, .chat-prose td { border: 1px solid var(--df-border-subtle); padding: 4px 8px; text-align: left; }
+.chat-prose th { background: var(--df-surface-raised); }
+.chat-msg-body--user {
+  max-width: 82%;
+  padding: 10px 14px;
+  background: var(--df-surface-raised);
+  border: none;
+  border-radius: 14px 14px 4px 14px;
+  color: var(--df-text-primary);
+  font-size: var(--df-text-sm);
+  line-height: 1.5;
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 1px 2px var(--df-skeu-near);
+}
+
+/* Origin guard banner — Audit Fase 1 #3.
+ * Renders ONLY when `window.location.origin` is not on the daemon's
+ * allow-list (apps/daemon/src/index.mjs DEFAULT_ALLOWED_ORIGINS). Sticky
+ * at the top so the user sees the misconfiguration before they hit it
+ * as a chat phantom. */
+.origin-guard-banner {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding: 14px 20px;
+  background: var(--df-accent-danger, #b14a3a);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  /* User 2026-05-21: drop solo no banner ficava flat em dark. Stack
+     inset highlight (gives the danger band a tactile edge) + warm-tinted
+     shadow via the skeu token. */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 3px 10px -2px var(--df-skeu-near);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.origin-guard-banner__title {
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.01em;
+}
+.origin-guard-banner__body code {
+  background: rgba(0, 0, 0, 0.22);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-family: var(--df-font-mono, ui-monospace, "SF Mono", Menlo, monospace);
+  font-size: 12px;
+}
+.origin-guard-banner__cta { margin-top: 4px; }
+.origin-guard-banner__link {
+  color: #fff;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+/* Persistence-state badge — Audit Fase 1 #1 (visible save state).
+ * Renders below user bubbles on non-default outcomes (saving / recovered
+ * / failed). "saved" stays implicit — no badge — so a healthy chat
+ * stays clean and only state changes draw the eye. */
+.chat-msg-persist {
+  align-self: flex-end;
+  margin-top: 4px;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--df-text-tertiary);
+  user-select: none;
+}
+.chat-msg-persist--saving { font-style: italic; opacity: 0.7; }
+.chat-msg-persist--recovered { color: var(--df-accent-warn, #c8861a); }
+.chat-msg-persist--failed { color: var(--df-accent-danger, #b14a3a); font-weight: 500; }
+
+@keyframes df-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(1.2); }
+}
+
+/* Chat input */
+.chat-input { flex-shrink: 0; padding: var(--df-sp-5); border-top: 1px solid var(--df-border-subtle); background: var(--df-bg-section); }
+.chat-input-box {
+  background: var(--df-surface-raised);
+  border-radius: var(--df-r-2xl);
+  transition: box-shadow var(--df-motion-ui) var(--df-ease-out);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 1px 2px var(--df-skeu-near),
+    0 4px 14px -2px var(--df-skeu-deep-near);
+  overflow: hidden;
+}
+.chat-input-box:focus-within {
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-strong),
+    0 1px 2px var(--df-skeu-near),
+    0 6px 20px -2px var(--df-skeu-deep-near),
+    var(--df-focus-ring);
+}
+.chat-input-field {
+  width: 100%;
+  padding: 18px 20px 8px;
+  background: transparent; border: 0; outline: none; resize: none;
+  font-family: var(--df-font-sans); font-size: var(--df-text-base);
+  color: var(--df-text-primary); line-height: 1.55;
+  min-height: 88px; max-height: 220px;
+}
+.chat-input-field::placeholder { color: var(--df-text-faint); }
+.chat-input-bar {
+  display: flex; align-items: center;
+  padding: 8px 12px 10px 14px; gap: 4px;
+  border-top: 1px solid var(--df-border-subtle);
+}
+.chat-input-bar-left { display: flex; align-items: center; gap: 2px; }
+.chat-input-bar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.model-selector {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px;
+  font-family: var(--df-font-mono); font-size: var(--df-text-xs);
+  color: var(--df-text-secondary);
+  background: var(--df-surface-elevated);
+  border: none;
+  border-radius: var(--df-r-md);
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 1px 1px var(--df-skeu-near);
+  transition-property: color, background, box-shadow, transform;
+  transition-duration: var(--df-motion-quick);
+  transition-timing-function: var(--df-ease-out);
+  letter-spacing: 0.01em;
+}
+.model-selector:hover {
+  color: var(--df-text-primary);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-hover),
+    0 2px 4px var(--df-skeu-near);
+}
+.model-selector-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--df-text-secondary);
+}
+.chat-mode-toggle {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px 10px;
+  font-family: var(--df-font-mono); font-size: var(--df-text-xs);
+  color: var(--df-text-secondary);
+  background: var(--df-surface-elevated);
+  border: none;
+  border-radius: var(--df-r-md);
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 1px 1px var(--df-skeu-near);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 500;
+  transition: color 120ms var(--df-ease-out), background 120ms var(--df-ease-out);
+}
+.chat-mode-toggle:hover { color: var(--df-text-primary); }
+.chat-mode-toggle[data-mode="ask"] {
+  background: color-mix(in srgb, var(--df-accent-user) 14%, var(--df-surface-elevated));
+  color: var(--df-accent-user);
+}
+.chat-mode-toggle[data-mode="edit"] {
+  background: color-mix(in srgb, var(--df-accent-claude, #c7955a) 14%, var(--df-surface-elevated));
+  color: var(--df-accent-claude, #c7955a);
+}
+.chat-input-send {
+  width: 36px; height: 36px;
+  border-radius: var(--df-r-lg);
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-primary);
+  border: none;
+  display: grid; place-items: center;
+  box-shadow: var(--df-shadow-button-tactile);
+  transition: box-shadow var(--df-motion-ui) var(--df-ease-out), transform var(--df-motion-ui) var(--df-ease-out), background var(--df-motion-ui) var(--df-ease-out);
+  cursor: pointer;
+}
+[data-theme="light"] .chat-input-send { color: var(--df-text-on-tactile); }
+.chat-input-send:hover {
+  background: var(--df-bg-button-tactile-hover);
+  box-shadow: var(--df-shadow-button-tactile-hover);
+}
+.chat-input-send:active {
+  box-shadow: var(--df-shadow-button-tactile-pressed);
+}
+.chat-input-send[data-disabled="true"] {
+  background: var(--df-interactive-pressed);
+  color: var(--df-text-muted);
+  box-shadow: var(--df-skeu-recess);
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Canvas */
+.editor-canvas { display: flex; flex-direction: column; background: var(--df-bg-base); overflow: hidden; position: relative; }
+.canvas-toolbar {
+  padding: 10px var(--df-sp-5);
+  display: flex; align-items: center; gap: var(--df-sp-2);
+  background: var(--df-bg-base);
+  border-bottom: 1px solid var(--df-border-subtle);
+  flex-shrink: 0; position: relative; z-index: 1;
+}
+.canvas-toolbar .btn-icon {
+  width: 32px; height: 32px; border-radius: var(--df-r-md);
+  color: var(--df-text-secondary);
+  background: transparent;
+  border: none;
+  transition: background var(--df-motion-quick) var(--df-ease-out), color var(--df-motion-quick) var(--df-ease-out), box-shadow var(--df-motion-quick) var(--df-ease-out), transform var(--df-motion-quick) var(--df-ease-out);
+}
+.canvas-toolbar .btn-icon:hover {
+  background: var(--df-surface-raised);
+  color: var(--df-text-primary);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle);
+}
+.canvas-toolbar .btn-icon:active {
+  background: var(--df-bg-section);
+  box-shadow: var(--df-skeu-recess);
+}
+.canvas-toolbar .pill {
+  padding: 8px 14px;
+  background: transparent;
+  border: none;
+  color: var(--df-text-secondary);
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  border-radius: var(--df-r-md);
+  transition: background var(--df-motion-quick) var(--df-ease-out), color var(--df-motion-quick) var(--df-ease-out), box-shadow var(--df-motion-quick) var(--df-ease-out);
+}
+.canvas-toolbar .pill:hover:not([data-active="true"]) {
+  background: var(--df-surface-raised);
+  color: var(--df-text-primary);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle);
+}
+.canvas-toolbar .pill[data-active="true"] {
+  background: var(--df-surface-elevated);
+  color: var(--df-text-primary);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-strong),
+    0 1px 2px var(--df-skeu-near);
+}
+.toolbar-divider { width: 1px; height: 22px; background: var(--df-border-strong); margin: 0 var(--df-sp-2); opacity: 0.4; }
+.toolbar-group { display: flex; gap: 2px; }
+/* isolation: isolate creates a stacking context so internal z-indexes
+   (streaming overlay z=5, DfLoader z=5) stay scoped to the canvas — without
+   it they escape to root and cover the topbar (z=2) including the AgentPicker
+   dropdown. User report 2026-05-04: CLI dropdown clipped behind loader
+   while HTML was generating. */
+.canvas-stage { flex: 1; padding: var(--df-sp-7); overflow: auto; position: relative; background: var(--df-bg-base); isolation: isolate; }
+
+.canvas-empty { flex: 1; display: grid; place-items: center; background: var(--df-bg-base); padding: var(--df-sp-8); }
+.canvas-empty-inner { display: flex; flex-direction: column; align-items: center; gap: var(--df-sp-3); max-width: 420px; text-align: center; }
+.canvas-empty-icon { width: 40px; height: 40px; color: var(--df-text-faint); margin-bottom: var(--df-sp-2); }
+.canvas-empty-title { font-family: var(--df-font-sans); font-size: var(--df-text-md); font-weight: 600; letter-spacing: -0.02em; color: var(--df-text-secondary); }
+.canvas-empty-sub { font-family: var(--df-font-sans); font-size: var(--df-text-sm); color: var(--df-text-muted); line-height: 1.55; }
+
+/* Statusbar */
+.editor-statusbar {
+  height: 32px; flex-shrink: 0;
+  padding: 0 var(--df-sp-5);
+  border-top: 1px solid var(--df-border-subtle);
+  background: var(--df-bg-sunken);
+  display: flex; align-items: center; justify-content: space-between; gap: var(--df-sp-4);
+  font-family: var(--df-font-mono); font-size: var(--df-text-xs); color: var(--df-text-muted); letter-spacing: 0.04em;
+}
+.statusbar-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--df-text-faint);
+  box-shadow:
+    inset 0 1px 1px rgba(0, 0, 0, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+  transition: background var(--df-motion-ui) var(--df-ease-out),
+              box-shadow var(--df-motion-ui) var(--df-ease-out);
+}
+.statusbar-dot[data-state="streaming"] {
+  background: var(--df-accent-user, var(--df-accent-ok));
+  animation: df-pulse 1s ease-in-out infinite;
+  box-shadow:
+    0 0 4px 0 color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 55%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.statusbar-dot[data-state="ready"] {
+  background: var(--df-accent-user, var(--df-accent-ok));
+  box-shadow:
+    0 0 4px 0 color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 55%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.statusbar-dot[data-state="error"] {
+  background: var(--df-accent-danger);
+  box-shadow:
+    0 0 4px 0 color-mix(in srgb, var(--df-accent-danger) 55%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.statusbar-dot[data-state="idle"] {
+  background: var(--df-text-faint);
+  box-shadow:
+    inset 0 1px 1px rgba(0, 0, 0, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* Tweaks card */
+.tweaks-card {
+  position: absolute; bottom: 24px; right: 24px;
+  width: 320px; max-height: calc(100% - 48px);
+  background: var(--df-surface-elevated);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-2xl);
+  display: flex; flex-direction: column;
+  box-shadow: var(--df-shadow-xl);
+  animation: df-modal-in 320ms var(--df-ease-emphasized);
+  overflow: hidden; z-index: 10;
+}
+.tweaks-card-head { padding: 14px 18px; border-bottom: 1px solid var(--df-border-subtle); display: flex; align-items: center; justify-content: space-between; background: var(--df-bg-section); }
+.tweaks-card-title-group { display: flex; align-items: center; gap: 10px; }
+.tweaks-card-icon { width: 18px; height: 18px; color: var(--df-text-secondary); }
+.tweaks-card-title { font-family: var(--df-font-sans); font-size: var(--df-text-base); font-weight: 600; letter-spacing: -0.015em; }
+.tweaks-card-meta { font-family: var(--df-font-mono); font-size: var(--df-text-xs); color: var(--df-text-muted); letter-spacing: 0.04em; margin-left: 6px; }
+.tweaks-card-body { padding: var(--df-sp-5); display: flex; flex-direction: column; gap: var(--df-sp-5); flex: 1; overflow-y: auto; background: var(--df-surface-elevated); }
+.dial { display: flex; flex-direction: column; gap: var(--df-sp-3); }
+.dial-label { display: flex; justify-content: space-between; align-items: baseline; }
+.dial-name { font-family: var(--df-font-sans); font-size: var(--df-text-sm); color: var(--df-text-secondary); letter-spacing: -0.005em; }
+.dial-value { font-family: var(--df-font-mono); font-size: var(--df-text-sm); color: var(--df-text-primary); letter-spacing: 0.04em; }
+.dial-slider { position: relative; height: 4px; border-radius: var(--df-r-xs); background: var(--df-border-subtle); }
+.dial-slider-fill { position: absolute; inset: 0 50% 0 0; border-radius: var(--df-r-xs); background: var(--df-text-primary); }
+.dial-slider-thumb { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 18px; height: 18px; border-radius: 50%; background: var(--df-text-primary); border: 1px solid var(--df-bg-section); box-shadow: var(--df-shadow-sm); }
+.dial-toggle { display: flex; background: var(--df-surface-raised); border: 1px solid var(--df-border-subtle); border-radius: var(--df-r-md); padding: 3px; gap: 2px; }
+.dial-toggle-opt { flex: 1; padding: 6px 12px; text-align: center; font-family: var(--df-font-mono); font-size: var(--df-text-sm); border-radius: var(--df-r-sm); color: var(--df-text-muted); transition-property: color, background, border-color, box-shadow, transform;
+  transition-duration: var(--df-motion-quick);
+  transition-timing-function: var(--df-ease-out); letter-spacing: 0.02em; cursor: pointer; }
+.dial-toggle-opt[data-selected="true"] { background: var(--df-text-primary); color: var(--df-text-inverse); }
+.dial-text { width: 100%; padding: 9px 12px; background: var(--df-surface-raised); border: 1px solid var(--df-border-subtle); border-radius: var(--df-r-md); font-family: var(--df-font-mono); font-size: var(--df-text-sm); color: var(--df-text-primary); letter-spacing: 0.02em; outline: none; }
+
+/* ============================================================ */
+/* HOME (home-v2) */
+/* ============================================================ */
+
+.editor-topbar.home-topbar {
+  display: grid;
+  height: 56px;
+  grid-template-columns: 460px 1fr auto;
+  padding: 0;
+}
+.home-topbar-brand { display: flex; align-items: center; gap: 10px; padding: 0 var(--df-sp-5); border-right: 1px solid var(--df-border-divider); }
+.home-brand-mark { width: 26px; height: 26px; flex-shrink: 0; color: var(--df-text-primary); }
+.home-brand-name { font-family: var(--df-font-sans); font-size: var(--df-text-base); font-weight: 600; letter-spacing: -0.02em; }
+.home-brand-badge { font-family: var(--df-font-mono); font-size: 10px; color: var(--df-text-muted); letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 7px; background: var(--df-surface-raised); border: 1px solid var(--df-border-subtle); border-radius: var(--df-r-sm); }
+
+.home-body-v2 { display: flex; flex: 1; overflow: hidden; padding: 0; background: transparent; }
+
+.home-sidebar {
+  width: 460px; flex-shrink: 0;
+  display: flex; flex-direction: column;
+  border-right: 1px solid var(--df-border-divider);
+  background: var(--df-bg-sunken);
+}
+.home-sidebar-tabstrip {
+  height: 56px;
+  display: flex; align-items: flex-end;
+  padding: 10px var(--df-sp-4) 0;
+  position: relative; flex-shrink: 0;
+  background: var(--df-bg-sunken);
+}
+.home-sidebar-tabstrip .topbar-chat-tabs { gap: 20px; }
+.home-sidebar-tabstrip .topbar-chat-tab { font-size: var(--df-text-sm); padding: 0 14px; }
+.home-sidebar-content { flex: 1; background: var(--df-bg-section); display: flex; flex-direction: column; overflow: hidden; }
+.home-sidebar-scroll { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.home-sidebar-footer { padding: 10px 18px; border-top: 1px solid var(--df-border-subtle); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+
+.home-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--df-bg-base); }
+/* Top padding clears the 64px fade gradient (.home-main::before) so the
+   first row of content always sits below the soft tab-strip transition.
+   Mirrors .chat-log's 72px top so both fades feel identical. */
+.home-main-body { flex: 1; overflow-y: auto; padding: 72px 28px 28px; }
+.home-right-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+
+.home-pcard-tile {
+  position: relative;
+  /* Hover lifts both .home-pcard and the dots menu together. */
+}
+.home-pcard {
+  /* v14: skeu material gradient (1.5% delta top→bottom) instead of flat bg.
+   * Reads as a raised plate sitting in real light — the inset highlight
+   * inside --df-shadow-card simulates the curved top edge.
+   * Base shadow stays as the skeu --df-shadow-card stack (never flat).
+   * The extra drop layer that lifts cards off the bg is scoped to the
+   * home feed below (user 2026-05-21: shadow goes on feed gallery,
+   * not inside the project folder where FileManager reuses this class). */
+  background:
+    linear-gradient(180deg,
+      color-mix(in oklab, var(--df-bg-section) 100%, white 1.2%) 0%,
+      var(--df-bg-section) 100%);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-xl);
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: var(--df-shadow-card);
+  transition: background var(--df-motion-ui) var(--df-ease-out),
+              border-color var(--df-motion-ui) var(--df-ease-out),
+              box-shadow var(--df-motion-ui) var(--df-ease-out),
+              transform var(--df-motion-ui) var(--df-ease-out);
+}
+.home-pcard-tile:hover .home-pcard {
+  background:
+    linear-gradient(180deg,
+      color-mix(in oklab, var(--df-surface-raised) 100%, white 1.5%) 0%,
+      var(--df-surface-raised) 100%);
+  border-color: var(--df-border-hover);
+  transform: translateY(1px);
+  box-shadow: var(--df-shadow-card-hover);
+}
+[data-theme="light"] .home-pcard {
+  background:
+    linear-gradient(180deg,
+      color-mix(in oklab, var(--df-bg-section) 100%, white 0.5%) 0%,
+      color-mix(in oklab, var(--df-bg-section) 100%, black 1%) 100%);
+}
+[data-theme="light"] .home-pcard-tile:hover .home-pcard {
+  background:
+    linear-gradient(180deg,
+      color-mix(in oklab, var(--df-surface-raised) 100%, white 0.8%) 0%,
+      color-mix(in oklab, var(--df-surface-raised) 100%, black 0.5%) 100%);
+}
+
+/* Feed-only soft drop. User 2026-05-21: "shadow no card era no feed
+   galeria, nao dentro do folder de projeto, toda sombra no factory
+   precisa ser mais suave e nao quero nada flat".
+   Scoped to .home-stage-v8 so FileManager (Files tab inside the editor)
+   stays with just the skeu base — same chrome, no extra lift.
+   Drop is intentionally faint: the skeu inset already does most of the
+   work. This layer is just a hint of separation from the page bg. */
+/* Feed-scoped drop dropped 2026-05-21 (round 3): user felt the
+   extra layer plus the trimmed --df-shadow-card was still loud. The
+   trimmed token already includes inset highlight + 3 ambient layers,
+   which is enough lift on its own. Rule left in place (empty
+   overrides) so FileManager (no `.home-stage-v8` ancestor) keeps the
+   same chrome the home feed gets. */
+.df-card-menu {
+  transition: transform var(--df-motion-ui) var(--df-ease-out),
+              opacity var(--df-motion-ui) var(--df-ease-out);
+}
+.home-pcard-tile:hover .df-card-menu {
+  transform: translateY(1px);
+}
+
+/* DS "Add" action card — mirrors .home-pcard anatomy (thumb 4:3 + meta) so
+   heights align with content cards. Dashed border signals action vs content. */
+.home-ds-add {
+  display: flex; flex-direction: column; align-items: stretch;
+  padding: 0;
+  background: transparent;
+  border: 1px dashed var(--df-border-subtle);
+  border-radius: var(--df-r-xl);
+  color: var(--df-text-muted);
+  cursor: pointer;
+  text-align: center;
+  overflow: hidden;
+  transition-property: color, background, border-color, box-shadow, transform;
+  transition-duration: var(--df-motion-ui);
+  transition-timing-function: var(--df-ease-out);
+}
+.home-ds-add:hover {
+  border-style: solid;
+  border-color: var(--df-border-hover);
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+  transform: translateY(2px);
+}
+.home-ds-add-top {
+  /* Match .home-pcard-thumb (now 16:9) so the DS "add" tile aligns
+     vertically with content cards in the same row. */
+  aspect-ratio: 16/9;
+  display: grid; place-items: center;
+  background: transparent;
+}
+.home-ds-add-meta {
+  padding: 10px 14px 12px;
+  border-top: 1px dashed var(--df-border-subtle);
+  display: flex; flex-direction: column; gap: 2px; align-items: center;
+}
+.home-ds-add-icon {
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  border: 1px solid var(--df-border-subtle);
+  background: var(--df-surface-raised);
+  color: inherit;
+}
+.home-ds-add:hover .home-ds-add-icon { border-color: currentColor; }
+.home-ds-add-label { font-family: var(--df-font-sans); font-size: var(--df-text-sm); font-weight: 600; color: var(--df-text-primary); line-height: 1.2; }
+.home-ds-add-sub { font-family: var(--df-font-mono); font-size: 10px; color: var(--df-text-faint); letter-spacing: 0.03em; }
+.home-pcard-thumb {
+  /* 16:9 matches the canonical iframe viewport (1280×720) used for
+     HtmlPreviewCover. Was 4:3 — projects with landscape designs got
+     visible letterbox bars. Vertical (9:16) projects still letterbox
+     here, which is correct: the thumb honestly shows the project's
+     real aspect, just with side-bars instead of stretching. */
+  aspect-ratio: 16/9;
+  background: var(--df-surface-raised);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    inset 0 -1px 0 var(--df-border-subtle),
+    inset 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+/* Footer layout — title + meta justified LEFT, three-dots menu trigger
+   anchored on the RIGHT in the same row. Removes the legacy top-right
+   corner controls (LED + dot menu) so the thumb stays clean. */
+.home-pcard-meta {
+  padding: 10px 14px 12px;
+  border-top: 1px solid var(--df-border-subtle);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+}
+.home-pcard-meta-text { min-width: 0; }
+.home-pcard-name {
+  font-family: var(--df-font-sans);
+  font-size: var(--df-text-sm);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 2px;
+  text-align: left;
+  /* Single line + ellipsis so long names don't push the menu. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.home-pcard-sub {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  color: var(--df-text-muted);
+  letter-spacing: 0.02em;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.home-pcard-sub--link { color: var(--df-text-primary); opacity: 0.65; }
+.home-pcard-meta-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+/* Three-dots trigger anchored right in the footer. Painted as a quiet
+   icon button — no background until hover. Rendered as <span role="button">
+   inside <button class="home-pcard"> to avoid nested <button> in HTML. */
+.home-pcard-menu-trigger {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--df-r-sm);
+  color: var(--df-text-faint);
+  cursor: pointer;
+  transition: color 120ms var(--df-ease-out), background 120ms var(--df-ease-out);
+  user-select: none;
+}
+.home-pcard-menu-trigger:hover,
+.home-pcard-menu-trigger[aria-expanded="true"] {
+  color: var(--df-text-primary);
+  background: var(--df-interactive-hover);
+}
+.home-pcard-menu-trigger:focus-visible {
+  outline: 2px solid var(--df-accent-user, var(--df-accent-ok));
+  outline-offset: 2px;
+}
+
+.home-create-card {
+  background: var(--df-surface-raised);
+  border: none;
+  border-radius: var(--df-r-2xl);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 1px 2px var(--df-skeu-near),
+    0 6px 16px -4px var(--df-skeu-deep-near);
+}
+.home-create-title { font-family: var(--df-font-display); font-size: var(--df-text-sm); font-weight: var(--df-fw-semibold, 600); letter-spacing: var(--df-tracking-tight); }
+.home-mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.home-mode-card {
+  padding: 8px;
+  background: var(--df-bg-section);
+  border: none;
+  border-radius: var(--df-r-md);
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 1px 1px var(--df-skeu-near);
+  transition: background var(--df-motion-quick) var(--df-ease-out), box-shadow var(--df-motion-quick) var(--df-ease-out), transform var(--df-motion-quick) var(--df-ease-out);
+}
+.home-mode-card:hover {
+  background: var(--df-surface-raised);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-hover),
+    0 2px 3px var(--df-skeu-near);
+}
+.home-mode-card[data-selected="true"] {
+  background: var(--df-surface-elevated);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-strong),
+    0 1px 2px var(--df-skeu-near);
+}
+.home-mode-thumb { width: 100%; aspect-ratio: 4/3; background: var(--df-surface-raised); border-radius: var(--df-r-sm); margin-bottom: 6px; overflow: hidden; display: flex; flex-direction: column; gap: 4px; padding: 7px; }
+.home-mode-wire-line { height: 3px; border-radius: 2px; background: var(--df-border-strong); }
+.home-mode-wire-box { flex: 1; border-radius: 3px; border: 1px dashed var(--df-border-hover); }
+.home-mode-hifi-bar { height: 7px; border-radius: 2px; background: var(--df-text-primary); opacity: 0.55; }
+.home-mode-hifi-content { display: flex; flex: 1; gap: 4px; }
+.home-mode-hifi-block { flex: 1; border-radius: 2px; background: var(--df-surface-elevated); }
+.home-mode-hifi-accent { width: 38%; border-radius: 2px; background: var(--df-text-primary); opacity: 0.35; }
+.home-mode-name { font-family: var(--df-font-sans); font-size: var(--df-text-xs); font-weight: 600; letter-spacing: -0.01em; margin-bottom: 2px; }
+.home-mode-desc { font-family: var(--df-font-mono); font-size: 9px; color: var(--df-text-muted); letter-spacing: 0.02em; line-height: 1.45; }
+.home-create-btn {
+  width: 100%;
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px;
+  padding: 11px;
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-primary);
+  border-radius: var(--df-r-md);
+  font-family: var(--df-font-body);
+  font-size: var(--df-text-sm);
+  font-weight: var(--df-fw-semibold, 600);
+  letter-spacing: var(--df-tracking-tight);
+  cursor: pointer;
+  border: 0;
+  box-shadow: var(--df-shadow-button-tactile);
+  transition: background var(--df-motion-ui) var(--df-ease-out),
+              box-shadow var(--df-motion-ui) var(--df-ease-out),
+              transform var(--df-motion-ui) var(--df-ease-out);
+}
+[data-theme="light"] .home-create-btn { color: var(--df-text-on-tactile); }
+.home-create-btn:hover {
+  background: var(--df-bg-button-tactile-hover);
+  box-shadow: var(--df-shadow-button-tactile-hover);
+}
+.home-create-btn:active {
+  box-shadow: var(--df-shadow-button-tactile-pressed);
+}
+
+.home-ds-card { background: var(--df-bg-base); border: 1px solid var(--df-border-subtle); border-radius: var(--df-r-xl); padding: 14px; }
+.home-ds-text { font-family: var(--df-font-sans); font-size: var(--df-text-sm); color: var(--df-text-secondary); line-height: 1.55; margin-bottom: 10px; }
+
+.home-left-footer { padding: 10px 16px; border-top: 1px solid var(--df-border-subtle); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.home-footer-link { display: flex; align-items: center; gap: 5px; font-family: var(--df-font-mono); font-size: var(--df-text-xs); color: var(--df-text-muted); cursor: pointer; background: transparent; border: 0; transition: color var(--df-motion-quick); }
+.home-footer-link:hover { color: var(--df-text-primary); }
+.home-footer-user { display: flex; align-items: center; gap: 5px; font-family: var(--df-font-mono); font-size: 10px; color: var(--df-text-muted); }
+.home-footer-avatar { width: 18px; height: 18px; border-radius: 50%; background: var(--df-surface-raised); border: 1px solid var(--df-border-subtle); display: grid; place-items: center; font-size: 9px; font-weight: 600; color: var(--df-text-secondary); }
+
+/* ============================================================ */
+/* NEW PROJECT column — Editorial Space layout (home-np-*) */
+/* Approved combo 2026-04-23: textural header · command name · */
+/* dense mode list · swatch DSes · chat-style prompt · status */
+/* workspace · primary CTA. Rhythm: 18px between sections. */
+/* ============================================================ */
+
+.home-np-stack { display: flex; flex-direction: column; gap: 18px; }
+
+.home-np-label-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
+.home-np-label { font-family: var(--df-font-mono); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--df-text-faint); }
+.home-np-manage { font-family: var(--df-font-mono); font-size: 9px; letter-spacing: 0.04em; color: var(--df-text-muted); text-decoration: none; background: transparent; border: 0; cursor: pointer; padding: 0; }
+.home-np-manage:hover { color: var(--df-text-primary); }
+
+/* M1 — Textural ASCII header */
+.home-np-header {
+  position: relative;
+  height: 118px;
+  border-radius: var(--df-r-lg);
+  overflow: hidden;
+  background: var(--df-bg-section);
+  border: none;
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 14px 16px;
+}
+.home-np-header-ascii { position: absolute; inset: 0; margin: 0; font-family: var(--df-font-mono); font-size: 10px; color: var(--df-text-faint); opacity: 0.38; white-space: pre; line-height: 1.08; padding: 10px 14px; letter-spacing: 0.04em; pointer-events: none; user-select: none; }
+.home-np-header-mark { position: absolute; top: 12px; right: 14px; width: 26px; height: 26px; color: var(--df-text-primary); opacity: 0.55; pointer-events: none; z-index: 1; transition: opacity var(--df-motion-base) var(--df-ease-out), color var(--df-motion-base) var(--df-ease-out), filter var(--df-motion-base) var(--df-ease-out); }
+.home-np-header:hover .home-np-header-mark { opacity: 0.85; }
+/* "is-typing" — only the LOGO lights up and glows while the project
+ * name is being typed. The halftone background stays unchanged. */
+.home-np-header.is-typing .home-np-header-mark {
+  opacity: 1;
+  color: var(--df-accent-user, var(--df-accent-ok));
+  filter:
+    drop-shadow(0 0 4px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 70%, transparent))
+    drop-shadow(0 0 12px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 40%, transparent));
+}
+.home-np-header-copy { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 4px; }
+.home-np-header-kicker { font-family: var(--df-font-mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--df-text-muted); }
+.home-np-header-title { font-family: var(--df-font-display); font-size: 22px; font-weight: var(--df-fw-bold, 700); letter-spacing: var(--df-tracking-display); color: var(--df-text-primary); }
+
+/* M1.5 — "Open project console" plate. Reads as a thick mechanical
+   panel-opener: tactile background, top sheen via inset highlight,
+   small accent LED on the left, body label on top + meta line below.
+   Hover lifts; press recesses. The aim is to look like a face-plate
+   key that "snaps off" to reveal the full console (modal). */
+.home-np-console-plate {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  text-align: left;
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-on-tactile);
+  border: 0;
+  border-radius: var(--df-r-md);
+  padding: 14px 16px 14px 36px;
+  cursor: pointer;
+  box-shadow: var(--df-shadow-button-tactile);
+  transition: box-shadow var(--df-motion-quick), transform var(--df-motion-quick);
+  font-family: var(--df-font-sans);
+}
+.home-np-console-plate:hover { box-shadow: var(--df-shadow-button-tactile-hover); }
+.home-np-console-plate:active {
+  box-shadow: var(--df-shadow-button-tactile-pressed);
+  transform: translateY(1px);
+}
+.home-np-console-plate-bevel {
+  position: absolute;
+  inset: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.32);
+  border-top-color: rgba(255, 255, 255, 0.1);
+  border-radius: calc(var(--df-r-md) - 5px);
+  pointer-events: none;
+}
+.home-np-console-plate-led {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  border-radius: 50%;
+  background: var(--df-accent-user, var(--df-accent-ok));
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.45),
+    0 0 6px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 50%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.home-np-console-plate-label {
+  font-size: 13px;
+  font-weight: var(--df-fw-medium);
+  letter-spacing: 0.005em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+.home-np-console-plate-meta {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  opacity: 0.62;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-theme="light"] .home-np-console-plate {
+  background: var(--df-surface-raised);
+  color: var(--df-text-primary);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 1px 2px var(--df-skeu-contact),
+    0 4px 10px -2px var(--df-skeu-near);
+}
+[data-theme="light"] .home-np-console-plate:hover {
+  background: var(--df-surface-elevated);
+}
+[data-theme="light"] .home-np-console-plate-bevel {
+  border-color: var(--df-border-subtle);
+  border-top-color: rgba(255, 255, 255, 0.5);
+}
+[data-theme="light"] .home-np-console-plate-label {
+  text-shadow: 0 1px 0 var(--df-skeu-top-light);
+}
+
+/* M2 — Command-style name input */
+.home-np-name {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  padding: 11px 12px;
+  font-family: var(--df-font-mono);
+  box-shadow: var(--df-skeu-recess);
+  transition: border-color var(--df-motion-quick), box-shadow var(--df-motion-quick);
+}
+.home-np-name:focus-within {
+  border-color: var(--df-border-focus);
+  box-shadow: var(--df-skeu-recess), var(--df-focus-ring);
+}
+.home-np-name-sigil { color: var(--df-accent-ok); font-size: 14px; font-weight: 700; line-height: 1; }
+.home-np-name-input { flex: 1; background: transparent; border: 0; outline: 0; color: var(--df-text-primary); font-size: 14px; font-family: inherit; letter-spacing: 0.01em; min-width: 0; }
+.home-np-name-input::placeholder { color: var(--df-text-faint); }
+.home-np-name-kbd { font-size: 9px; color: var(--df-text-faint); border: 1px solid var(--df-border-subtle); border-radius: 3px; padding: 1px 5px; font-family: inherit; flex-shrink: 0; }
+
+/* M3 — Dense list of Modes */
+.home-np-mode {
+  display: flex; flex-direction: column; gap: 2px;
+  background: var(--df-bg-section);
+  border: none;
+  border-radius: var(--df-r-md);
+  padding: 4px;
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle);
+}
+.home-np-mode-item { display: grid; grid-template-columns: 18px 1fr auto; align-items: center; gap: 10px; padding: 7px 8px; border-radius: var(--df-r-sm); cursor: pointer; color: var(--df-text-secondary); transition: background var(--df-motion-quick), color var(--df-motion-quick); border: 0; background: transparent; font-family: inherit; text-align: left; }
+.home-np-mode-item:hover { background: var(--df-surface-raised); color: var(--df-text-primary); }
+.home-np-mode-item:focus-visible { outline: 1px solid var(--df-border-focus); outline-offset: -2px; }
+.home-np-mode-item.is-on { background: color-mix(in srgb, var(--df-border-focus) 14%, transparent); color: var(--df-text-primary); }
+.home-np-mode-glyph { font-family: var(--df-font-mono); font-size: 14px; color: var(--df-text-muted); line-height: 1; }
+.home-np-mode-item.is-on .home-np-mode-glyph { color: var(--df-accent-ok); }
+.home-np-mode-name { font-family: var(--df-font-sans); font-size: 13px; font-weight: 500; letter-spacing: -0.005em; }
+.home-np-mode-meta { font-family: var(--df-font-mono); font-size: 9px; color: var(--df-text-faint); text-align: right; }
+.home-np-mode-placeholder { padding: 10px 8px; font-family: var(--df-font-mono); font-size: 10px; color: var(--df-text-faint); text-align: center; }
+
+/* M4 — Swatch strip DS selector */
+.home-np-ds { display: flex; flex-direction: column; gap: 6px; }
+.home-np-ds-item {
+  display: grid; grid-template-columns: auto 1fr auto auto;
+  align-items: center; gap: 10px;
+  padding: 10px 12px;
+  background: var(--df-bg-section);
+  border: none;
+  border-radius: var(--df-r-md);
+  cursor: pointer;
+  color: var(--df-text-secondary);
+  font-family: inherit;
+  text-align: left;
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle);
+  transition: background var(--df-motion-quick), box-shadow var(--df-motion-quick);
+}
+.home-np-ds-view { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; background: transparent; border: 0; color: var(--df-text-muted); cursor: pointer; border-radius: var(--df-r-sm); transition: background var(--df-motion-quick), color var(--df-motion-quick); padding: 0; }
+.home-np-ds-view:hover { background: var(--df-surface-raised); color: var(--df-text-primary); }
+.home-np-ds-view svg { width: 13px; height: 13px; }
+.home-np-ds-item:hover { border-color: var(--df-border-hover); }
+.home-np-ds-item:focus-visible { outline: 1px solid var(--df-border-focus); outline-offset: 2px; }
+.home-np-ds-item.is-on { border-color: var(--df-border-focus); background: color-mix(in srgb, var(--df-border-focus) 8%, var(--df-bg-section)); color: var(--df-text-primary); }
+.home-np-ds-swatches { display: grid; grid-template-columns: repeat(4, 10px); gap: 2px; }
+.home-np-ds-swatch { width: 10px; height: 26px; border-radius: 2px; border: 1px solid color-mix(in srgb, var(--df-border-subtle) 60%, transparent); }
+.home-np-ds-meta { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.home-np-ds-name { font-family: var(--df-font-sans); font-size: 13px; font-weight: 600; letter-spacing: -0.005em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.home-np-ds-sub { font-family: var(--df-font-mono); font-size: 9px; color: var(--df-text-muted); letter-spacing: 0.02em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.home-np-ds-check { width: 14px; height: 14px; opacity: 0; color: var(--df-accent-ok); transition: opacity var(--df-motion-quick); }
+.home-np-ds-item.is-on .home-np-ds-check { opacity: 1; }
+.home-np-ds-empty { display: flex; flex-direction: column; gap: 6px; padding: 14px 12px; background: var(--df-bg-section); border: 1px dashed var(--df-border-subtle); border-radius: var(--df-r-md); align-items: center; text-align: center; cursor: pointer; color: var(--df-text-muted); transition: border-color var(--df-motion-quick), color var(--df-motion-quick); font-family: inherit; }
+.home-np-ds-empty:hover { border-color: var(--df-border-hover); color: var(--df-text-secondary); }
+.home-np-ds-empty-label { font-family: var(--df-font-mono); font-size: 10px; letter-spacing: 0.04em; }
+.home-np-ds-empty-hint { font-family: var(--df-font-sans); font-size: 11px; color: var(--df-text-faint); }
+
+/* Direction picker — mirrors DS picker shape, swaps swatch strip for a
+   12-aspect signature thumbnail. */
+.home-np-direction { display: flex; flex-direction: column; gap: 6px; max-height: 360px; overflow-y: auto; padding-right: 2px; }
+.home-np-direction-item {
+  display: grid; grid-template-columns: auto 1fr auto auto;
+  align-items: center; gap: 10px;
+  padding: 8px 10px 8px 8px;
+  background: var(--df-bg-section);
+  border: none;
+  border-radius: var(--df-r-md);
+  cursor: pointer;
+  color: var(--df-text-secondary);
+  font-family: inherit;
+  text-align: left;
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle);
+  transition: background var(--df-motion-quick), box-shadow var(--df-motion-quick);
+}
+.home-np-direction-item:hover { box-shadow: inset 0 1px 0 var(--df-skeu-top-light), inset 0 0 0 1px var(--df-border-hover); }
+.home-np-direction-item:focus-visible { outline: 1px solid var(--df-border-focus); outline-offset: 2px; }
+.home-np-direction-item.is-on { box-shadow: inset 0 1px 0 var(--df-skeu-top-light), inset 0 0 0 1px var(--df-border-focus); background: color-mix(in srgb, var(--df-border-focus) 6%, var(--df-bg-section)); color: var(--df-text-primary); }
+.home-np-direction-thumb { position: relative; width: 56px; height: 36px; border-radius: var(--df-r-sm); overflow: hidden; flex-shrink: 0; box-shadow: inset 0 0 0 1px var(--df-border-subtle); background: var(--df-bg-base); }
+.home-np-direction-thumb--none { display: grid; place-items: center; font-family: var(--df-font-mono); font-size: 16px; color: var(--df-text-faint); }
+.home-np-direction-meta { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.home-np-direction-name { font-family: var(--df-font-sans); font-size: 13px; font-weight: 600; letter-spacing: -0.005em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: inherit; }
+.home-np-direction-sub { font-family: var(--df-font-sans); font-size: 11px; color: var(--df-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.3; }
+.home-np-direction-view { width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; background: transparent; border: 0; color: var(--df-text-muted); cursor: pointer; border-radius: var(--df-r-sm); transition: background var(--df-motion-quick), color var(--df-motion-quick); padding: 0; }
+.home-np-direction-view:hover { background: var(--df-surface-raised); color: var(--df-text-primary); }
+.home-np-direction-view svg { width: 13px; height: 13px; }
+.home-np-direction-check { width: 14px; height: 14px; opacity: 0; color: var(--df-accent-ok); transition: opacity var(--df-motion-quick); }
+.home-np-direction-item.is-on .home-np-direction-check { opacity: 1; }
+.home-np-direction-more {
+  padding: 6px 10px;
+  background: transparent;
+  border: 1px dashed var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  color: var(--df-text-muted);
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color var(--df-motion-quick), color var(--df-motion-quick);
+}
+.home-np-direction-more:hover { border-color: var(--df-border-hover); color: var(--df-text-secondary); }
+
+/* Modal fade-in keyframe used by Direction detail modal + others. */
+@keyframes df-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Home tab body fade — soft gradient at the top of the scroll container
+   so long feeds (Directions, Skills) blend into the tab strip instead of
+   cutting hard against it. Same `::before` pattern the editor sidebar
+   uses behind the chat tabs. */
+.home-main { position: relative; }
+.home-main::before {
+  /* No-op — the mask-image on .home-main-body is what does the fade
+     work now (see editor-sidebar comment for why overlay → mask). */
+  content: none;
+}
+.home-main-body {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    rgba(0, 0, 0, 0.05) 24px,
+    rgba(0, 0, 0, 0.4) 48px,
+    rgba(0, 0, 0, 0.85) 72px,
+    black 96px
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    rgba(0, 0, 0, 0.05) 24px,
+    rgba(0, 0, 0, 0.4) 48px,
+    rgba(0, 0, 0, 0.85) 72px,
+    black 96px
+  );
+}
+
+/* M5 — Chat-style initial prompt */
+.home-np-prompt {
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  box-shadow: var(--df-skeu-recess);
+  transition: border-color var(--df-motion-quick), box-shadow var(--df-motion-quick);
+}
+.home-np-prompt:focus-within {
+  border-color: var(--df-border-focus);
+  box-shadow: var(--df-skeu-recess), var(--df-focus-ring);
+}
+.home-np-prompt-field { min-height: 64px; padding: 11px 13px; font-family: var(--df-font-body); font-size: 13px; color: var(--df-text-primary); line-height: 1.55; border: 0; outline: 0; background: transparent; resize: vertical; max-height: 180px; width: 100%; }
+.home-np-prompt-field::placeholder { color: var(--df-text-faint); font-style: italic; }
+.home-np-prompt-bar { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-top: 1px solid var(--df-border-subtle); }
+.home-np-prompt-bar-left { display: flex; align-items: center; gap: 2px; }
+.home-np-prompt-bar-right { display: flex; align-items: center; gap: 6px; }
+.home-np-prompt-ico { width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; background: transparent; border: 0; color: var(--df-text-muted); cursor: pointer; border-radius: var(--df-r-sm); transition: background var(--df-motion-quick), color var(--df-motion-quick); }
+.home-np-prompt-ico:hover:not(:disabled) { background: var(--df-surface-raised); color: var(--df-text-primary); }
+.home-np-prompt-ico svg { width: 14px; height: 14px; }
+.home-np-prompt-ico:disabled { opacity: 0.4; cursor: not-allowed; }
+.home-np-prompt-provider { display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; background: var(--df-surface-raised); border: 1px solid var(--df-border-subtle); border-radius: var(--df-r-sm); font-family: var(--df-font-mono); font-size: 10px; color: var(--df-text-secondary); cursor: pointer; transition: border-color var(--df-motion-quick); }
+.home-np-prompt-provider:hover { border-color: var(--df-border-hover); color: var(--df-text-primary); }
+.home-np-prompt-provider-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+
+/* M6 — Workspace status indicators */
+.home-np-config { display: flex; flex-direction: column; gap: 6px; }
+.home-np-config-row { display: grid; grid-template-columns: 10px 1fr auto; align-items: center; gap: 10px; padding: 6px 8px; background: var(--df-bg-section); border-radius: var(--df-r-sm); border: 1px solid var(--df-border-subtle); }
+.home-np-config-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  background: var(--df-accent-user, var(--df-accent-ok));
+  box-shadow:
+    0 0 4px 0 color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 55%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.home-np-config-dot.is-warn {
+  background: var(--df-accent-warn);
+  box-shadow:
+    0 0 4px 0 color-mix(in srgb, var(--df-accent-warn) 55%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.home-np-config-main { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.home-np-config-label { font-family: var(--df-font-mono); font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--df-text-faint); }
+.home-np-config-val { font-family: var(--df-font-mono); font-size: 11px; color: var(--df-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.home-np-config-action { font-family: var(--df-font-mono); font-size: 9px; color: var(--df-text-muted); letter-spacing: 0.04em; cursor: pointer; background: transparent; border: 0; padding: 2px 4px; transition: color var(--df-motion-quick); }
+.home-np-config-action:hover { color: var(--df-text-primary); }
+.home-np-config-edit { display: flex; align-items: center; gap: 6px; padding: 0 2px; }
+.home-np-config-input { flex: 1; padding: 4px 8px; font-family: var(--df-font-mono); font-size: 10px; background: var(--df-bg-base); border: 1px solid var(--df-border-subtle); border-radius: 3px; color: var(--df-text-primary); outline: 0; min-width: 0; }
+.home-np-config-input:focus { border-color: var(--df-border-focus); }
+.home-np-config-pick { padding: 4px 8px; font-family: var(--df-font-mono); font-size: 10px; background: var(--df-surface-raised); border: 1px solid var(--df-border-subtle); border-radius: 3px; color: var(--df-text-secondary); cursor: pointer; flex-shrink: 0; transition: background var(--df-motion-quick), color var(--df-motion-quick); }
+.home-np-config-pick:hover { background: var(--df-surface-elevated); color: var(--df-text-primary); }
+.home-np-config-clear { padding: 2px 4px; background: transparent; border: 0; color: var(--df-text-faint); cursor: pointer; display: grid; place-items: center; flex-shrink: 0; transition: color var(--df-motion-quick); }
+.home-np-config-clear:hover { color: var(--df-text-primary); }
+
+/* M7 — Primary + arrow CTA */
+.home-np-cta { width: 100%; height: 48px; display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--df-text-primary); color: var(--df-bg-base); border: 0; border-radius: var(--df-r-md); font-family: var(--df-font-sans); font-size: 14px; font-weight: 600; letter-spacing: -0.005em; cursor: pointer; transition: opacity var(--df-motion-quick); }
+.home-np-cta:hover:not(:disabled) { opacity: 0.88; }
+.home-np-cta:hover:not(:disabled) .home-np-cta-arrow { transform: translateX(2px); }
+.home-np-cta:disabled { opacity: 0.4; cursor: not-allowed; }
+.home-np-cta-arrow { transition: transform var(--df-motion-quick); flex-shrink: 0; }
+
+/* ============================================================ */
+/* FIRST-RUN */
+/* ============================================================ */
+
+.firstrun { flex: 1; display: grid; place-items: center; padding: var(--df-sp-5); }
+.firstrun-card { width: 100%; max-width: 480px; background: var(--df-bg-section); border: 1px solid var(--df-border-subtle); border-radius: var(--df-r-2xl); padding: var(--df-sp-5); box-shadow: var(--df-shadow-xl); display: flex; flex-direction: column; gap: var(--df-sp-4); }
+.firstrun-header { display: flex; align-items: center; gap: var(--df-sp-2); }
+.firstrun-mark { width: 22px; height: 22px; flex-shrink: 0; }
+.firstrun-brand { font-size: var(--df-text-sm); font-weight: 600; color: var(--df-text-primary); letter-spacing: -0.01em; flex: 1; }
+.firstrun-step { font-family: var(--df-font-mono); font-size: var(--df-text-xs); color: var(--df-text-faint); letter-spacing: 0.08em; }
+.firstrun-divider { height: 1px; background: var(--df-border-subtle); margin: 0 calc(var(--df-sp-5) * -1); }
+.firstrun-title { font-family: var(--df-font-sans); font-size: var(--df-text-xl); font-weight: 600; letter-spacing: -0.02em; color: var(--df-text-primary); }
+.firstrun-sub { font-size: var(--df-text-sm); color: var(--df-text-muted); line-height: 1.5; margin-top: calc(var(--df-sp-2) * -1); }
+.cli-list { display: flex; flex-direction: column; gap: 6px; }
+.cli-row { display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: var(--df-sp-3); padding: 10px 14px; background: var(--df-surface-raised); border: 1px solid var(--df-border-subtle); border-radius: var(--df-r-lg); }
+.cli-circle { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-family: var(--df-font-mono); font-size: var(--df-text-xs); font-weight: 700; color: var(--df-text-secondary); background: var(--df-surface-elevated); border: 1px solid var(--df-border-subtle); }
+.cli-circle--ok { background: var(--df-text-primary); color: var(--df-text-inverse); border-color: var(--df-text-primary); }
+.cli-name { font-size: var(--df-text-sm); font-weight: 500; color: var(--df-text-primary); }
+.cli-meta { font-family: var(--df-font-mono); font-size: var(--df-text-xs); color: var(--df-text-muted); letter-spacing: 0.02em; }
+.cli-status { font-family: var(--df-font-mono); font-size: var(--df-text-xs); color: var(--df-text-secondary); letter-spacing: 0.04em; white-space: nowrap; }
+.cli-status--missing { color: var(--df-text-faint); }
+.firstrun-agent { display: flex; flex-direction: column; gap: var(--df-sp-1); }
+.firstrun-agent-label { font-family: var(--df-font-mono); font-size: var(--df-text-xs); color: var(--df-text-faint); letter-spacing: 0.10em; text-transform: uppercase; }
+.firstrun-select { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--df-surface-raised); border: 1px solid var(--df-border-subtle); border-radius: var(--df-r-lg); font-size: var(--df-text-sm); cursor: pointer; }
+.firstrun-actions { display: flex; justify-content: flex-end; gap: var(--df-sp-2); padding-top: var(--df-sp-1); }
+
+/* ============================================================ */
+/* SETTINGS */
+/* ============================================================ */
+
+.settings { flex: 1; display: grid; grid-template-columns: 240px 1fr; overflow: hidden; width: 100%; height: 100%; }
+.settings-sidebar { padding: var(--df-sp-7) var(--df-sp-5); border-right: 1px solid var(--df-border-subtle); background: var(--df-bg-section); overflow-y: auto; }
+.settings-mark { width: 36px; height: 36px; margin-bottom: var(--df-sp-6); }
+.settings-nav { display: flex; flex-direction: column; gap: 2px; }
+/* .settings-nav-item deleted in PR2.5 cleanup — migrated to .df-nav-item in PR2 (see components.css) */
+/* settings width bumped 880px → 1400px (user:
+ * "todas paginas settings nao precisam desse como usar … largura de
+ * todas paginas de settings podia ser maior 1400"). Wider canvas gives
+ * Padrões' split-panel (rail + detail) the breathing room it needed.
+ * Side padding stays generous (sp-12 ≈ 48px) so cards don't touch the
+ * sidebar edge. */
+.settings-main { padding: var(--df-sp-10) var(--df-sp-12); overflow-y: auto; min-width: 0; }
+.settings-main > * { max-width: 1080px; margin-left: auto; margin-right: auto; }
+/* User ask 2026-05-21: "padronize o hero de cada pagina em settings e
+ * a largura do conteudo. conforme navego entre paginas de settings da
+ * pra notar inconsistencias em posicao de texto, tamanhos, larguras,
+ * heros, etc". Canonical settings page wrapper — every page (Appearance,
+ * Providers, Padrões, Shortcuts, About) sits inside a `.settings-page`
+ * so vertical rhythm, max-width and hero placement are identical. */
+.settings-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--df-sp-6);
+  padding-bottom: var(--df-sp-12);
+}
+.settings-page > .settings-kicker { margin-bottom: 0; }
+.settings-page > .settings-title { margin-top: 4px; margin-bottom: 0; }
+.settings-kicker { font-family: var(--df-font-mono); font-size: var(--df-text-xs); color: var(--df-text-muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: var(--df-sp-3); }
+.settings-title { font-family: var(--df-font-sans); font-size: 28px; font-weight: 600; letter-spacing: -0.022em; line-height: 1.15; margin-bottom: var(--df-sp-8); }
+.settings-group { padding: var(--df-sp-6) 0; border-top: 1px solid var(--df-border-subtle); }
+.settings-group-title { font-family: var(--df-font-sans); font-size: var(--df-text-md); font-weight: 600; letter-spacing: -0.015em; margin-bottom: var(--df-sp-1); }
+.settings-group-sub { font-size: var(--df-text-sm); color: var(--df-text-secondary); margin-bottom: var(--df-sp-5); line-height: 1.55; }
+.theme-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--df-sp-4); max-width: 540px; }
+.theme-card {
+  padding: var(--df-sp-3);
+  background: var(--df-surface-raised);
+  border: none;
+  border-radius: var(--df-r-2xl);
+  cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 1px 2px var(--df-skeu-near);
+  transition: background var(--df-motion-quick) var(--df-ease-out), box-shadow var(--df-motion-quick) var(--df-ease-out), transform var(--df-motion-quick) var(--df-ease-out);
+}
+.theme-card:hover {
+  background: var(--df-surface-elevated);
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-hover),
+    0 2px 4px var(--df-skeu-near),
+    0 8px 16px -4px var(--df-skeu-deep-near);
+}
+.theme-card[data-selected="true"] {
+  background: var(--df-surface-elevated);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-strong),
+    0 1px 2px var(--df-skeu-near);
+}
+.theme-preview { height: 152px; border-radius: var(--df-r-md); overflow: hidden; position: relative; margin-bottom: var(--df-sp-3); display: flex; flex-direction: column; }
+.theme-preview--dark { background: #161613; color: #D7E8C8; }
+.theme-preview--light { background: #eaeaea; color: #1A1A17; }
+.theme-preview-bar { height: 18px; border-bottom: 1px solid currentColor; opacity: 0.18; }
+.theme-preview-content { flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+.theme-preview-line { height: 5px; background: currentColor; border-radius: 2px; opacity: 0.85; }
+.theme-preview-line--muted { opacity: 0.35; }
+.theme-preview-cta { margin-top: auto; align-self: flex-start; padding: 4px 10px; background: currentColor; border-radius: 4px; width: 60px; height: 16px; }
+.theme-name { font-family: var(--df-font-sans); font-weight: 600; font-size: var(--df-text-sm); letter-spacing: -0.01em; margin-bottom: 2px; }
+.theme-hint { font-family: var(--df-font-mono); font-size: var(--df-text-xs); color: var(--df-text-muted); letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* ============================================================ */
+/* CMD PALETTE */
+/* ============================================================ */
+
+.cmd-overlay { position: absolute; inset: 0; background: var(--df-surface-overlay); backdrop-filter: blur(18px) saturate(1.02); -webkit-backdrop-filter: blur(18px) saturate(1.02); z-index: 20; display: flex; justify-content: center; align-items: flex-start; padding-top: 120px; }
+.cmd-modal { width: 560px; max-width: calc(100% - 48px); background: var(--df-surface-elevated); border: none; border-radius: var(--df-r-3xl); box-shadow: var(--df-shadow-card); overflow: hidden; animation: df-modal-in 320ms var(--df-ease-emphasized); }
+.cmd-search { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--df-border-subtle); }
+.cmd-search-icon { width: 16px; height: 16px; color: var(--df-text-muted); flex-shrink: 0; }
+.cmd-search-input { flex: 1; background: transparent; border: 0; outline: none; font-family: var(--df-font-sans); font-size: var(--df-text-base); color: var(--df-text-primary); letter-spacing: -0.005em; }
+.cmd-search-input::placeholder { color: var(--df-text-faint); }
+.cmd-kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 2px 6px;
+  min-width: 22px; height: 20px;
+  background: var(--df-surface-elevated);
+  border: none;
+  border-radius: var(--df-r-sm);
+  font-family: var(--df-font-mono); font-size: 11px;
+  color: var(--df-text-muted);
+  letter-spacing: 0.04em;
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 1px 0 var(--df-skeu-near);
+}
+.cmd-section { padding: 8px 0; border-bottom: 1px solid var(--df-border-subtle); }
+.cmd-section:last-of-type { border-bottom: 0; }
+.cmd-section-title { padding: 6px 18px; font-family: var(--df-font-mono); font-size: var(--df-text-xs); color: var(--df-text-muted); letter-spacing: 0.10em; text-transform: uppercase; }
+.cmd-item { display: flex; align-items: center; gap: 12px; padding: 8px 18px; cursor: pointer; transition: background var(--df-motion-quick) var(--df-ease-out); }
+.cmd-item:hover, .cmd-item[data-active="true"] { background: var(--df-interactive-hover); }
+.cmd-item-icon { width: 28px; height: 28px; border-radius: var(--df-r-sm); background: var(--df-surface-raised); border: 1px solid var(--df-border-subtle); display: grid; place-items: center; color: var(--df-text-secondary); flex-shrink: 0; }
+.cmd-item-icon svg { width: 14px; height: 14px; }
+.cmd-item-label { flex: 1; font-family: var(--df-font-sans); font-size: var(--df-text-sm); color: var(--df-text-primary); letter-spacing: -0.005em; }
+.cmd-item-shortcut { display: inline-flex; align-items: center; gap: 4px; font-family: var(--df-font-mono); font-size: var(--df-text-xs); color: var(--df-text-muted); letter-spacing: 0.04em; }
+.cmd-footer { padding: 10px 18px; background: var(--df-bg-section); border-top: 1px solid var(--df-border-subtle); display: flex; align-items: center; gap: var(--df-sp-4); font-family: var(--df-font-mono); font-size: var(--df-text-xs); color: var(--df-text-muted); letter-spacing: 0.04em; }
+.cmd-footer-hint { display: inline-flex; align-items: center; gap: 6px; }
+
+/* ============================================================ */
+/* THINKING / SKELETON */
+/* ============================================================ */
+
+/* Slash command autocomplete */
+.slash-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0; right: 0;
+  max-height: 320px; overflow-y: auto;
+  background: var(--df-surface-elevated);
+  border: none;
+  border-radius: var(--df-r-lg);
+  box-shadow: var(--df-shadow-card);
+  z-index: 60;
+  padding: 6px;
+}
+.slash-menu-heading {
+  padding: 8px 12px 4px;
+  font-family: var(--df-font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--df-text-faint);
+}
+/* User ask 2026-05-21 (final): "no dropdown de skills e comandos
+   queria so os comandos e descrição logo ao lado, o quanto couber,
+   sempre sem quebra de linha uma skill ou comando por linha". Single
+   row per item: label first (truncates if huge), description right
+   after on the same line clipped to whatever space remains, never
+   wraps. Trigger dropped — the user is already typing into the slash
+   buffer so showing `/foo` next to the label is noise. Tooltip on
+   hover surfaces label + description full text for anyone who wants
+   the rest. */
+.slash-menu-item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  width: 100%;
+  padding: 7px 12px;
+  background: none;
+  border: none;
+  border-radius: var(--df-r-sm);
+  text-align: left;
+  cursor: pointer;
+  color: var(--df-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  transition: background var(--df-motion-quick) var(--df-ease-out), box-shadow var(--df-motion-quick) var(--df-ease-out);
+}
+.slash-menu-item.is-active {
+  background: var(--df-surface-raised);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle);
+}
+.slash-menu-label {
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--df-text-primary);
+  flex-shrink: 0;
+  max-width: 40%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.slash-menu-desc {
+  font-size: 12px;
+  color: var(--df-text-faint);
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.thinking-dots { display: inline-flex; align-items: center; gap: 8px; padding: var(--df-sp-3) 0; }
+.thinking-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--df-text-primary); animation: df-thinking 1.2s ease-in-out infinite; opacity: 0.4; }
+.thinking-dots span:nth-child(2) { animation-delay: 0.15s; }
+.thinking-dots span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes df-thinking { 0%, 100% { opacity: 0.3; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1); } }
+@keyframes df-shimmer { 0% { background-position: -400px 0; } 100% { background-position: 400px 0; } }
+@keyframes df-dropdown-fade { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Editorial verb dispatch — shimmer card in chat + active pill on canvas */
+@keyframes df-verb-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+@keyframes df-verb-pill-breath { 0%, 100% { opacity: 0.55; transform: scale(0.85); } 50% { opacity: 1; transform: scale(1.18); } }
+@keyframes df-verb-pill-in { from { opacity: 0; transform: translate(-50%, -8px) scale(0.96); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
+@keyframes df-verb-dots { 0%, 20% { content: ""; } 40% { content: "."; } 60% { content: ".."; } 80%, 100% { content: "..."; } }
+.df-verb-dots { display: inline-block; width: 14px; text-align: left; color: transparent; }
+.df-verb-dots::after { content: ""; animation: df-verb-dots 1400ms steps(4, end) infinite; color: var(--df-text-muted); }
+@keyframes df-stream-sweep { 0% { background-position: 50% -120%; } 100% { background-position: 50% 220%; } }
+@keyframes df-stream-rim { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+/* Per-category verb shaders — rendered inside VerbCard while running */
+@keyframes df-shader-scan {
+  0%   { top: -8%; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { top: 108%; opacity: 0; }
+}
+@keyframes df-shader-conic-a { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes df-shader-conic-b { from { transform: rotate(360deg); } to { transform: rotate(0deg); } }
+@keyframes df-shader-aurora-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.7; }
+  50%      { transform: translate3d(40%, 8%, 0) scale(1.15); opacity: 0.95; }
+}
+@keyframes df-shader-aurora-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1.05); opacity: 0.6; }
+  50%      { transform: translate3d(-30%, -10%, 0) scale(0.95); opacity: 0.9; }
+}
+@keyframes df-shader-aurora-c {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(0.95); opacity: 0.55; }
+  50%      { transform: translate3d(-50%, 12%, 0) scale(1.1); opacity: 0.85; }
+}
+@keyframes df-shader-sparkle {
+  0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+  40%, 60% { opacity: 1; transform: translate(-50%, -50%) scale(var(--df-spark-scale, 1.4)); }
+}
+@keyframes df-shader-glitch-noise {
+  0%   { transform: translate(0, 0); }
+  33%  { transform: translate(-2px, 1px); }
+  66%  { transform: translate(1px, -2px); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes df-shader-glitch-track {
+  0%   { top: -10%; opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { top: 110%; opacity: 0; }
+}
+.skeleton { background: linear-gradient(90deg, var(--df-surface-raised) 25%, var(--df-surface-elevated) 50%, var(--df-surface-raised) 75%); background-size: 800px 100%; animation: df-shimmer 1.6s infinite linear; border-radius: var(--df-r-md); }
+
+/* Markdown preview — scoped typography for skill detail/create/import modals */
+.markdown-preview { color: var(--df-text-primary); }
+.markdown-preview h1,
+.markdown-preview h2,
+.markdown-preview h3,
+.markdown-preview h4 { font-family: var(--df-font-sans); color: var(--df-text-primary); font-weight: 600; letter-spacing: -0.01em; margin-top: 20px; margin-bottom: 8px; line-height: 1.25; }
+.markdown-preview h1 { font-size: 20px; }
+.markdown-preview h2 { font-size: 17px; }
+.markdown-preview h3 { font-size: 14px; }
+.markdown-preview h4 { font-size: 13px; color: var(--df-text-secondary); }
+.markdown-preview h1:first-child,
+.markdown-preview h2:first-child,
+.markdown-preview h3:first-child { margin-top: 0; }
+.markdown-preview p { line-height: 1.65; margin: 0 0 12px; color: var(--df-text-primary); }
+.markdown-preview code { font-family: var(--df-font-mono); font-size: 11.5px; background: var(--df-surface-raised); border: 1px solid var(--df-border-subtle); padding: 1px 5px; border-radius: 3px; color: var(--df-text-primary); }
+.markdown-preview pre { background: var(--df-bg-section); border: 1px solid var(--df-border-subtle); padding: 12px 14px; border-radius: var(--df-r-sm); overflow-x: auto; line-height: 1.5; margin: 0 0 14px; }
+.markdown-preview pre code { background: none; border: none; padding: 0; font-size: 11.5px; color: var(--df-text-primary); }
+.markdown-preview ul,
+.markdown-preview ol { padding-left: 22px; margin: 0 0 12px; line-height: 1.6; }
+.markdown-preview li { margin-bottom: 4px; color: var(--df-text-primary); }
+.markdown-preview li > p { margin-bottom: 4px; }
+.markdown-preview blockquote { border-left: 1px solid var(--df-border-strong); padding: 2px 12px; color: var(--df-text-muted); margin: 0 0 12px; font-style: italic; }
+.markdown-preview strong { color: var(--df-text-primary); font-weight: 600; }
+.markdown-preview em { font-style: italic; color: var(--df-text-secondary); }
+.markdown-preview a { color: var(--df-text-primary); text-decoration: underline; text-underline-offset: 2px; }
+.markdown-preview hr { border: none; border-top: 1px solid var(--df-border-subtle); margin: 20px 0; }
+.markdown-preview table { border-collapse: collapse; margin: 0 0 14px; font-size: 12px; }
+.markdown-preview th,
+.markdown-preview td { padding: 6px 10px; border: 1px solid var(--df-border-subtle); text-align: left; }
+.markdown-preview th { background: var(--df-bg-section); font-weight: 600; color: var(--df-text-primary); }
+.markdown-preview > *:first-child { margin-top: 0; }
+.markdown-preview > *:last-child { margin-bottom: 0; }
+
+
+/* ═════════════════════════════════════════════════════════════════
+   Home NP — Model selector (row above Initial prompt) + prompt chips
+   + recording state. Replaces the provider pill that lived inside the
+   prompt bar and enables attach/mic buttons.
+   ═════════════════════════════════════════════════════════════════ */
+
+.home-np-model-row {
+  position: relative;
+}
+.home-np-model-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  font-family: var(--df-font-mono);
+  font-size: var(--df-text-xs);
+  color: var(--df-text-primary);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: border-color var(--df-motion-quick), background var(--df-motion-quick);
+}
+.home-np-model-btn:hover {
+  border-color: var(--df-border-hover);
+  background: var(--df-surface-raised);
+}
+.home-np-model-dot {
+  width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+  box-shadow: 0 0 0 2px color-mix(in srgb, currentColor 6%, transparent);
+}
+.home-np-model-name {
+  flex: 1; text-align: left; text-transform: lowercase;
+}
+.home-np-model-caret {
+  color: var(--df-text-muted);
+  transition: transform var(--df-motion-quick) var(--df-ease-out);
+  flex-shrink: 0;
+}
+.home-np-model-backdrop {
+  position: fixed; inset: 0; z-index: 9998;
+  background: transparent;
+}
+.home-np-model-menu {
+  position: fixed;
+  max-height: 260px;
+  overflow-y: auto;
+  background: var(--df-surface-elevated);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  box-shadow: var(--df-shadow-xl);
+  z-index: 9999;
+  padding: 4px;
+  animation: df-dropdown-fade 120ms var(--df-ease-out);
+}
+.home-np-model-opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  background: transparent;
+  border: 0;
+  border-radius: var(--df-r-sm);
+  font-family: var(--df-font-mono);
+  font-size: var(--df-text-xs);
+  color: var(--df-text-secondary);
+  letter-spacing: 0.02em;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--df-motion-quick), color var(--df-motion-quick);
+}
+.home-np-model-opt:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+}
+.home-np-model-opt.is-on {
+  background: var(--df-interactive-selected);
+  color: var(--df-text-primary);
+}
+.home-np-model-opt-name {
+  flex: 1; text-transform: lowercase;
+}
+.home-np-model-opt-check {
+  color: var(--df-accent-ok);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Prompt attachment chips (above textarea) */
+.home-np-prompt-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px 10px 0;
+}
+.home-np-prompt-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 4px 3px 8px;
+  background: var(--df-surface-raised);
+  border: 1px solid var(--df-border-subtle);
+  /* v14: pill killed → r-sm (6px). */
+  border-radius: var(--df-r-sm);
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  color: var(--df-text-secondary);
+  letter-spacing: 0.02em;
+  max-width: 100%;
+}
+.home-np-prompt-chip-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 180px;
+}
+.home-np-prompt-chip-x {
+  width: 16px; height: 16px;
+  display: grid; place-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--df-text-faint);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  transition: color var(--df-motion-quick), background var(--df-motion-quick);
+}
+.home-np-prompt-chip-x:hover {
+  color: var(--df-text-primary);
+  background: var(--df-interactive-hover);
+}
+
+/* Mic recording pulse */
+.home-np-prompt-ico.is-recording {
+  color: var(--df-accent-danger);
+  animation: df-record-pulse 1.1s var(--df-ease-standard) infinite;
+}
+@keyframes df-record-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+
+/* Override: no more .is-disabled greyed attach buttons — wired up now */
+.home-np-prompt-ico:not(:disabled) { opacity: 1; cursor: pointer; }
+
+/* ═════════════════════════════════════════════════════════════════
+   Skills tab — Claude-style simplified layout
+   Three controls only: header/CTA · search · grid.
+   Custom folder + import live in Settings.
+   ═════════════════════════════════════════════════════════════════ */
+
+.skills-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  /* Width matches the Projects tab so all top-level tabs share one
+   * envelope. Projects renders directly inside .home-stage-v8 (1180px),
+   * so .skills-tab / .ds-tab inherit the same envelope by removing
+   * any inner clamp. */
+  width: 100%;
+}
+
+.skills-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding-bottom: 4px;
+}
+.skills-title {
+  font-family: var(--df-font-sans);
+  font-size: var(--df-text-xl);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--df-text-primary);
+  margin: 0;
+  line-height: 1.15;
+}
+.skills-lede {
+  margin: 6px 0 0;
+  max-width: 560px;
+  color: var(--df-text-secondary);
+  font-size: var(--df-text-sm);
+  line-height: 1.5;
+}
+.skills-lede code {
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  background: var(--df-surface-raised);
+  border: 1px solid var(--df-border-subtle);
+  padding: 1px 6px;
+  border-radius: 3px;
+  color: var(--df-text-primary);
+}
+.skills-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  background: var(--df-text-primary);
+  color: var(--df-text-inverse);
+  border: 0;
+  border-radius: var(--df-r-md);
+  font-size: var(--df-text-sm);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity var(--df-motion-quick) var(--df-ease-out);
+}
+.skills-cta:hover { opacity: 0.88; }
+
+.skills-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  height: 40px;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  transition: border-color var(--df-motion-quick) var(--df-ease-out);
+}
+.skills-search:focus-within { border-color: var(--df-border-focus); }
+.skills-search svg { color: var(--df-text-faint); flex-shrink: 0; }
+.skills-search input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  outline: none;
+  font-family: var(--df-font-sans);
+  font-size: var(--df-text-sm);
+  color: var(--df-text-primary);
+}
+.skills-search input::placeholder { color: var(--df-text-faint); }
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+}
+.skills-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 16px 14px;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--df-font-sans);
+  color: inherit;
+  transition: border-color var(--df-motion-quick) var(--df-ease-out),
+              background var(--df-motion-quick) var(--df-ease-out),
+              transform var(--df-motion-quick) var(--df-ease-out);
+}
+.skills-card:hover {
+  border-color: var(--df-border-hover);
+  background: var(--df-surface-raised);
+  transform: translateY(1px);
+}
+.skills-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.skills-card-trigger {
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  color: var(--df-text-primary);
+  letter-spacing: 0.02em;
+}
+.skills-card-source {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--df-text-faint);
+  padding: 2px 7px;
+  /* v14: pill killed → r-sm (6px). */
+  border-radius: var(--df-r-sm);
+  border: 1px solid currentColor;
+}
+.skills-card-source--df       { color: var(--df-tag-project); }
+.skills-card-source--project  { color: var(--df-tag-global); }
+.skills-card-source--global   { color: var(--df-text-muted); }
+.skills-card-source--builtin  { color: var(--df-tag-builtin); }
+.skills-card-name {
+  font-size: var(--df-text-md);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--df-text-primary);
+  line-height: 1.3;
+}
+.skills-card-desc {
+  margin: 0;
+  font-size: var(--df-text-xs);
+  line-height: 1.5;
+  color: var(--df-text-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.skills-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  padding: 64px 24px;
+  background: var(--df-bg-section);
+  border: 1px dashed var(--df-border-subtle);
+  border-radius: var(--df-r-lg);
+}
+.skills-empty-title {
+  font-size: var(--df-text-md);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--df-text-primary);
+}
+.skills-empty-body {
+  max-width: 460px;
+  font-size: var(--df-text-sm);
+  color: var(--df-text-secondary);
+  line-height: 1.55;
+}
+
+.skills-toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  z-index: 400;
+  padding: 9px 14px;
+  background: var(--df-surface-elevated);
+  border: 1px solid var(--df-border-strong);
+  border-radius: var(--df-r-md);
+  box-shadow: var(--df-shadow-lg);
+  font-family: var(--df-font-sans);
+  font-size: var(--df-text-sm);
+  color: var(--df-text-primary);
+  animation: df-dropdown-fade 120ms var(--df-ease-out);
+}
+
+/* ═════════════════════════════════════════════════════════════════
+   Settings → Providers — simplified layout
+   One clean row per provider: dot · name · status · blurb · CTA.
+   No capability grid, no matrix — those were developer detail.
+   ═════════════════════════════════════════════════════════════════ */
+
+.providers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.provider-row {
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  align-items: start;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--df-surface-raised);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  transition: border-color var(--df-motion-quick) var(--df-ease-out),
+              background var(--df-motion-quick) var(--df-ease-out);
+}
+.provider-row:hover {
+  border-color: var(--df-border-hover);
+}
+.provider-row.is-active {
+  background: var(--df-interactive-selected);
+  border-color: var(--df-border-strong);
+}
+
+.provider-dot {
+  width: 10px;
+  height: 10px;
+  align-self: center;
+  border-radius: 50%;
+  background: var(--df-text-faint);
+  box-shadow:
+    inset 0 1px 1px rgba(0, 0, 0, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+  transition: background var(--df-motion-quick) var(--df-ease-out),
+              box-shadow var(--df-motion-quick) var(--df-ease-out);
+}
+.provider-dot.is-on {
+  /* Skeu LED — flat accent fill, soft halo, tiny specular. Same family
+   * as cnp-trigger-dot in the New Project modal. */
+  background: var(--df-accent-user, var(--df-accent-ok));
+  box-shadow:
+    0 0 5px 0 color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 55%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.provider-main {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.provider-row-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.provider-name {
+  font-size: var(--df-text-sm);
+  font-weight: 600;
+  color: var(--df-text-primary);
+  letter-spacing: -0.005em;
+}
+.provider-default-pill {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--df-text-primary);
+  background: var(--df-surface-elevated);
+  border: 1px solid var(--df-border-strong);
+  padding: 1px 7px;
+  /* v14: pill killed → r-sm (6px). */
+  border-radius: var(--df-r-sm);
+}
+.provider-status {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--df-text-muted);
+  text-transform: lowercase;
+}
+.provider-status--connected    { color: var(--df-accent-ok); }
+.provider-status--needs-auth   { color: var(--df-accent-warn); }
+.provider-status--not-installed,
+.provider-status--unknown      { color: var(--df-text-faint); }
+
+.provider-blurb {
+  font-size: var(--df-text-xs);
+  color: var(--df-text-muted);
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .provider-row {
+    grid-template-columns: 10px 1fr;
+  }
+  .provider-row > .df-btn {
+    grid-column: 1 / -1;
+    justify-self: start;
+    margin-top: 4px;
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════
+   Providers panel — single vertical list, accordion expand. No category
+   headers crowding the panel; the type tag (CLI/API/LOCAL) lives inside
+   each row.
+   ═════════════════════════════════════════════════════════════════ */
+
+.providers-v13-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.providers-v13-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.provider-v13 {
+  background: var(--df-surface-raised);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  overflow: hidden;
+  transition: border-color var(--df-motion-quick) var(--df-ease-out);
+}
+.provider-v13:hover { border-color: var(--df-border-hover); }
+.provider-v13.is-active { border-color: var(--df-border-strong); }
+.provider-v13.is-expanded { border-color: var(--df-border-strong); background: var(--df-surface-elevated); }
+
+.provider-v13-row {
+  display: grid;
+  grid-template-columns: 10px 1fr auto auto auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: transparent;
+  border: 0;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  transition: background var(--df-motion-quick) var(--df-ease-out);
+}
+.provider-v13-row:hover { background: var(--df-interactive-hover); }
+.provider-v13-row:focus-visible {
+  outline: 2px solid var(--df-border-focus);
+  outline-offset: -2px;
+}
+
+.provider-v13-name {
+  font-size: var(--df-text-sm);
+  font-weight: 600;
+  color: var(--df-text-primary);
+  letter-spacing: -0.005em;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.provider-v13-tag {
+  font-family: var(--df-font-mono);
+  font-size: 9px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--df-text-muted);
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+  padding: 2px 6px;
+  flex-shrink: 0;
+}
+.provider-v13-tag--cli   { color: var(--df-text-secondary); }
+.provider-v13-tag--api   { color: var(--df-accent-warn); }
+.provider-v13-tag--local { color: var(--df-text-faint); }
+
+.provider-v13-chev {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--df-text-faint);
+  flex-shrink: 0;
+}
+
+.provider-v13-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 14px 14px;
+  background: var(--df-bg-section);
+  border-top: 1px solid var(--df-border-subtle);
+  animation: provider-v13-slide-down 200ms var(--df-ease-out);
+}
+@keyframes provider-v13-slide-down {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .provider-v13-detail { animation: none; }
+}
+
+.provider-v13-blurb {
+  margin: 8px 0 0;
+  font-size: var(--df-text-xs);
+  color: var(--df-text-muted);
+  line-height: 1.55;
+}
+
+.provider-v13-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .provider-v13-row {
+    grid-template-columns: 10px 1fr auto auto;
+    row-gap: 6px;
+  }
+  .provider-v13-row .provider-v13-tag,
+  .provider-v13-row .provider-default-pill {
+    grid-row: 2;
+    grid-column: 2 / -1;
+    justify-self: start;
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════
+   Batch 3 fixes — Skills cards standardize + modal blur + header
+   ═════════════════════════════════════════════════════════════════ */
+
+/* Skills header: CTAs right-aligned, Import ghost + New primary */
+.skills-header-actions {
+  display: inline-flex;
+  gap: 8px;
+  flex-shrink: 0;
+  align-items: center;
+}
+.skills-cta--ghost {
+  background: transparent;
+  color: var(--df-text-primary);
+  border: 1px solid var(--df-border-subtle);
+  font-weight: 500;
+}
+.skills-cta--ghost:hover {
+  border-color: var(--df-border-hover);
+  background: var(--df-interactive-hover);
+  opacity: 1;
+}
+
+/* Skill cards: fixed height + flex so content truncates + chin lines up.
+   Previous layout let description length drive height → chaotic grid. */
+.skills-card {
+  min-height: 148px;
+  height: 100%;
+}
+.skills-grid {
+  grid-auto-rows: 1fr;
+}
+.skills-card-desc {
+  flex: 1;
+}
+
+/* Modal backdrop: blur + subtle overlay, theme-adaptive.
+   Single utility class — every modal overlay points at the same tokens. */
+.df-modal-backdrop,
+.skill-modal-backdrop,
+.ds-setup-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: var(--df-surface-overlay);
+  backdrop-filter: blur(14px) saturate(1.02);
+  -webkit-backdrop-filter: blur(14px) saturate(1.02);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Global selector for any inline style that still uses the old rgba shim.
+   Safe no-op for modals that have already been migrated. */
+[data-modal-backdrop="true"] {
+  background: var(--df-surface-overlay) !important;
+  backdrop-filter: blur(14px) saturate(1.02) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.02) !important;
+}
+
+/* ═════════════════════════════════════════════════════════════════
+   Diagnostics drawer + floating button
+   Global observability — errors, bridge status, storage, recent events.
+   Open via floating button (bottom-right) or ⌘⇧D.
+   ═════════════════════════════════════════════════════════════════ */
+
+.diag-fab {
+  position: fixed;
+  right: var(--df-sp-4);
+  bottom: var(--df-sp-4);
+  z-index: 60;
+  width: 38px; height: 38px;
+  display: grid; place-items: center;
+  background: var(--df-surface-raised);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: 50%;
+  color: var(--df-text-muted);
+  cursor: pointer;
+  box-shadow: var(--df-shadow-sm);
+  transition: color var(--df-motion-quick) var(--df-ease-out),
+              background var(--df-motion-quick) var(--df-ease-out),
+              border-color var(--df-motion-quick) var(--df-ease-out),
+              transform var(--df-motion-quick) var(--df-ease-out);
+}
+.diag-fab:hover {
+  color: var(--df-text-primary);
+  background: var(--df-surface-elevated);
+  border-color: var(--df-border-hover);
+  transform: translateY(1px);
+}
+.diag-fab.has-errors {
+  color: var(--df-accent-danger);
+  border-color: color-mix(in srgb, var(--df-accent-danger) 40%, var(--df-border-subtle));
+}
+.diag-fab-badge {
+  position: absolute;
+  top: -2px; right: -2px;
+  min-width: 16px; height: 16px;
+  padding: 0 4px;
+  display: grid; place-items: center;
+  background: var(--df-accent-danger);
+  color: var(--df-text-inverse);
+  font-family: var(--df-font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  /* v14: pill killed → r-xs (4px) — micro count badge. */
+  border-radius: var(--df-r-xs);
+  line-height: 1;
+}
+
+/* ─── Drawer shell ────────────────────────────────────────────── */
+.diag-drawer {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: min(640px, 94vw);
+  background: var(--df-bg-base);
+  border-left: 1px solid var(--df-border-subtle);
+  box-shadow: var(--df-shadow-xl);
+  display: flex;
+  flex-direction: column;
+  animation: df-slide-in-right 220ms var(--df-ease-out);
+  overflow: hidden;
+}
+@keyframes df-slide-in-right {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+.diag-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--df-sp-5) var(--df-sp-4) var(--df-sp-4);
+  border-bottom: 1px solid var(--df-border-subtle);
+}
+.diag-kicker {
+  display: inline-block;
+  font-family: var(--df-font-mono);
+  font-size: var(--df-text-2xs);
+  color: var(--df-text-faint);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.diag-title {
+  font-size: var(--df-text-lg);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--df-text-primary);
+  margin: 0;
+}
+.diag-close {
+  width: 30px; height: 30px;
+  display: grid; place-items: center;
+  border: 0; background: transparent;
+  color: var(--df-text-muted);
+  border-radius: var(--df-r-sm);
+  cursor: pointer;
+  transition: color var(--df-motion-quick) var(--df-ease-out),
+              background var(--df-motion-quick) var(--df-ease-out);
+}
+.diag-close:hover { color: var(--df-text-primary); background: var(--df-interactive-hover); }
+
+/* ─── Stat cards ─────────────────────────────────────────────── */
+.diag-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: var(--df-sp-2);
+  padding: var(--df-sp-4);
+  border-bottom: 1px solid var(--df-border-subtle);
+}
+.diag-card {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: var(--df-sp-3);
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  min-width: 0;
+}
+.diag-card-label {
+  font-family: var(--df-font-mono);
+  font-size: var(--df-text-2xs);
+  color: var(--df-text-faint);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.diag-card-value {
+  display: flex; align-items: center; gap: 6px;
+  font-size: var(--df-text-base);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--df-text-primary);
+}
+.diag-card-meta {
+  font-family: var(--df-font-mono);
+  font-size: var(--df-text-2xs);
+  color: var(--df-text-muted);
+  letter-spacing: 0.04em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.diag-card-action {
+  margin-top: 4px;
+  align-self: flex-start;
+  padding: 3px 8px;
+  background: transparent;
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-xs);
+  font-family: var(--df-font-mono);
+  font-size: var(--df-text-2xs);
+  color: var(--df-text-secondary);
+  cursor: pointer;
+  transition: border-color var(--df-motion-quick), color var(--df-motion-quick);
+}
+.diag-card-action:hover { color: var(--df-text-primary); border-color: var(--df-border-hover); }
+.diag-card-action:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.diag-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--df-text-faint);
+  flex-shrink: 0;
+}
+.diag-dot.is-on {
+  background: var(--df-accent-ok);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--df-accent-user) 50%, transparent);
+}
+
+/* ─── Toolbar ────────────────────────────────────────────────── */
+.diag-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--df-sp-2);
+  padding: var(--df-sp-3) var(--df-sp-4);
+  border-bottom: 1px solid var(--df-border-subtle);
+  flex-wrap: wrap;
+}
+.diag-filters {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+}
+.diag-filter {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px;
+  font-family: var(--df-font-mono);
+  font-size: var(--df-text-2xs);
+  color: var(--df-text-muted);
+  background: transparent;
+  border: 0;
+  border-radius: var(--df-r-xs);
+  letter-spacing: 0.05em;
+  text-transform: lowercase;
+  cursor: pointer;
+  transition: color var(--df-motion-quick), background var(--df-motion-quick);
+}
+.diag-filter:hover { color: var(--df-text-secondary); }
+.diag-filter.is-on {
+  color: var(--df-text-primary);
+  background: var(--df-surface-raised);
+}
+.diag-filter-count {
+  font-size: 9px;
+  color: var(--df-text-faint);
+  padding: 1px 5px;
+  border: 1px solid var(--df-border-subtle);
+  /* v14: pill killed → r-xs (4px). */
+  border-radius: var(--df-r-xs);
+}
+.diag-scope {
+  padding: 4px 8px;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+  font-family: var(--df-font-mono);
+  font-size: var(--df-text-2xs);
+  color: var(--df-text-secondary);
+}
+
+.diag-toolbar-actions {
+  margin-left: auto;
+  display: inline-flex;
+  gap: 4px;
+}
+.diag-action {
+  padding: 5px 10px;
+  background: var(--df-surface-raised);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+  font-family: var(--df-font-mono);
+  font-size: var(--df-text-2xs);
+  color: var(--df-text-primary);
+  cursor: pointer;
+  transition: background var(--df-motion-quick), border-color var(--df-motion-quick);
+}
+.diag-action:hover { background: var(--df-surface-elevated); border-color: var(--df-border-hover); }
+.diag-action--ghost {
+  background: transparent;
+  color: var(--df-text-muted);
+}
+.diag-action--ghost:hover { color: var(--df-text-primary); }
+
+/* ─── Log rows ───────────────────────────────────────────────── */
+.diag-log {
+  flex: 1;
+  overflow-y: auto;
+  font-family: var(--df-font-mono);
+  font-size: var(--df-text-2xs);
+  line-height: 1.5;
+}
+.diag-empty {
+  padding: var(--df-sp-6);
+  text-align: center;
+  color: var(--df-text-faint);
+  font-family: var(--df-font-mono);
+  font-size: var(--df-text-xs);
+}
+
+.diag-row {
+  display: grid;
+  grid-template-columns: 90px 48px 90px 1fr;
+  gap: 8px;
+  padding: 5px var(--df-sp-4);
+  border-bottom: 1px solid var(--df-border-subtle);
+  letter-spacing: 0.02em;
+  align-items: start;
+}
+.diag-row:hover { background: var(--df-interactive-hover); }
+.diag-row-time { color: var(--df-text-faint); }
+.diag-row-level {
+  text-align: center;
+  border-radius: var(--df-r-xs);
+  padding: 0 6px;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  height: 14px;
+  line-height: 14px;
+  align-self: start;
+  margin-top: 1px;
+}
+.diag-row-level--error {
+  color: var(--df-accent-danger);
+  background: color-mix(in srgb, var(--df-accent-danger) 12%, transparent);
+}
+.diag-row-level--warn {
+  color: var(--df-accent-warn);
+  background: color-mix(in srgb, var(--df-accent-warn) 12%, transparent);
+}
+.diag-row-level--info {
+  color: var(--df-text-secondary);
+  background: var(--df-surface-raised);
+}
+.diag-row-level--debug {
+  color: var(--df-text-muted);
+  background: transparent;
+  border: 1px solid var(--df-border-subtle);
+}
+.diag-row-scope {
+  color: var(--df-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.diag-row-msg {
+  color: var(--df-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.diag-row-detail {
+  grid-column: 1 / -1;
+  margin: 6px 0 2px;
+  padding: 8px 10px;
+  background: var(--df-bg-sunken);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-xs);
+  color: var(--df-text-muted);
+  font-family: var(--df-font-mono);
+  font-size: var(--df-text-2xs);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 260px;
+  overflow: auto;
+}
+
+.diag-storage {
+  border-top: 1px solid var(--df-border-subtle);
+  padding: var(--df-sp-3) var(--df-sp-4);
+}
+.diag-storage-head {
+  font-family: var(--df-font-mono);
+  font-size: var(--df-text-2xs);
+  color: var(--df-text-faint);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.diag-storage-list {
+  list-style: none;
+  margin: 0; padding: 0;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.diag-storage-list li {
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--df-font-mono);
+  font-size: var(--df-text-2xs);
+  color: var(--df-text-secondary);
+  padding: 4px 0;
+}
+.diag-storage-list code {
+  color: var(--df-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 70%;
+}
+.diag-storage-list span {
+  color: var(--df-text-muted);
+}
+
+/* ═════════════════════════════════════════════════════════════════
+   DS tab — unified with Skills tab anatomy
+   (same header + grid + card shell, DS-specific inner content)
+   ═════════════════════════════════════════════════════════════════ */
+
+.ds-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  /* Width matches the Projects tab — see .skills-tab. */
+  width: 100%;
+}
+
+/* DS cards — visual twin of Direction cards (aspect-ratio cover + clean
+   title/sub footer). The source badge + path are intentionally absent
+   to keep the card focused on title + thumbnail. */
+.ds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.ds-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 18px 18px;
+  background: var(--df-bg-section);
+  border: none;
+  border-radius: var(--df-r-xl);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  color: inherit;
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 1px 2px var(--df-skeu-near);
+  transition: background var(--df-motion-quick) var(--df-ease-out),
+              box-shadow var(--df-motion-ui) var(--df-ease-out);
+  position: relative;
+}
+.ds-card:hover {
+  background: var(--df-surface-raised);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-hover),
+    0 2px 5px var(--df-skeu-near),
+    0 12px 28px -6px var(--df-skeu-deep-near);
+}
+
+.ds-card-cover {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: var(--df-bg-base);
+  border-radius: var(--df-r-md);
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px var(--df-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ds-card-cover .home-pcard-thumb {
+  aspect-ratio: auto;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: 0;
+  padding: 0 16px;
+}
+
+.ds-card-remove {
+  position: absolute;
+  top: 8px; right: 8px;
+  width: 26px; height: 26px;
+  display: grid; place-items: center;
+  background: var(--df-surface-overlay);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--df-border-subtle);
+  color: var(--df-text-faint);
+  border-radius: 50%;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--df-motion-quick), color var(--df-motion-quick);
+}
+.ds-card:hover .ds-card-remove { opacity: 1; }
+.ds-card-remove:hover { color: var(--df-accent-danger); }
+
+.ds-card-name {
+  font-family: var(--df-font-display);
+  font-size: 17px;
+  font-weight: var(--df-fw-semibold, 600);
+  letter-spacing: var(--df-tracking-tight);
+  color: var(--df-text-primary);
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 4px;
+}
+.ds-card-sub {
+  font-size: 12.5px;
+  color: var(--df-text-secondary);
+  line-height: 1.55;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Empty DS card swatch state — visible warning vs silent gray dots */
+.ds-card-empty {
+  color: var(--df-text-faint) !important;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 8px,
+    color-mix(in srgb, var(--df-text-faint) 8%, transparent) 8px,
+    color-mix(in srgb, var(--df-text-faint) 8%, transparent) 10px
+  ) !important;
+}
+.ds-card:hover .ds-card-empty {
+  color: var(--df-accent-warn) !important;
+}
+
+/* ─── DS card thumb band (v12) ───────────────────────────────────────
+ * Spec 2026-05-05: "queria padronizar esses cards". DS cards
+ * now use EntityCard (same as Project + Template); the thumb content
+ * is a horizontal swatch band + Aa typography sample so the card
+ * reads as "design system" at thumbnail size without diverging from
+ * the unified card anatomy. */
+.ds-card-thumb-band {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--df-bg-base);
+  overflow: hidden;
+}
+.ds-card-thumb-swatches {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: stretch;
+}
+.ds-card-thumb-swatch {
+  flex: 1;
+  display: block;
+  height: 100%;
+  /* Subtle separator between swatches so they don't blur into each other. */
+  box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.06);
+}
+.ds-card-thumb-typeglyph {
+  position: relative;
+  z-index: 1;
+  font-family: var(--df-font-display, var(--df-font-sans));
+  font-size: 36px;
+  font-weight: var(--df-fw-bold, 700);
+  letter-spacing: -0.02em;
+  /* Glyph picks up brightest swatch via mix-blend; on dark palettes it
+   * appears light, on light ones it appears dark. Subtle by design. */
+  color: rgba(255, 255, 255, 0.78);
+  mix-blend-mode: difference;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+  user-select: none;
+}
+@media (max-width: 1280px) {
+  .ds-card-thumb-typeglyph { font-size: 30px; }
+}
+
+.ds-card-thumb-band--loading,
+.ds-card-thumb-band--empty {
+  background: var(--df-surface-raised);
+  flex-direction: column;
+  gap: 6px;
+  color: var(--df-text-faint);
+  padding: 0 12px;
+}
+.ds-card-thumb-band--empty {
+  background: repeating-linear-gradient(
+    45deg,
+    var(--df-surface-raised),
+    var(--df-surface-raised) 8px,
+    color-mix(in srgb, var(--df-text-faint) 8%, transparent) 8px,
+    color-mix(in srgb, var(--df-text-faint) 8%, transparent) 10px
+  );
+}
+.entity-card:hover .ds-card-thumb-band--empty {
+  color: var(--df-accent-warn);
+}
+.ds-card-thumb-status {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-align: center;
+  line-height: 1.3;
+  color: inherit;
+}
+
+/* ============================================================ */
+/* DS PREVIEW · BENTO LAYOUT */
+/* ============================================================ */
+/* Editorial bento grid that turns a parsed design.md into a
+ * showcase: hero, palette poster, type specimens, scale, spacing,
+ * radii, live components, an interface mock, and prose.
+ * 12-col grid; each tile spans an explicit area for predictability.
+ */
+
+.ds-bento {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 18px;
+  align-items: stretch;
+}
+
+.ds-bento-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 22px;
+  background: var(--df-surface-elevated);
+  border-radius: var(--df-r-2xl);
+  box-shadow: var(--df-shadow-card);
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Spans — designed for desktop grid, gracefully degrade on narrow viewports below */
+
+.ds-bento-tile--hero            { grid-column: span 12; padding: 32px 32px 28px; }
+.ds-bento-tile--palette         { grid-column: span 7; grid-row: span 2; }
+.ds-bento-tile--type-specimen   { grid-column: span 5; grid-row: span 2; }
+.ds-bento-tile--type-scale      { grid-column: span 4; }
+.ds-bento-tile--spacing         { grid-column: span 4; }
+.ds-bento-tile--radii           { grid-column: span 4; }
+.ds-bento-tile--components-live { grid-column: span 6; }
+.ds-bento-tile--interface-mock  { grid-column: span 6; }
+.ds-bento-tile--components-list { grid-column: span 12; }
+.ds-bento-tile--prose           { grid-column: span 12; }
+.ds-bento-tile--findings        { grid-column: span 12; }
+
+/* When some tiles are missing the bento auto-flows; nothing else to do */
+
+@media (max-width: 1100px) {
+  .ds-bento-tile--palette,
+  .ds-bento-tile--type-specimen { grid-column: span 12; grid-row: auto; }
+  .ds-bento-tile--type-scale,
+  .ds-bento-tile--spacing,
+  .ds-bento-tile--radii { grid-column: span 6; }
+  .ds-bento-tile--components-live,
+  .ds-bento-tile--interface-mock { grid-column: span 12; }
+}
+
+@media (max-width: 720px) {
+  .ds-bento { gap: 12px; }
+  .ds-bento-tile { padding: 18px; }
+  .ds-bento-tile--type-scale,
+  .ds-bento-tile--spacing,
+  .ds-bento-tile--radii { grid-column: span 12; }
+}
+
+
+/* ──────────────────────────────────────────────────────────────────────
+   Responsive — narrow viewports
+   App is desktop-first (user primary surface) but should at least
+   degrade gracefully on tablets and small laptops without breaking.
+   ────────────────────────────────────────────────────────────────────── */
+
+/* Below 1280: thinner sidebar, 3-col project grid */
+@media (max-width: 1280px) {
+  .editor-topbar.home-topbar { grid-template-columns: 380px 1fr auto; }
+  .home-sidebar { width: 380px; }
+  .home-right-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Below 1024: 2-col project grid, settings padding shrinks */
+@media (max-width: 1024px) {
+  .home-right-grid { grid-template-columns: repeat(2, 1fr); }
+  .settings-main { padding: var(--df-sp-6) var(--df-sp-7); }
+  .home-main-body { padding: 64px 20px 20px; }
+}
+
+/* Below 880: stack sidebar + main, single-column home, hide secondary
+ * panels on the editor (they were already overlay-style).
+ * Sidebar becomes a sticky top strip rather than a full column. */
+@media (max-width: 880px) {
+  .editor-topbar.home-topbar {
+    grid-template-columns: 1fr auto;
+    /* Keep desktop topbar height (56px) below 880px — user ask
+     * 2026-05-18: "em telas pequenas nao quero diminuir altura da
+     * topbar". The previous `height: auto + padding-bottom: 4px` was
+     * letting the brand strip collapse the bar to ~40px which made the
+     * tabs feel cramped and lost the visual anchor. */
+  }
+  .home-topbar-brand { padding: 8px 14px; border-right: none; }
+  .home-body-v2 { flex-direction: column; }
+  .home-sidebar {
+    width: 100%;
+    flex-shrink: 0;
+    border-right: none;
+    border-bottom: 1px solid var(--df-border-divider);
+    max-height: 60vh;
+  }
+  .home-sidebar-scroll { padding: 12px; }
+  .home-main-body { padding: 60px 16px 16px; }
+  .home-right-grid { grid-template-columns: 1fr; gap: 10px; }
+  .settings { flex-direction: column; }
+  .settings-sidebar { width: 100%; max-height: none; border-right: none; border-bottom: 1px solid var(--df-border-divider); }
+  .settings-main { padding: var(--df-sp-5) var(--df-sp-5); }
+}
+
+/* Below 600: tighter buttons, single-column DS grid in modal,
+ * Direction modal becomes near-fullscreen */
+@media (max-width: 600px) {
+  .home-main-body { padding: 56px 12px 12px; }
+  .home-pcard { border-radius: var(--df-r-md); }
+  .df-modal--xl, .df-modal--lg, .df-modal--md {
+    width: calc(100% - 16px);
+    max-height: calc(100vh - 32px);
+  }
+  .dm-cat-grid { grid-template-columns: 1fr; }
+  .dm-formato-grid { grid-template-columns: 1fr; }
+  .dsall-row-meta .dsall-row-sub { font-size: 9.5px; }
+  .st-panel-row { grid-template-columns: 1fr; }
+  .st-panel-row--two { grid-template-columns: 1fr; }
+  /* Editor: chat column already resizable; hide the resize handle below
+   * 600 since it lives in a different layout context. The user can
+   * scroll the panes. */
+}

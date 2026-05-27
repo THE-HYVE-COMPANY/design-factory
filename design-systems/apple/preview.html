@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apple Web — Design System</title>
+<!-- SF Pro is a commercial Apple face; substituting Inter as the nearest Google Fonts equivalent at matching weights (300/400/600/700). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Colors */
+    --color-primary: #0066cc;
+    --color-primary-focus: #0071e3;
+    --color-primary-on-dark: #2997ff;
+    --color-on-primary: #ffffff;
+    --color-on-dark: #ffffff;
+    --color-canvas: #ffffff;
+    --color-canvas-parchment: #f5f5f7;
+    --color-surface-pearl: #fafafc;
+    --color-surface-tile-1: #272729;
+    --color-surface-tile-2: #2a2a2c;
+    --color-surface-tile-3: #252527;
+    --color-surface-black: #000000;
+    --color-surface-chip-translucent: #d2d2d7;
+    --color-ink: #1d1d1f;
+    --color-body: #1d1d1f;
+    --color-body-on-dark: #ffffff;
+    --color-body-muted: #cccccc;
+    --color-ink-muted-80: #333333;
+    --color-ink-muted-48: #7a7a7a;
+    --color-divider-soft: #f0f0f0;
+    --color-hairline: #e0e0e0;
+
+    /* Radii */
+    --rounded-none: 0px;
+    --rounded-xs: 5px;
+    --rounded-sm: 8px;
+    --rounded-md: 11px;
+    --rounded-lg: 18px;
+    --rounded-pill: 9999px;
+    --rounded-full: 9999px;
+
+    /* Spacing */
+    --space-xxs: 4px;
+    --space-xs: 8px;
+    --space-sm: 12px;
+    --space-md: 17px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-xxl: 48px;
+    --space-section: 80px;
+
+    /* Font stacks (SF Pro → Inter fallback) */
+    --font-display: "Inter", "SF Pro Display", system-ui, -apple-system, sans-serif;
+    --font-text: "Inter", "SF Pro Text", system-ui, -apple-system, sans-serif;
+
+    /* Product shadow — the system's only drop shadow */
+    --product-shadow: rgba(0,0,0,0.22) 3px 5px 30px 0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--color-canvas); color: var(--color-ink); }
+  body {
+    font-family: var(--font-text);
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.47;
+    letter-spacing: -0.374px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  a { color: var(--color-primary); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ----------------- Typography tokens ----------------- */
+  .t-hero-display {
+    font-family: var(--font-display);
+    font-size: 56px;
+    font-weight: 600;
+    line-height: 1.07;
+    letter-spacing: -0.28px;
+  }
+  .t-display-lg {
+    font-family: var(--font-display);
+    font-size: 40px;
+    font-weight: 600;
+    line-height: 1.10;
+    letter-spacing: 0px;
+  }
+  .t-display-md {
+    font-family: var(--font-text);
+    font-size: 34px;
+    font-weight: 600;
+    line-height: 1.47;
+    letter-spacing: -0.374px;
+  }
+  .t-lead {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.14;
+    letter-spacing: 0.196px;
+  }
+  .t-lead-airy {
+    font-family: var(--font-text);
+    font-size: 24px;
+    font-weight: 300;
+    line-height: 1.5;
+    letter-spacing: 0px;
+  }
+  .t-tagline {
+    font-family: var(--font-text);
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 1.19;
+    letter-spacing: 0.231px;
+  }
+  .t-body-strong {
+    font-family: var(--font-text);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.24;
+    letter-spacing: -0.374px;
+  }
+  .t-body-md {
+    font-family: var(--font-text);
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.47;
+    letter-spacing: -0.374px;
+  }
+  .t-dense-link {
+    font-family: var(--font-text);
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 2.41;
+    letter-spacing: 0px;
+  }
+  .t-button-large {
+    font-family: var(--font-text);
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 1.0;
+    letter-spacing: 0px;
+  }
+  .t-caption {
+    font-family: var(--font-text);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.43;
+    letter-spacing: -0.224px;
+  }
+  .t-caption-strong {
+    font-family: var(--font-text);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.29;
+    letter-spacing: -0.224px;
+  }
+  .t-button-utility {
+    font-family: var(--font-text);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.29;
+    letter-spacing: -0.224px;
+  }
+  .t-nav-link {
+    font-family: var(--font-text);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.0;
+    letter-spacing: -0.12px;
+  }
+  .t-fine-print {
+    font-family: var(--font-text);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.0;
+    letter-spacing: -0.12px;
+  }
+  .t-micro-legal {
+    font-family: var(--font-text);
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: -0.08px;
+  }
+  .t-label-caps {
+    font-family: var(--font-text);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.0;
+    letter-spacing: 0.08px;
+  }
+
+  /* ----------------- Global Nav ----------------- */
+  .global-nav {
+    background: var(--color-surface-black);
+    color: var(--color-on-dark);
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .global-nav-inner {
+    width: 100%;
+    max-width: 1024px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+  }
+  .global-nav .logo {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+  }
+  .global-nav ul {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+  .global-nav ul a {
+    color: var(--color-on-dark);
+    opacity: 0.88;
+  }
+  .global-nav ul a:hover { opacity: 1; text-decoration: none; }
+  .global-nav .right { display: flex; gap: 12px; align-items: center; }
+
+  /* ----------------- Sub-nav frosted ----------------- */
+  .sub-nav {
+    height: 52px;
+    background: rgba(245, 245, 247, 0.8);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--color-divider-soft);
+    position: sticky;
+    top: 44px;
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .sub-nav-inner {
+    width: 100%;
+    max-width: 1024px;
+    padding: 0 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sub-nav .left { color: var(--color-ink); }
+  .sub-nav .right { display: flex; gap: 24px; align-items: center; }
+  .sub-nav .right a { color: var(--color-ink); }
+
+  /* ----------------- Buttons ----------------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    cursor: pointer;
+    font-family: var(--font-text);
+    transition: transform 0.12s ease;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  .btn:active { transform: scale(0.95); }
+  .btn:focus-visible { outline: 2px solid var(--color-primary-focus); outline-offset: 2px; }
+
+  /* Primary (pill) */
+  .btn-primary {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    border-radius: var(--rounded-pill);
+    padding: 11px 22px;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.47;
+    letter-spacing: -0.374px;
+  }
+
+  /* Secondary pill (ghost) */
+  .btn-secondary {
+    background: transparent;
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    border-radius: var(--rounded-pill);
+    padding: 11px 22px;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.47;
+    letter-spacing: -0.374px;
+  }
+
+  /* Ghost / dark utility */
+  .btn-dark-utility {
+    background: var(--color-ink);
+    color: var(--color-on-dark);
+    border-radius: var(--rounded-sm);
+    padding: 8px 15px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.29;
+    letter-spacing: -0.224px;
+  }
+
+  /* Pearl capsule */
+  .btn-pearl {
+    background: var(--color-surface-pearl);
+    color: var(--color-ink-muted-80);
+    border: 3px solid var(--color-divider-soft);
+    border-radius: var(--rounded-md);
+    padding: 8px 14px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.43;
+    letter-spacing: -0.224px;
+  }
+
+  /* Hero store CTA */
+  .btn-store-hero {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    border-radius: var(--rounded-pill);
+    padding: 14px 28px;
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 1.0;
+    letter-spacing: 0px;
+  }
+
+  /* Icon circular */
+  .btn-icon {
+    background: var(--color-surface-chip-translucent);
+    color: var(--color-ink);
+    border-radius: var(--rounded-full);
+    width: 44px;
+    height: 44px;
+    padding: 0;
+  }
+
+  /* Button size variants (for gallery) */
+  .btn-sm { padding: 6px 14px; font-size: 14px; }
+  .btn-md { padding: 11px 22px; font-size: 17px; }
+  .btn-lg { padding: 14px 28px; font-size: 18px; font-weight: 300; }
+  .btn-secondary.btn-sm { padding: 5px 13px; }
+  .btn-secondary.btn-lg { padding: 13px 27px; }
+  /* Ghost (link-style) */
+  .btn-ghost {
+    background: transparent;
+    color: var(--color-primary);
+    border: 0;
+    border-radius: var(--rounded-pill);
+    padding: 11px 22px;
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.47;
+    letter-spacing: -0.374px;
+  }
+  .btn-ghost.btn-sm { padding: 6px 14px; font-size: 14px; }
+  .btn-ghost.btn-lg { padding: 14px 28px; font-size: 18px; font-weight: 300; }
+
+  /* ----------------- Product tiles ----------------- */
+  .tile {
+    padding: var(--space-section) 22px;
+    border-radius: var(--rounded-none);
+    text-align: center;
+  }
+  .tile-light { background: var(--color-canvas); color: var(--color-ink); }
+  .tile-parchment { background: var(--color-canvas-parchment); color: var(--color-ink); }
+  .tile-dark { background: var(--color-surface-tile-1); color: var(--color-on-dark); }
+  .tile-dark-2 { background: var(--color-surface-tile-2); color: var(--color-on-dark); }
+  .tile-dark-3 { background: var(--color-surface-tile-3); color: var(--color-on-dark); }
+
+  .tile-content {
+    max-width: 980px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-md);
+  }
+  .tile-content .ctas { display: flex; gap: var(--space-lg); margin-top: var(--space-xs); }
+  .tile-content .product-render {
+    margin-top: var(--space-xxl);
+    width: 320px;
+    height: 220px;
+    background: linear-gradient(180deg, #c7c7cc 0%, #8e8e93 100%);
+    border-radius: 18px;
+    filter: drop-shadow(var(--product-shadow));
+    position: relative;
+  }
+  .tile-dark .product-render,
+  .tile-dark-2 .product-render,
+  .tile-dark-3 .product-render {
+    background: linear-gradient(180deg, #4a4a4d 0%, #1d1d1f 100%);
+  }
+  .tile .muted-on-dark { color: var(--color-body-muted); }
+  .tile-dark a, .tile-dark-2 a, .tile-dark-3 a { color: var(--color-primary-on-dark); }
+  .tile-dark .btn-secondary,
+  .tile-dark-2 .btn-secondary,
+  .tile-dark-3 .btn-secondary {
+    color: var(--color-primary-on-dark);
+    border-color: var(--color-primary-on-dark);
+  }
+
+  /* ----------------- Section container ----------------- */
+  .section {
+    padding: var(--space-section) 22px;
+  }
+  .section-inner { max-width: 1024px; margin: 0 auto; }
+  .section-head { margin-bottom: var(--space-xxl); }
+  .section-head .eyebrow { color: var(--color-ink-muted-48); margin-bottom: var(--space-sm); text-transform: uppercase; }
+  .section-head h2 { margin-bottom: var(--space-md); }
+  .section-head p { color: var(--color-ink-muted-80); max-width: 680px; }
+
+  /* ----------------- Hero ----------------- */
+  .hero {
+    background: var(--color-canvas);
+    padding: 96px 22px 80px;
+    text-align: center;
+  }
+  .hero h1 { margin-bottom: var(--space-md); }
+  .hero .subhead { color: var(--color-ink-muted-80); max-width: 720px; margin: 0 auto var(--space-xl); }
+  .hero .ctas { display: inline-flex; gap: var(--space-lg); align-items: center; }
+  .hero-photo {
+    margin-top: var(--space-xxl);
+    height: 360px;
+    background:
+      radial-gradient(ellipse at 30% 40%, #ffffff 0%, transparent 55%),
+      radial-gradient(ellipse at 70% 60%, #f5f5f7 0%, transparent 55%),
+      linear-gradient(180deg, #ffffff 0%, #f5f5f7 100%);
+      position: relative;
+      max-width: 1024px;
+      margin-left: auto;
+      margin-right: auto;
+  }
+  .hero-photo::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 380px;
+    height: 240px;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(180deg, #d1d1d6 0%, #8e8e93 100%);
+    border-radius: 28px;
+    filter: drop-shadow(var(--product-shadow));
+  }
+
+  /* ----------------- Button gallery ----------------- */
+  .btn-grid {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: var(--space-lg) var(--space-xl);
+    align-items: center;
+  }
+  .btn-row { display: flex; gap: var(--space-md); align-items: center; flex-wrap: wrap; }
+  .btn-label { color: var(--color-ink-muted-80); }
+
+  /* ----------------- Form ----------------- */
+  .form-card {
+    background: var(--color-canvas);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--rounded-lg);
+    padding: var(--space-xxl);
+    max-width: 540px;
+  }
+  .form-field { margin-bottom: var(--space-lg); }
+  .form-field label {
+    display: block;
+    color: var(--color-ink-muted-80);
+    margin-bottom: var(--space-xs);
+  }
+  .form-field input,
+  .form-field select,
+  .form-field textarea {
+    width: 100%;
+    height: 44px;
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    border: 1px solid var(--color-divider-soft);
+    border-radius: var(--rounded-pill);
+    padding: 12px 20px;
+    font-family: var(--font-text);
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.47;
+    letter-spacing: -0.374px;
+    outline: none;
+  }
+  .form-field input:focus,
+  .form-field select:focus,
+  .form-field textarea:focus { border-color: var(--color-primary-focus); }
+  .form-field textarea {
+    height: auto;
+    min-height: 120px;
+    border-radius: var(--rounded-lg);
+    padding: 14px 20px;
+    resize: vertical;
+  }
+  .form-actions { display: flex; gap: var(--space-md); align-items: center; }
+
+  /* ----------------- Cards (store utility) ----------------- */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-lg);
+  }
+  .card {
+    background: var(--color-canvas);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--rounded-lg);
+    padding: var(--space-lg);
+  }
+  .card-image {
+    height: 200px;
+    background: linear-gradient(180deg, #f5f5f7 0%, #e6e6eb 100%);
+    border-radius: var(--rounded-sm);
+    margin-bottom: var(--space-lg);
+    position: relative;
+  }
+  .card-image::after {
+    content: "";
+    position: absolute;
+    inset: 24px;
+    background: linear-gradient(180deg, #c7c7cc 0%, #8e8e93 100%);
+    border-radius: 14px;
+    filter: drop-shadow(var(--product-shadow));
+  }
+  .card-eyebrow { color: var(--color-ink-muted-48); margin-bottom: var(--space-xxs); }
+  .card-name { margin-bottom: var(--space-xxs); }
+  .card-price { color: var(--color-ink-muted-80); margin-bottom: var(--space-md); }
+  .card-link { color: var(--color-primary); }
+
+  /* ----------------- Stats row ----------------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-xl);
+  }
+  .stat-tile {
+    padding: var(--space-lg) 0;
+    border-top: 1px solid var(--color-hairline);
+  }
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: 56px;
+    font-weight: 600;
+    line-height: 1.07;
+    letter-spacing: -0.28px;
+    color: var(--color-ink);
+    margin-bottom: var(--space-xs);
+  }
+  .stat-label { color: var(--color-ink-muted-80); }
+
+  /* ----------------- Table ----------------- */
+  .table-wrap {
+    background: var(--color-canvas);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--rounded-lg);
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    text-align: left;
+    padding: 17px 24px;
+    background: var(--color-canvas-parchment);
+    color: var(--color-ink-muted-80);
+    font-family: var(--font-text);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.29;
+    letter-spacing: -0.224px;
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  tbody td {
+    padding: 17px 24px;
+    border-bottom: 1px solid var(--color-divider-soft);
+    color: var(--color-ink);
+  }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody td.right { text-align: right; }
+  .pill-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: var(--rounded-pill);
+    background: rgba(0, 102, 204, 0.08);
+    color: var(--color-primary);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08px;
+  }
+  .pill-status.muted { background: var(--color-divider-soft); color: var(--color-ink-muted-80); }
+
+  /* ----------------- Type ramp ----------------- */
+  .ramp-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: var(--space-xl);
+    align-items: baseline;
+    padding: var(--space-lg) 0;
+    border-bottom: 1px solid var(--color-divider-soft);
+  }
+  .ramp-meta { color: var(--color-ink-muted-48); }
+  .ramp-meta .token { color: var(--color-ink); display: block; margin-bottom: 4px; }
+
+  /* ----------------- Palette ----------------- */
+  .palette {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--space-lg);
+  }
+  .swatch {
+    background: var(--color-canvas);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--rounded-lg);
+    overflow: hidden;
+  }
+  .swatch-chip {
+    height: 96px;
+    border-bottom: 1px solid var(--color-divider-soft);
+  }
+  .swatch-meta {
+    padding: var(--space-md);
+  }
+  .swatch-meta .name { color: var(--color-ink); margin-bottom: 4px; word-break: break-all; }
+  .swatch-meta .hex { color: var(--color-ink-muted-48); font-feature-settings: "tnum"; }
+
+  /* ----------------- Radii ----------------- */
+  .radii {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: var(--space-lg);
+    align-items: end;
+  }
+  .radii-cell { text-align: center; }
+  .radii-box {
+    width: 96px;
+    height: 96px;
+    background: var(--color-canvas);
+    border: 1px solid var(--color-hairline);
+    margin: 0 auto var(--space-sm);
+  }
+  .radii-meta { color: var(--color-ink-muted-48); }
+  .radii-meta .token { color: var(--color-ink); display: block; }
+
+  /* ----------------- Spacing rhythm ----------------- */
+  .space-row {
+    display: grid;
+    grid-template-columns: 160px 1fr 80px;
+    gap: var(--space-md);
+    align-items: center;
+    padding: var(--space-sm) 0;
+  }
+  .space-bar {
+    height: 14px;
+    background: var(--color-primary);
+    border-radius: var(--rounded-xs);
+  }
+  .space-token { color: var(--color-ink); }
+  .space-value { color: var(--color-ink-muted-48); text-align: right; font-feature-settings: "tnum"; }
+
+  /* ----------------- Floating sticky bar ----------------- */
+  .sticky-bar {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 48px);
+    max-width: 1024px;
+    height: 64px;
+    background: rgba(245, 245, 247, 0.8);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-radius: var(--rounded-lg);
+    padding: 12px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    z-index: 30;
+  }
+
+  /* ----------------- Configurator chips ----------------- */
+  .chips { display: flex; gap: var(--space-sm); flex-wrap: wrap; }
+  .chip {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--rounded-pill);
+    padding: 12px 16px;
+    font-family: var(--font-text);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.43;
+    letter-spacing: -0.224px;
+    cursor: pointer;
+  }
+  .chip.selected {
+    border: 2px solid var(--color-primary-focus);
+    padding: 11px 15px;
+  }
+
+  /* ----------------- Footer ----------------- */
+  footer {
+    background: var(--color-canvas-parchment);
+    color: var(--color-ink-muted-80);
+    padding: 64px 22px;
+  }
+  .footer-inner { max-width: 1024px; margin: 0 auto; }
+  .footer-cols {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--space-xl);
+    padding-bottom: var(--space-xxl);
+    border-bottom: 1px solid var(--color-hairline);
+  }
+  .footer-col h4 { color: var(--color-ink); margin-bottom: var(--space-xs); }
+  .footer-col ul { list-style: none; }
+  .footer-col ul a { color: var(--color-ink-muted-80); }
+  .footer-legal {
+    padding-top: var(--space-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--color-ink-muted-48);
+  }
+  .footer-legal ul { display: flex; gap: var(--space-lg); list-style: none; }
+  .footer-legal ul a { color: var(--color-ink-muted-48); }
+
+  /* responsive trims */
+  @media (max-width: 1068px) {
+    .hero h1 { font-size: 40px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .card-grid { grid-template-columns: repeat(2, 1fr); }
+    .palette { grid-template-columns: repeat(4, 1fr); }
+    .radii { grid-template-columns: repeat(4, 1fr); }
+    .footer-cols { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 640px) {
+    .hero h1 { font-size: 34px; }
+    .global-nav ul { display: none; }
+    .card-grid { grid-template-columns: 1fr; }
+    .palette { grid-template-columns: repeat(2, 1fr); }
+    .radii { grid-template-columns: repeat(2, 1fr); }
+    .stats { grid-template-columns: 1fr; }
+    .btn-grid { grid-template-columns: 1fr; }
+    .footer-cols { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ GLOBAL NAV ============ -->
+<nav class="global-nav">
+  <div class="global-nav-inner">
+    <span class="logo">apple.web</span>
+    <ul class="t-nav-link">
+      <li><a href="#">Store</a></li>
+      <li><a href="#">Mac</a></li>
+      <li><a href="#">iPad</a></li>
+      <li><a href="#">iPhone</a></li>
+      <li><a href="#">Watch</a></li>
+      <li><a href="#">Vision</a></li>
+      <li><a href="#">Support</a></li>
+    </ul>
+    <div class="right">
+      <a href="#" class="t-nav-link" style="color:var(--color-on-dark); opacity:0.88;">Search</a>
+      <a href="#" class="btn btn-dark-utility" style="background:transparent; padding:6px 10px;">Bag</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ SUB NAV FROSTED ============ -->
+<div class="sub-nav">
+  <div class="sub-nav-inner">
+    <span class="t-tagline left">MacBook Pro</span>
+    <div class="right t-button-utility">
+      <a href="#">Overview</a>
+      <a href="#">Switch</a>
+      <a href="#">Specs</a>
+      <a href="#">Compare</a>
+      <a href="#" class="btn btn-primary" style="padding:8px 16px; font-size:14px;">Buy</a>
+    </div>
+  </div>
+</div>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <p class="t-tagline" style="color:var(--color-primary); margin-bottom: var(--space-md);">New</p>
+  <h1 class="t-hero-display">A canvas where the<br>product disappears into the work.</h1>
+  <p class="t-lead subhead">Photography-first catalog design, presented with reverence. One accent, two button shapes, and the largest possible quiet around every render.</p>
+  <div class="ctas">
+    <a href="#" class="btn btn-primary">Buy</a>
+    <a href="#" class="btn btn-secondary">Learn more</a>
+  </div>
+  <div class="hero-photo" aria-hidden="true"></div>
+</section>
+
+<!-- ============ ALTERNATING TILES ============ -->
+<section class="tile tile-parchment">
+  <div class="tile-content">
+    <p class="t-label-caps" style="color:var(--color-primary); text-transform:uppercase;">PRO. BEYOND.</p>
+    <h2 class="t-display-lg">MacBook Pro</h2>
+    <p class="t-lead">Mind-blowing. Head-turning. Editorial restraint, headline tracking, room to breathe.</p>
+    <div class="ctas">
+      <a href="#" class="btn btn-primary">Buy</a>
+      <a href="#" class="btn btn-secondary">Learn more</a>
+    </div>
+    <div class="product-render" aria-hidden="true"></div>
+  </div>
+</section>
+
+<section class="tile tile-dark">
+  <div class="tile-content">
+    <p class="t-label-caps" style="color:var(--color-primary-on-dark); text-transform:uppercase;">BUILT FOR APPLE INTELLIGENCE</p>
+    <h2 class="t-display-lg">iPhone</h2>
+    <p class="t-lead muted-on-dark">Carved from a single block of light. Or so it looks against the near-black canvas.</p>
+    <div class="ctas">
+      <a href="#" class="btn btn-primary">Buy</a>
+      <a href="#" class="btn btn-secondary">Learn more</a>
+    </div>
+    <div class="product-render" aria-hidden="true"></div>
+  </div>
+</section>
+
+<section class="tile tile-light">
+  <div class="tile-content">
+    <p class="t-label-caps" style="color:var(--color-primary); text-transform:uppercase;">SUPERCHARGED BY M-SERIES</p>
+    <h2 class="t-display-lg">iPad Pro</h2>
+    <p class="t-lead">The thinnest Apple product ever. Edge-to-edge, with zero gap to the tile above.</p>
+    <div class="ctas">
+      <a href="#" class="btn btn-primary">Buy</a>
+      <a href="#" class="btn btn-secondary">Learn more</a>
+    </div>
+    <div class="product-render" aria-hidden="true"></div>
+  </div>
+</section>
+
+<section class="tile tile-dark-3">
+  <div class="tile-content">
+    <p class="t-label-caps" style="color:var(--color-primary-on-dark); text-transform:uppercase;">SPATIAL</p>
+    <h2 class="t-display-lg">Vision</h2>
+    <p class="t-lead muted-on-dark">A new era for the way we work, watch and remember. The tile darkens one step further.</p>
+    <div class="ctas">
+      <a href="#" class="btn btn-primary">Pre-order</a>
+      <a href="#" class="btn btn-secondary">Learn more</a>
+    </div>
+    <div class="product-render" aria-hidden="true"></div>
+  </div>
+</section>
+
+<!-- ============ BUTTONS GALLERY ============ -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-head">
+      <p class="eyebrow t-label-caps">Buttons</p>
+      <h2 class="t-display-md">Two shapes. One accent. Pressed at 0.95.</h2>
+      <p class="t-body-md">Pill (rounded.pill) for any primary action. Compact rect (rounded.sm) for utility. Mid-weight pearl capsule exists only at rounded.md, never elsewhere.</p>
+    </div>
+    <div class="btn-grid">
+      <div class="btn-label t-caption-strong">Primary</div>
+      <div class="btn-row">
+        <button class="btn btn-primary btn-sm">Buy</button>
+        <button class="btn btn-primary btn-md">Buy</button>
+        <button class="btn btn-primary btn-lg">Buy</button>
+      </div>
+
+      <div class="btn-label t-caption-strong">Secondary</div>
+      <div class="btn-row">
+        <button class="btn btn-secondary btn-sm">Learn more</button>
+        <button class="btn btn-secondary btn-md">Learn more</button>
+        <button class="btn btn-secondary btn-lg">Learn more</button>
+      </div>
+
+      <div class="btn-label t-caption-strong">Ghost (link)</div>
+      <div class="btn-row">
+        <button class="btn btn-ghost btn-sm">Continue ›</button>
+        <button class="btn btn-ghost btn-md">Continue ›</button>
+        <button class="btn btn-ghost btn-lg">Continue ›</button>
+      </div>
+
+      <div class="btn-label t-caption-strong">Utility &amp; Specials</div>
+      <div class="btn-row">
+        <button class="btn btn-dark-utility">Sign In</button>
+        <button class="btn btn-pearl">Add to Bag</button>
+        <button class="btn btn-icon" aria-label="Next">›</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FORM ============ -->
+<section class="section" style="background: var(--color-canvas-parchment);">
+  <div class="section-inner">
+    <div class="section-head">
+      <p class="eyebrow t-label-caps">Form</p>
+      <h2 class="t-display-md">Inputs share the pill radius with primary actions.</h2>
+      <p class="t-body-md">Search is treated as a primary action. The form card uses the store utility card grammar — soft hairline, lg radius, lg padding.</p>
+    </div>
+
+    <form class="form-card" onsubmit="event.preventDefault()">
+      <div class="form-field">
+        <label class="t-caption" for="f-name">Full name</label>
+        <input id="f-name" type="text" placeholder="Tim Cook">
+      </div>
+      <div class="form-field">
+        <label class="t-caption" for="f-email">Email</label>
+        <input id="f-email" type="email" placeholder="tim@apple.com">
+      </div>
+      <div class="form-field">
+        <label class="t-caption" for="f-pref">Preferred model</label>
+        <select id="f-pref">
+          <option>MacBook Pro 14"</option>
+          <option>MacBook Pro 16"</option>
+          <option>MacBook Air 15"</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label class="t-caption" for="f-note">Notes</label>
+        <textarea id="f-note" placeholder="Tell us how you'll use it…"></textarea>
+      </div>
+
+      <p class="t-caption-strong" style="margin-bottom: var(--space-xs);">Storage</p>
+      <div class="chips" style="margin-bottom: var(--space-lg);">
+        <span class="chip">512GB</span>
+        <span class="chip selected">1TB</span>
+        <span class="chip">2TB</span>
+        <span class="chip">4TB</span>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Continue</button>
+        <button class="btn btn-secondary" type="button">Cancel</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- ============ CARDS ============ -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-head">
+      <p class="eyebrow t-label-caps">Store cards</p>
+      <h2 class="t-display-md">Browsable containers at rounded.lg.</h2>
+      <p class="t-body-md">Soft hairline border, no shadow. Only the product render carries the system's one drop shadow.</p>
+    </div>
+
+    <div class="card-grid">
+      <article class="card">
+        <div class="card-image"></div>
+        <p class="card-eyebrow t-caption">New</p>
+        <h3 class="card-name t-body-strong">MacBook Air 15"</h3>
+        <p class="card-price t-body-md">From $1,299</p>
+        <a class="card-link t-body-md" href="#">Buy ›</a>
+      </article>
+      <article class="card">
+        <div class="card-image"></div>
+        <p class="card-eyebrow t-caption">Pro</p>
+        <h3 class="card-name t-body-strong">MacBook Pro 14"</h3>
+        <p class="card-price t-body-md">From $1,599</p>
+        <a class="card-link t-body-md" href="#">Buy ›</a>
+      </article>
+      <article class="card">
+        <div class="card-image"></div>
+        <p class="card-eyebrow t-caption">Max</p>
+        <h3 class="card-name t-body-strong">MacBook Pro 16"</h3>
+        <p class="card-price t-body-md">From $2,499</p>
+        <a class="card-link t-body-md" href="#">Buy ›</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ROW ============ -->
+<section class="section" style="background: var(--color-canvas);">
+  <div class="section-inner">
+    <div class="section-head">
+      <p class="eyebrow t-label-caps">By the numbers</p>
+      <h2 class="t-display-md">Performance you can read at a glance.</h2>
+    </div>
+    <div class="stats">
+      <div class="stat-tile">
+        <div class="stat-value">22h</div>
+        <div class="stat-label t-body-md">Battery life, all-day editorial.</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-value">3x</div>
+        <div class="stat-label t-body-md">Faster GPU on M-series silicon.</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-value">17"</div>
+        <div class="stat-label t-body-md">Type at exactly 17px body.</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-value">1</div>
+        <div class="stat-label t-body-md">Accent color. Action Blue.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TABLE ============ -->
+<section class="section" style="background: var(--color-canvas-parchment);">
+  <div class="section-inner">
+    <div class="section-head">
+      <p class="eyebrow t-label-caps">Compare</p>
+      <h2 class="t-display-md">A hairline table, no decorative chrome.</h2>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Chip</th>
+            <th>Memory</th>
+            <th>Storage</th>
+            <th class="right">Price</th>
+            <th class="right">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="t-body-strong">MacBook Air 13"</td>
+            <td class="t-body-md">M-series</td>
+            <td class="t-body-md">8GB</td>
+            <td class="t-body-md">256GB</td>
+            <td class="t-body-md right">$1,099</td>
+            <td class="right"><span class="pill-status">In stock</span></td>
+          </tr>
+          <tr>
+            <td class="t-body-strong">MacBook Air 15"</td>
+            <td class="t-body-md">M-series</td>
+            <td class="t-body-md">16GB</td>
+            <td class="t-body-md">512GB</td>
+            <td class="t-body-md right">$1,299</td>
+            <td class="right"><span class="pill-status">In stock</span></td>
+          </tr>
+          <tr>
+            <td class="t-body-strong">MacBook Pro 14"</td>
+            <td class="t-body-md">M-series Pro</td>
+            <td class="t-body-md">18GB</td>
+            <td class="t-body-md">1TB</td>
+            <td class="t-body-md right">$1,999</td>
+            <td class="right"><span class="pill-status">In stock</span></td>
+          </tr>
+          <tr>
+            <td class="t-body-strong">MacBook Pro 16"</td>
+            <td class="t-body-md">M-series Max</td>
+            <td class="t-body-md">36GB</td>
+            <td class="t-body-md">1TB</td>
+            <td class="t-body-md right">$2,499</td>
+            <td class="right"><span class="pill-status muted">Backorder</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TYPE RAMP ============ -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-head">
+      <p class="eyebrow t-label-caps">Typography</p>
+      <h2 class="t-display-md">SF Pro Display &amp; SF Pro Text — tight tracking, 17px body.</h2>
+      <p class="t-body-md">Weight ladder: 300 / 400 / 600 / 700. Mid-weight 500 is deliberately absent.</p>
+    </div>
+
+    <div>
+      <div class="ramp-row">
+        <div class="ramp-meta t-caption">
+          <span class="token t-caption-strong">hero-display</span>
+          56 / 600 / 1.07 / -0.28px
+        </div>
+        <div class="t-hero-display">Reverent. Photographic.</div>
+      </div>
+
+      <div class="ramp-row">
+        <div class="ramp-meta t-caption">
+          <span class="token t-caption-strong">display-lg</span>
+          40 / 600 / 1.10 / 0px
+        </div>
+        <div class="t-display-lg">Product tile headline</div>
+      </div>
+
+      <div class="ramp-row">
+        <div class="ramp-meta t-caption">
+          <span class="token t-caption-strong">display-md</span>
+          34 / 600 / 1.47 / -0.374px
+        </div>
+        <div class="t-display-md">Section level heading</div>
+      </div>
+
+      <div class="ramp-row">
+        <div class="ramp-meta t-caption">
+          <span class="token t-caption-strong">lead</span>
+          28 / 400 / 1.14 / +0.196px
+        </div>
+        <div class="t-lead">Tagline beneath a headline — a touch airy.</div>
+      </div>
+
+      <div class="ramp-row">
+        <div class="ramp-meta t-caption">
+          <span class="token t-caption-strong">lead-airy</span>
+          24 / 300 / 1.5 / 0px
+        </div>
+        <div class="t-lead-airy">Editorial atmosphere, weight 300.</div>
+      </div>
+
+      <div class="ramp-row">
+        <div class="ramp-meta t-caption">
+          <span class="token t-caption-strong">tagline</span>
+          21 / 600 / 1.19 / +0.231px
+        </div>
+        <div class="t-tagline">MacBook Pro</div>
+      </div>
+
+      <div class="ramp-row">
+        <div class="ramp-meta t-caption">
+          <span class="token t-caption-strong">body-strong</span>
+          17 / 600 / 1.24 / -0.374px
+        </div>
+        <div class="t-body-strong">Inline emphasis, no rhythm break.</div>
+      </div>
+
+      <div class="ramp-row">
+        <div class="ramp-meta t-caption">
+          <span class="token t-caption-strong">body-md</span>
+          17 / 400 / 1.47 / -0.374px
+        </div>
+        <div class="t-body-md">Default paragraph at 17px — one pixel larger than SaaS convention. Editorial leading at 1.47 is a brand constant; never compress it.</div>
+      </div>
+
+      <div class="ramp-row">
+        <div class="ramp-meta t-caption">
+          <span class="token t-caption-strong">dense-link</span>
+          17 / 400 / 2.41 / 0px
+        </div>
+        <div>
+          <a class="t-dense-link" href="#" style="display:block;">Find a Store</a>
+          <a class="t-dense-link" href="#" style="display:block;">Genius Bar</a>
+          <a class="t-dense-link" href="#" style="display:block;">Today at Apple</a>
+        </div>
+      </div>
+
+      <div class="ramp-row">
+        <div class="ramp-meta t-caption">
+          <span class="token t-caption-strong">button-large</span>
+          18 / 300 / 1.0 / 0px
+        </div>
+        <div class="t-button-large">Buy Now</div>
+      </div>
+
+      <div class="ramp-row">
+        <div class="ramp-meta t-caption">
+          <span class="token t-caption-strong">caption</span>
+          14 / 400 / 1.43 / -0.224px
+        </div>
+        <div class="t-caption">Available in three finishes. Free engraving with select models.</div>
+      </div>
+
+      <div class="ramp-row">
+        <div class="ramp-meta t-caption">
+          <span class="token t-caption-strong">caption-strong</span>
+          14 / 600 / 1.29 / -0.224px
+        </div>
+        <div class="t-caption-strong">Column heading, footer.</div>
+      </div>
+
+      <div class="ramp-row">
+        <div class="ramp-meta t-caption">
+          <span class="token t-caption-strong">button-utility</span>
+          14 / 400 / 1.29 / -0.224px
+        </div>
+        <div class="t-button-utility">Sign In · Bag · Search</div>
+      </div>
+
+      <div class="ramp-row">
+        <div class="ramp-meta t-caption">
+          <span class="token t-caption-strong">nav-link</span>
+          12 / 400 / 1.0 / -0.12px
+        </div>
+        <div class="t-nav-link">Store · Mac · iPad · iPhone · Watch · Vision</div>
+      </div>
+
+      <div class="ramp-row">
+        <div class="ramp-meta t-caption">
+          <span class="token t-caption-strong">fine-print</span>
+          12 / 400 / 1.0 / -0.12px
+        </div>
+        <div class="t-fine-print">Shipping &amp; returns. Free 2-day delivery.</div>
+      </div>
+
+      <div class="ramp-row">
+        <div class="ramp-meta t-caption">
+          <span class="token t-caption-strong">micro-legal</span>
+          10 / 400 / 1.3 / -0.08px
+        </div>
+        <div class="t-micro-legal">* Trade-in values vary based on the condition, year and configuration of your eligible trade-in device.</div>
+      </div>
+
+      <div class="ramp-row">
+        <div class="ramp-meta t-caption">
+          <span class="token t-caption-strong">label-caps</span>
+          12 / 600 / 1.0 / +0.08px
+        </div>
+        <div class="t-label-caps" style="text-transform:uppercase;">NEW · PRO · MAX</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PALETTE ============ -->
+<section class="section" style="background: var(--color-canvas-parchment);">
+  <div class="section-inner">
+    <div class="section-head">
+      <p class="eyebrow t-label-caps">Palette</p>
+      <h2 class="t-display-md">One blue. Five greys. Pure black for nav only.</h2>
+      <p class="t-body-md">No decorative gradients exist in the system; atmosphere is photographic.</p>
+    </div>
+
+    <div class="palette">
+      <div class="swatch"><div class="swatch-chip" style="background:#0066cc;"></div><div class="swatch-meta"><div class="name t-caption-strong">primary</div><div class="hex t-caption">#0066cc</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#0071e3;"></div><div class="swatch-meta"><div class="name t-caption-strong">primary-focus</div><div class="hex t-caption">#0071e3</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#2997ff;"></div><div class="swatch-meta"><div class="name t-caption-strong">primary-on-dark</div><div class="hex t-caption">#2997ff</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#ffffff; border-bottom:1px solid var(--color-hairline);"></div><div class="swatch-meta"><div class="name t-caption-strong">on-primary</div><div class="hex t-caption">#ffffff</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#ffffff; border-bottom:1px solid var(--color-hairline);"></div><div class="swatch-meta"><div class="name t-caption-strong">on-dark</div><div class="hex t-caption">#ffffff</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#ffffff; border-bottom:1px solid var(--color-hairline);"></div><div class="swatch-meta"><div class="name t-caption-strong">canvas</div><div class="hex t-caption">#ffffff</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#f5f5f7;"></div><div class="swatch-meta"><div class="name t-caption-strong">canvas-parchment</div><div class="hex t-caption">#f5f5f7</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#fafafc;"></div><div class="swatch-meta"><div class="name t-caption-strong">surface-pearl</div><div class="hex t-caption">#fafafc</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#272729;"></div><div class="swatch-meta"><div class="name t-caption-strong">surface-tile-1</div><div class="hex t-caption">#272729</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#2a2a2c;"></div><div class="swatch-meta"><div class="name t-caption-strong">surface-tile-2</div><div class="hex t-caption">#2a2a2c</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#252527;"></div><div class="swatch-meta"><div class="name t-caption-strong">surface-tile-3</div><div class="hex t-caption">#252527</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#000000;"></div><div class="swatch-meta"><div class="name t-caption-strong">surface-black</div><div class="hex t-caption">#000000</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#d2d2d7;"></div><div class="swatch-meta"><div class="name t-caption-strong">surface-chip-translucent</div><div class="hex t-caption">#d2d2d7</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#1d1d1f;"></div><div class="swatch-meta"><div class="name t-caption-strong">ink</div><div class="hex t-caption">#1d1d1f</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#1d1d1f;"></div><div class="swatch-meta"><div class="name t-caption-strong">body</div><div class="hex t-caption">#1d1d1f</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#ffffff; border-bottom:1px solid var(--color-hairline);"></div><div class="swatch-meta"><div class="name t-caption-strong">body-on-dark</div><div class="hex t-caption">#ffffff</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#cccccc;"></div><div class="swatch-meta"><div class="name t-caption-strong">body-muted</div><div class="hex t-caption">#cccccc</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#333333;"></div><div class="swatch-meta"><div class="name t-caption-strong">ink-muted-80</div><div class="hex t-caption">#333333</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#7a7a7a;"></div><div class="swatch-meta"><div class="name t-caption-strong">ink-muted-48</div><div class="hex t-caption">#7a7a7a</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#f0f0f0;"></div><div class="swatch-meta"><div class="name t-caption-strong">divider-soft</div><div class="hex t-caption">#f0f0f0</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background:#e0e0e0;"></div><div class="swatch-meta"><div class="name t-caption-strong">hairline</div><div class="hex t-caption">#e0e0e0</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RADII ============ -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-head">
+      <p class="eyebrow t-label-caps">Radii</p>
+      <h2 class="t-display-md">Four shapes carry four meanings.</h2>
+      <p class="t-body-md">Tiles are flat. Utility is rounded.sm. Cards are rounded.lg. Primary actions are pill.</p>
+    </div>
+    <div class="radii">
+      <div class="radii-cell">
+        <div class="radii-box" style="border-radius: 0;"></div>
+        <div class="radii-meta t-caption"><span class="token t-caption-strong">none</span>0px</div>
+      </div>
+      <div class="radii-cell">
+        <div class="radii-box" style="border-radius: 5px;"></div>
+        <div class="radii-meta t-caption"><span class="token t-caption-strong">xs</span>5px</div>
+      </div>
+      <div class="radii-cell">
+        <div class="radii-box" style="border-radius: 8px;"></div>
+        <div class="radii-meta t-caption"><span class="token t-caption-strong">sm</span>8px</div>
+      </div>
+      <div class="radii-cell">
+        <div class="radii-box" style="border-radius: 11px;"></div>
+        <div class="radii-meta t-caption"><span class="token t-caption-strong">md</span>11px</div>
+      </div>
+      <div class="radii-cell">
+        <div class="radii-box" style="border-radius: 18px;"></div>
+        <div class="radii-meta t-caption"><span class="token t-caption-strong">lg</span>18px</div>
+      </div>
+      <div class="radii-cell">
+        <div class="radii-box" style="border-radius: 9999px;"></div>
+        <div class="radii-meta t-caption"><span class="token t-caption-strong">pill</span>9999px</div>
+      </div>
+      <div class="radii-cell">
+        <div class="radii-box" style="border-radius: 9999px;"></div>
+        <div class="radii-meta t-caption"><span class="token t-caption-strong">full</span>9999px</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SPACING RHYTHM ============ -->
+<section class="section" style="background: var(--color-canvas-parchment);">
+  <div class="section-inner">
+    <div class="section-head">
+      <p class="eyebrow t-label-caps">Spacing</p>
+      <h2 class="t-display-md">8px base, with one 4px sub-step.</h2>
+      <p class="t-body-md">Structural layout snaps to the scale; the section-level rhythm is 80px.</p>
+    </div>
+    <div>
+      <div class="space-row"><div class="space-token t-caption-strong">xxs</div><div class="space-bar" style="width:4px;"></div><div class="space-value t-caption">4px</div></div>
+      <div class="space-row"><div class="space-token t-caption-strong">xs</div><div class="space-bar" style="width:8px;"></div><div class="space-value t-caption">8px</div></div>
+      <div class="space-row"><div class="space-token t-caption-strong">sm</div><div class="space-bar" style="width:12px;"></div><div class="space-value t-caption">12px</div></div>
+      <div class="space-row"><div class="space-token t-caption-strong">md</div><div class="space-bar" style="width:17px;"></div><div class="space-value t-caption">17px</div></div>
+      <div class="space-row"><div class="space-token t-caption-strong">lg</div><div class="space-bar" style="width:24px;"></div><div class="space-value t-caption">24px</div></div>
+      <div class="space-row"><div class="space-token t-caption-strong">xl</div><div class="space-bar" style="width:32px;"></div><div class="space-value t-caption">32px</div></div>
+      <div class="space-row"><div class="space-token t-caption-strong">xxl</div><div class="space-bar" style="width:48px;"></div><div class="space-value t-caption">48px</div></div>
+      <div class="space-row"><div class="space-token t-caption-strong">section</div><div class="space-bar" style="width:80px;"></div><div class="space-value t-caption">80px</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FLOATING STICKY BAR ============ -->
+<div class="sticky-bar">
+  <div>
+    <div class="t-caption" style="color: var(--color-ink-muted-80);">MacBook Pro 14"</div>
+    <div class="t-body-md" style="color: var(--color-ink); font-weight: 600;">From $1,999</div>
+  </div>
+  <a href="#" class="btn btn-primary">Buy</a>
+</div>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-cols">
+      <div class="footer-col">
+        <h4 class="t-caption-strong">Shop and Learn</h4>
+        <ul>
+          <li><a class="t-dense-link" href="#">Store</a></li>
+          <li><a class="t-dense-link" href="#">Mac</a></li>
+          <li><a class="t-dense-link" href="#">iPad</a></li>
+          <li><a class="t-dense-link" href="#">iPhone</a></li>
+          <li><a class="t-dense-link" href="#">Watch</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="t-caption-strong">Services</h4>
+        <ul>
+          <li><a class="t-dense-link" href="#">Music</a></li>
+          <li><a class="t-dense-link" href="#">TV+</a></li>
+          <li><a class="t-dense-link" href="#">Fitness+</a></li>
+          <li><a class="t-dense-link" href="#">Arcade</a></li>
+          <li><a class="t-dense-link" href="#">iCloud</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="t-caption-strong">Account</h4>
+        <ul>
+          <li><a class="t-dense-link" href="#">Manage ID</a></li>
+          <li><a class="t-dense-link" href="#">iCloud.com</a></li>
+          <li><a class="t-dense-link" href="#">Orders</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="t-caption-strong">For Business</h4>
+        <ul>
+          <li><a class="t-dense-link" href="#">Solutions</a></li>
+          <li><a class="t-dense-link" href="#">Shop for Business</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4 class="t-caption-strong">About</h4>
+        <ul>
+          <li><a class="t-dense-link" href="#">Newsroom</a></li>
+          <li><a class="t-dense-link" href="#">Leadership</a></li>
+          <li><a class="t-dense-link" href="#">Careers</a></li>
+          <li><a class="t-dense-link" href="#">Investors</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="t-micro-legal" style="margin-top: var(--space-lg); color: var(--color-ink-muted-48);">More ways to shop: Find a retailer near you. Or call 1-800-APL-CARE.</p>
+
+    <div class="footer-legal">
+      <div class="t-fine-print">Copyright © 2026 Apple Web. All rights reserved.</div>
+      <ul class="t-fine-print">
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Use</a></li>
+        <li><a href="#">Sales and Refunds</a></li>
+        <li><a href="#">Legal</a></li>
+        <li><a href="#">Site Map</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

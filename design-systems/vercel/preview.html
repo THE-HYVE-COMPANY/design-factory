@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vercel — Design System Preview</title>
+<!-- Geist & Geist Mono are proprietary; using Inter (geometric sans substitute) and JetBrains Mono (mono substitute) from Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Brand & Accent */
+    --c-primary: #171717;
+    --c-cyan: #50e3c2;
+    --c-highlight-pink: #ff0080;
+    --c-violet: #7928ca;
+    --c-link: #0070f3;
+
+    /* Surface */
+    --c-canvas: #ffffff;
+    --c-canvas-soft: #fafafa;
+    --c-canvas-soft-2: #f5f5f5;
+    --c-hairline: #ebebeb;
+    --c-hairline-strong: #a1a1a1;
+
+    /* Text */
+    --c-ink: #171717;
+    --c-body: #4d4d4d;
+    --c-mute: #888888;
+    --c-on-primary: #ffffff;
+
+    /* Semantic */
+    --c-success: #0070f3;
+    --c-link-deep: #0761d1;
+    --c-link-bg-soft: #d3e5ff;
+    --c-error: #ee0000;
+    --c-error-soft: #f7d4d6;
+    --c-error-deep: #c50000;
+    --c-warning: #f5a623;
+    --c-warning-soft: #ffefcf;
+    --c-warning-deep: #ab570a;
+
+    /* Brand Gradient stops */
+    --g-develop-start: #007cf0;
+    --g-develop-end: #00dfd8;
+    --g-preview-start: #7928ca;
+    --g-preview-end: #ff0080;
+    --g-ship-start: #ff4d4d;
+    --g-ship-end: #f9cb28;
+
+    /* Spacing */
+    --sp-xxs: 4px;
+    --sp-xs: 8px;
+    --sp-sm: 12px;
+    --sp-md: 16px;
+    --sp-lg: 24px;
+    --sp-xl: 32px;
+    --sp-2xl: 40px;
+    --sp-3xl: 48px;
+    --sp-4xl: 64px;
+    --sp-5xl: 96px;
+    --sp-6xl: 128px;
+    --sp-section: 192px;
+
+    /* Radii */
+    --r-none: 0px;
+    --r-xs: 4px;
+    --r-sm: 6px;
+    --r-md: 8px;
+    --r-lg: 12px;
+    --r-xl: 16px;
+    --r-pill-sm: 64px;
+    --r-pill: 100px;
+    --r-full: 9999px;
+
+    /* Shadows */
+    --shadow-1: 0 0 0 1px #00000014 inset;
+    --shadow-2: 0px 1px 1px #00000005, 0px 2px 2px #0000000a, 0 0 0 1px #00000014 inset;
+    --shadow-3: 0px 2px 2px #0000000a, 0px 8px 8px -8px #0000000a, 0 0 0 1px #00000014 inset;
+    --shadow-4: 0px 2px 2px #0000000a, 0px 8px 16px -4px #0000000a, 0 0 0 1px #00000014 inset;
+    --shadow-5: 0px 1px 1px #00000005, 0px 8px 16px -4px #0000000a, 0px 24px 32px -8px #0000000f, 0 0 0 1px #00000014 inset;
+
+    /* Fonts */
+    --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+    --page-width: 1400px;
+    --header-height: 64px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--c-canvas-soft);
+    color: var(--c-ink);
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+    font-feature-settings: "ss01", "ss02";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  .container {
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: 0 var(--sp-lg);
+  }
+
+  /* ---------- Typography tokens ---------- */
+  .t-display-xl { font-size: 48px; font-weight: 600; line-height: 48px; letter-spacing: -2.4px; }
+  .t-display-lg { font-size: 32px; font-weight: 600; line-height: 40px; letter-spacing: -1.28px; }
+  .t-display-md { font-size: 24px; font-weight: 600; line-height: 32px; letter-spacing: -0.96px; }
+  .t-display-sm { font-size: 20px; font-weight: 600; line-height: 28px; letter-spacing: -0.6px; }
+  .t-body-lg { font-size: 18px; font-weight: 400; line-height: 28px; letter-spacing: 0; }
+  .t-body-md { font-size: 16px; font-weight: 400; line-height: 24px; letter-spacing: 0; }
+  .t-body-md-strong { font-size: 16px; font-weight: 500; line-height: 24px; letter-spacing: 0; }
+  .t-body-sm { font-size: 14px; font-weight: 400; line-height: 20px; letter-spacing: -0.28px; }
+  .t-body-sm-strong { font-size: 14px; font-weight: 500; line-height: 20px; letter-spacing: -0.28px; }
+  .t-caption { font-size: 12px; font-weight: 400; line-height: 16px; letter-spacing: 0; }
+  .t-caption-mono { font-family: var(--font-mono); font-size: 12px; font-weight: 400; line-height: 16px; letter-spacing: 0; }
+  .t-code { font-family: var(--font-mono); font-size: 13px; font-weight: 400; line-height: 20px; letter-spacing: 0; }
+  .t-button-md { font-size: 14px; font-weight: 500; line-height: 20px; letter-spacing: 0; }
+  .t-button-lg { font-size: 16px; font-weight: 500; line-height: 24px; letter-spacing: 0; }
+
+  /* ---------- Nav ---------- */
+  .nav-bar {
+    background: var(--c-canvas);
+    color: var(--c-ink);
+    height: var(--header-height);
+    padding: var(--sp-sm) var(--sp-lg);
+    border-bottom: 1px solid var(--c-hairline);
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center;
+  }
+  .nav-inner {
+    max-width: var(--page-width);
+    margin: 0 auto;
+    width: 100%;
+    display: flex; align-items: center; gap: var(--sp-lg);
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: var(--sp-xs);
+    font-weight: 600; font-size: 17px; letter-spacing: -0.5px;
+  }
+  .nav-logo svg { display: block; }
+  .nav-links {
+    display: flex; align-items: center; gap: var(--sp-xxs);
+    flex: 1; justify-content: center;
+  }
+  .nav-link {
+    color: var(--c-body);
+    font-size: 14px; font-weight: 400; line-height: 20px; letter-spacing: -0.28px;
+    padding: var(--sp-xs) var(--sp-sm);
+    border-radius: var(--r-full);
+    transition: background 0.15s, color 0.15s;
+  }
+  .nav-link:hover { background: var(--c-canvas-soft-2); color: var(--c-ink); }
+  .nav-cluster { display: flex; align-items: center; gap: var(--sp-xs); }
+  .nav-cta-ask-ai, .nav-cta-login, .nav-cta-signup {
+    height: 28px;
+    padding: 0 var(--sp-xs);
+    border-radius: var(--r-sm);
+    font-size: 14px; font-weight: 500; line-height: 20px; letter-spacing: -0.28px;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer; border: 0;
+  }
+  .nav-cta-ask-ai { background: var(--c-canvas); color: var(--c-ink); border: 1px solid var(--c-hairline); }
+  .nav-cta-login { background: var(--c-canvas); color: var(--c-ink); border: 1px solid var(--c-hairline); }
+  .nav-cta-signup { background: var(--c-primary); color: var(--c-on-primary); }
+
+  /* ---------- Banner marketing ---------- */
+  .banner-row { display: flex; justify-content: center; padding: var(--sp-xl) var(--sp-lg) 0; }
+  .banner-marketing {
+    background: var(--c-canvas-soft);
+    color: var(--c-body);
+    font-size: 14px; line-height: 20px; letter-spacing: -0.28px;
+    padding: var(--sp-xs) var(--sp-sm);
+    border-radius: var(--r-full);
+    border: 1px solid var(--c-hairline);
+    display: inline-flex; align-items: center; gap: var(--sp-xs);
+  }
+  .banner-marketing .pill-tag {
+    background: var(--c-link-bg-soft); color: var(--c-link-deep);
+    padding: 2px var(--sp-xs); border-radius: var(--r-full);
+    font-size: 12px; font-weight: 500;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero-band {
+    background: var(--c-canvas);
+    padding: var(--sp-4xl) var(--sp-lg) var(--sp-5xl);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+  .hero-mesh {
+    position: absolute;
+    top: -10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1200px;
+    height: 700px;
+    background:
+      radial-gradient(circle at 15% 30%, var(--g-develop-start) 0%, transparent 35%),
+      radial-gradient(circle at 35% 20%, var(--g-develop-end) 0%, transparent 30%),
+      radial-gradient(circle at 60% 35%, var(--g-preview-start) 0%, transparent 35%),
+      radial-gradient(circle at 80% 25%, var(--g-preview-end) 0%, transparent 30%),
+      radial-gradient(circle at 90% 50%, var(--g-ship-start) 0%, transparent 32%),
+      radial-gradient(circle at 70% 70%, var(--g-ship-end) 0%, transparent 30%),
+      radial-gradient(circle at 25% 65%, var(--c-cyan) 0%, transparent 28%);
+    filter: blur(60px) saturate(1.05);
+    opacity: 0.85;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .hero-inner { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; }
+  .hero-eyebrow {
+    display: inline-block;
+    color: var(--c-body);
+    background: var(--c-canvas-soft);
+    border: 1px solid var(--c-hairline);
+    padding: var(--sp-xs) var(--sp-sm);
+    border-radius: var(--r-full);
+    margin-bottom: var(--sp-lg);
+  }
+  .hero-headline {
+    color: var(--c-ink);
+    margin: 0 0 var(--sp-lg);
+  }
+  .hero-sub {
+    color: var(--c-body);
+    margin: 0 auto var(--sp-xl);
+    max-width: 640px;
+  }
+  .hero-cta-row {
+    display: flex; gap: var(--sp-md); justify-content: center; align-items: center;
+    flex-wrap: wrap;
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn { display: inline-flex; align-items: center; justify-content: center; cursor: pointer; border: 0; transition: opacity 0.15s, background 0.15s; }
+  .btn:hover { opacity: 0.88; }
+
+  .btn-primary {
+    background: var(--c-primary); color: var(--c-on-primary);
+    padding: 0 var(--sp-sm); height: 48px;
+    border-radius: var(--r-pill);
+    font-size: 16px; font-weight: 500; line-height: 24px;
+    min-width: 140px;
+  }
+  .btn-secondary {
+    background: var(--c-canvas); color: var(--c-ink);
+    padding: 0 var(--sp-sm); height: 48px;
+    border-radius: var(--r-pill);
+    font-size: 16px; font-weight: 500; line-height: 24px;
+    border: 1px solid var(--c-hairline);
+    min-width: 140px;
+  }
+  .btn-primary-md {
+    background: var(--c-primary); color: var(--c-on-primary);
+    padding: 0 var(--sp-md); height: 40px;
+    border-radius: var(--r-pill);
+    font-size: 14px; font-weight: 500; line-height: 20px; letter-spacing: -0.28px;
+  }
+  .btn-secondary-md {
+    background: var(--c-canvas); color: var(--c-ink);
+    padding: 0 var(--sp-md); height: 40px;
+    border-radius: var(--r-pill);
+    font-size: 14px; font-weight: 500; line-height: 20px; letter-spacing: -0.28px;
+    border: 1px solid var(--c-hairline);
+  }
+  .btn-primary-sm {
+    background: var(--c-primary); color: var(--c-on-primary);
+    padding: 0 var(--sp-sm); height: 32px;
+    border-radius: var(--r-pill);
+    font-size: 14px; font-weight: 500; line-height: 20px; letter-spacing: -0.28px;
+  }
+  .btn-secondary-sm {
+    background: var(--c-canvas); color: var(--c-ink);
+    padding: 0 var(--sp-sm); height: 32px;
+    border-radius: var(--r-pill);
+    font-size: 14px; font-weight: 500; line-height: 20px; letter-spacing: -0.28px;
+    border: 1px solid var(--c-hairline);
+  }
+  .btn-ghost-lg, .btn-ghost-md, .btn-ghost-sm {
+    background: transparent; color: var(--c-ink);
+    border-radius: var(--r-pill);
+  }
+  .btn-ghost-lg { padding: 0 var(--sp-sm); height: 48px; font-size: 16px; font-weight: 500; line-height: 24px; }
+  .btn-ghost-md { padding: 0 var(--sp-md); height: 40px; font-size: 14px; font-weight: 500; line-height: 20px; letter-spacing: -0.28px; }
+  .btn-ghost-sm { padding: 0 var(--sp-sm); height: 32px; font-size: 14px; font-weight: 500; line-height: 20px; letter-spacing: -0.28px; }
+  .btn-ghost-lg:hover, .btn-ghost-md:hover, .btn-ghost-sm:hover { background: var(--c-canvas-soft-2); }
+
+  /* ---------- Tab pills ---------- */
+  .tab-row {
+    display: flex; justify-content: center; gap: var(--sp-sm);
+    padding: var(--sp-xl) var(--sp-lg);
+    flex-wrap: wrap;
+  }
+  .tab-ghost {
+    background: var(--c-canvas);
+    color: var(--c-ink);
+    font-size: 14px; font-weight: 400; line-height: 20px; letter-spacing: -0.28px;
+    padding: var(--sp-xs) var(--sp-md);
+    border-radius: var(--r-pill-sm);
+    border: 1px solid var(--c-hairline);
+    cursor: pointer;
+  }
+  .tab-ghost.active { background: var(--c-primary); color: var(--c-on-primary); border-color: var(--c-primary); }
+
+  /* ---------- Sections ---------- */
+  .section { padding: var(--sp-5xl) var(--sp-lg); }
+  .section-canvas { background: var(--c-canvas); }
+  .section-soft { background: var(--c-canvas-soft); }
+  .section-dark { background: var(--c-primary); color: var(--c-on-primary); }
+  .section-header { max-width: 720px; margin: 0 auto var(--sp-3xl); text-align: center; }
+  .section-eyebrow {
+    color: var(--c-body);
+    text-transform: uppercase;
+    margin-bottom: var(--sp-md);
+    letter-spacing: 0.6px;
+  }
+  .section-headline { margin: 0 0 var(--sp-md); }
+  .section-sub { color: var(--c-body); margin: 0; }
+  .section-dark .section-sub { color: #a1a1a1; }
+  .section-dark .section-eyebrow { color: #a1a1a1; }
+
+  /* ---------- Feature 3-up grid ---------- */
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--sp-lg);
+  }
+  .card-marketing {
+    background: var(--c-canvas);
+    color: var(--c-ink);
+    padding: var(--sp-lg);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-3);
+  }
+  .card-marketing .card-eyebrow { color: var(--c-body); margin-bottom: var(--sp-md); }
+  .card-marketing h3 { margin: 0 0 var(--sp-sm); color: var(--c-ink); }
+  .card-marketing p { margin: 0 0 var(--sp-md); color: var(--c-body); }
+  .card-link { color: var(--c-link); font-weight: 500; }
+  .card-link:hover { text-decoration: underline; }
+
+  /* ---------- Form ---------- */
+  .form-card {
+    background: var(--c-canvas);
+    border-radius: var(--r-lg);
+    padding: var(--sp-xl);
+    box-shadow: var(--shadow-4);
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .form-card h3 { margin: 0 0 var(--sp-xs); }
+  .form-card .form-sub { color: var(--c-body); margin: 0 0 var(--sp-lg); }
+  .form-field { display: flex; flex-direction: column; gap: var(--sp-xs); margin-bottom: var(--sp-md); }
+  .form-label { color: var(--c-body); font-size: 14px; font-weight: 500; line-height: 20px; letter-spacing: -0.28px; }
+  .form-input, .form-input-sm, .form-input-lg, .form-select, .form-textarea {
+    background: var(--c-canvas);
+    color: var(--c-ink);
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-sm);
+    padding: 0 var(--sp-sm);
+    font-family: var(--font-sans);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .form-input { height: 40px; font-size: 14px; line-height: 20px; letter-spacing: -0.28px; }
+  .form-input-sm { height: 32px; font-size: 14px; line-height: 20px; letter-spacing: -0.28px; }
+  .form-input-lg { height: 48px; font-size: 16px; line-height: 24px; }
+  .form-textarea { padding: var(--sp-sm); font-size: 14px; line-height: 20px; resize: vertical; min-height: 80px; }
+  .form-input:focus, .form-input-sm:focus, .form-input-lg:focus, .form-textarea:focus { border-color: var(--c-link); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-md); }
+
+  /* ---------- Stats ---------- */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--sp-lg);
+  }
+  .stat-tile {
+    background: var(--c-canvas);
+    padding: var(--sp-xl);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-2);
+  }
+  .stat-label {
+    color: var(--c-body);
+    margin-bottom: var(--sp-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .stat-value { color: var(--c-ink); margin-bottom: var(--sp-xs); }
+  .stat-delta { color: var(--c-link); }
+
+  /* ---------- Table ---------- */
+  .table-wrap {
+    background: var(--c-canvas);
+    border-radius: var(--r-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-2);
+  }
+  table.data-table { width: 100%; border-collapse: collapse; }
+  .data-table th {
+    background: var(--c-canvas-soft);
+    color: var(--c-body);
+    text-align: left;
+    padding: var(--sp-sm) var(--sp-md);
+    border-bottom: 1px solid var(--c-hairline);
+    font-family: var(--font-mono);
+    font-size: 12px; font-weight: 400; line-height: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .data-table td {
+    padding: var(--sp-md);
+    border-bottom: 1px solid var(--c-hairline);
+    color: var(--c-ink);
+    font-size: 14px; line-height: 20px; letter-spacing: -0.28px;
+  }
+  .data-table tr:last-child td { border-bottom: 0; }
+  .data-table td.mono { font-family: var(--font-mono); font-size: 13px; color: var(--c-body); }
+  .status-pill {
+    display: inline-block; padding: 2px var(--sp-xs);
+    border-radius: var(--r-full); font-size: 12px; line-height: 16px;
+  }
+  .status-live { background: rgba(0,112,243,0.08); color: var(--c-link); }
+  .status-pending { background: var(--c-warning-soft); color: var(--c-warning-deep); }
+  .status-failed { background: var(--c-error-soft); color: var(--c-error-deep); }
+
+  /* ---------- Pricing ---------- */
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-lg); }
+  .pricing-card {
+    background: var(--c-canvas);
+    color: var(--c-ink);
+    padding: var(--sp-xl);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-4);
+  }
+  .pricing-card-featured {
+    background: var(--c-primary);
+    color: var(--c-on-primary);
+    padding: var(--sp-xl);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow-4);
+  }
+  .pricing-tier { margin: 0 0 var(--sp-xs); }
+  .pricing-price { margin: 0 0 var(--sp-lg); }
+  .pricing-price small { font-size: 16px; font-weight: 400; color: var(--c-body); letter-spacing: 0; }
+  .pricing-card-featured .pricing-price small { color: var(--c-hairline-strong); }
+  .pricing-features { list-style: none; padding: 0; margin: 0 0 var(--sp-xl); }
+  .pricing-features li {
+    display: flex; align-items: center; gap: var(--sp-xs);
+    padding: var(--sp-xs) 0;
+    font-size: 16px; line-height: 24px;
+    color: var(--c-body);
+    border-bottom: 1px solid var(--c-hairline);
+  }
+  .pricing-card-featured .pricing-features li { color: var(--c-hairline-strong); border-bottom-color: rgba(255,255,255,0.08); }
+  .pricing-features li::before {
+    content: "→"; color: var(--c-link); font-family: var(--font-mono); font-size: 13px;
+  }
+  .pricing-card-featured .pricing-features li::before { color: var(--c-cyan); }
+
+  /* ---------- Code editor mockup ---------- */
+  .code-editor-mockup {
+    background: var(--c-primary);
+    color: var(--c-on-primary);
+    padding: var(--sp-lg);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-4);
+    overflow: hidden;
+  }
+  .code-editor-mockup .code-head {
+    display: flex; gap: 6px; margin-bottom: var(--sp-md);
+  }
+  .code-editor-mockup .code-head span {
+    width: 10px; height: 10px; border-radius: var(--r-full); background: #333;
+  }
+  .code-block { font-family: var(--font-mono); font-size: 13px; line-height: 20px; color: var(--c-on-primary); }
+  .code-block .c-key { color: var(--c-cyan); }
+  .code-block .c-str { color: var(--g-ship-end); }
+  .code-block .c-com { color: var(--c-hairline-strong); }
+  .code-block .c-fn { color: var(--c-highlight-pink); }
+
+  /* ---------- Showcase dark band ---------- */
+  .showcase-dark-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-3xl);
+    align-items: center;
+    max-width: 1200px; margin: 0 auto;
+  }
+
+  /* ---------- Logo strip ---------- */
+  .logo-strip {
+    background: var(--c-canvas);
+    padding: var(--sp-lg) var(--sp-xl);
+    border-top: 1px solid var(--c-hairline);
+    border-bottom: 1px solid var(--c-hairline);
+  }
+  .logo-strip-inner {
+    display: flex; justify-content: space-around; align-items: center;
+    gap: var(--sp-xl); flex-wrap: wrap;
+    max-width: 1200px; margin: 0 auto;
+  }
+  .logo-strip svg, .logo-strip .logo-text {
+    height: 24px;
+    color: var(--c-body);
+    fill: currentColor;
+    opacity: 0.9;
+  }
+  .logo-text { font-size: 18px; font-weight: 600; letter-spacing: -0.5px; }
+
+  /* ---------- Template grid ---------- */
+  .template-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--sp-md);
+  }
+  .template-card {
+    background: var(--c-canvas);
+    padding: var(--sp-md);
+    border-radius: var(--r-md);
+    box-shadow: var(--shadow-2);
+  }
+  .template-thumb {
+    aspect-ratio: 16/9;
+    border-radius: var(--r-sm);
+    margin-bottom: var(--sp-md);
+    background-size: cover;
+    background-position: center;
+  }
+  .template-card h4 { margin: 0 0 var(--sp-xxs); color: var(--c-ink); }
+  .template-card p { margin: 0; color: var(--c-mute); }
+
+  /* ---------- Type ramp ---------- */
+  .type-ramp { display: flex; flex-direction: column; gap: var(--sp-lg); }
+  .type-row {
+    display: grid; grid-template-columns: 260px 1fr;
+    gap: var(--sp-lg); align-items: baseline;
+    padding-bottom: var(--sp-lg);
+    border-bottom: 1px solid var(--c-hairline);
+  }
+  .type-row:last-child { border-bottom: 0; }
+  .type-meta { color: var(--c-body); }
+  .type-meta .token { color: var(--c-ink); font-family: var(--font-mono); font-size: 13px; display: block; margin-bottom: 4px; }
+  .type-meta .specs { color: var(--c-mute); font-size: 12px; font-family: var(--font-mono); }
+
+  /* ---------- Palette ---------- */
+  .palette-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--sp-md);
+  }
+  .swatch {
+    background: var(--c-canvas);
+    border-radius: var(--r-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-2);
+  }
+  .swatch-color { height: 96px; }
+  .swatch-meta { padding: var(--sp-sm) var(--sp-md); }
+  .swatch-meta .name { color: var(--c-ink); font-weight: 500; margin-bottom: 2px; }
+  .swatch-meta .hex { color: var(--c-mute); font-family: var(--font-mono); font-size: 12px; }
+
+  .gradient-showcase {
+    margin-top: var(--sp-xl);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-2);
+  }
+  .gradient-mesh {
+    height: 200px;
+    background:
+      radial-gradient(circle at 10% 50%, var(--g-develop-start) 0%, transparent 35%),
+      radial-gradient(circle at 30% 30%, var(--g-develop-end) 0%, transparent 35%),
+      radial-gradient(circle at 55% 60%, var(--g-preview-start) 0%, transparent 35%),
+      radial-gradient(circle at 75% 30%, var(--g-preview-end) 0%, transparent 35%),
+      radial-gradient(circle at 90% 70%, var(--g-ship-start) 0%, transparent 35%),
+      radial-gradient(circle at 95% 30%, var(--g-ship-end) 0%, transparent 35%);
+    filter: saturate(1.05);
+  }
+  .gradient-stops {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    background: var(--c-canvas);
+  }
+  .gradient-pair { padding: var(--sp-md); border-right: 1px solid var(--c-hairline); }
+  .gradient-pair:last-child { border-right: 0; }
+  .gradient-pair-bar { height: 32px; border-radius: var(--r-sm); margin-bottom: var(--sp-xs); }
+  .gradient-pair .pair-name { color: var(--c-ink); font-weight: 500; margin-bottom: 2px; }
+  .gradient-pair .pair-stops { color: var(--c-mute); font-family: var(--font-mono); font-size: 12px; }
+
+  /* ---------- Radii showcase ---------- */
+  .radii-grid {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: var(--sp-md);
+  }
+  .radius-item { text-align: center; }
+  .radius-box {
+    width: 96px; height: 96px; margin: 0 auto var(--sp-sm);
+    background: var(--c-canvas);
+    border: 1px solid var(--c-hairline);
+    box-shadow: var(--shadow-2);
+  }
+  .radius-name { color: var(--c-ink); font-family: var(--font-mono); font-size: 13px; }
+  .radius-value { color: var(--c-mute); font-family: var(--font-mono); font-size: 12px; }
+
+  /* ---------- Spacing ---------- */
+  .spacing-list { display: flex; flex-direction: column; gap: var(--sp-sm); }
+  .spacing-row { display: grid; grid-template-columns: 180px 1fr 80px; gap: var(--sp-md); align-items: center; }
+  .spacing-token { font-family: var(--font-mono); font-size: 13px; color: var(--c-ink); }
+  .spacing-bar { height: 8px; background: var(--c-primary); border-radius: var(--r-xs); }
+  .spacing-value { font-family: var(--font-mono); font-size: 12px; color: var(--c-mute); text-align: right; }
+
+  /* ---------- Elevation showcase ---------- */
+  .elevation-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: var(--sp-md); }
+  .elev-card {
+    background: var(--c-canvas);
+    border-radius: var(--r-md);
+    padding: var(--sp-md);
+    min-height: 96px;
+  }
+  .elev-card .elev-name { color: var(--c-ink); font-weight: 500; margin-bottom: var(--sp-xxs); }
+  .elev-card .elev-desc { color: var(--c-mute); font-size: 12px; line-height: 16px; }
+  .elev-0 { box-shadow: none; }
+  .elev-1 { box-shadow: var(--shadow-1); }
+  .elev-2 { box-shadow: var(--shadow-2); }
+  .elev-3 { box-shadow: var(--shadow-3); }
+  .elev-4 { box-shadow: var(--shadow-4); }
+  .elev-5 { box-shadow: var(--shadow-5); }
+
+  /* ---------- Buttons gallery ---------- */
+  .btn-gallery { display: grid; grid-template-columns: repeat(3, auto); gap: var(--sp-lg); justify-content: start; align-items: center; }
+  .btn-gallery-row {
+    display: contents;
+  }
+  .btn-gallery-label {
+    font-family: var(--font-mono); font-size: 13px; color: var(--c-mute);
+    grid-column: 1 / -1;
+    margin-top: var(--sp-md);
+    padding-bottom: var(--sp-xs);
+    border-bottom: 1px solid var(--c-hairline);
+  }
+  .btn-gallery-label:first-child { margin-top: 0; }
+
+  /* ---------- Footer ---------- */
+  .footer {
+    background: var(--c-canvas);
+    color: var(--c-body);
+    padding: var(--sp-4xl) var(--sp-lg);
+    border-top: 1px solid var(--c-hairline);
+  }
+  .footer-inner {
+    max-width: var(--page-width); margin: 0 auto;
+    display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr; gap: var(--sp-xl);
+  }
+  .footer-brand-col .nav-logo { margin-bottom: var(--sp-md); }
+  .footer-brand-col p { color: var(--c-mute); margin: 0 0 var(--sp-md); font-size: 14px; line-height: 20px; }
+  .footer-col h4 {
+    font-family: var(--font-mono);
+    font-size: 12px; font-weight: 400; line-height: 16px;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    color: var(--c-mute);
+    margin: 0 0 var(--sp-md);
+  }
+  .footer-col ul { list-style: none; padding: 0; margin: 0; }
+  .footer-col li { margin-bottom: var(--sp-xs); }
+  .footer-col a { color: var(--c-body); font-size: 14px; line-height: 20px; letter-spacing: -0.28px; }
+  .footer-col a:hover { color: var(--c-ink); }
+  .footer-bottom {
+    max-width: var(--page-width); margin: var(--sp-3xl) auto 0;
+    padding-top: var(--sp-lg);
+    border-top: 1px solid var(--c-hairline);
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--c-mute); font-size: 12px;
+  }
+
+  /* ---------- Misc ---------- */
+  .badge-secondary {
+    display: inline-block;
+    background: var(--c-canvas-soft);
+    color: var(--c-body);
+    padding: 0 var(--sp-xs);
+    border-radius: var(--r-full);
+    font-size: 12px; line-height: 16px;
+    border: 1px solid var(--c-hairline);
+  }
+  .icon-button-circular {
+    width: 32px; height: 32px;
+    background: var(--c-canvas);
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-full);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--c-ink); cursor: pointer;
+  }
+
+  .link-inline { color: var(--c-link); }
+  .link-inline:hover { text-decoration: underline; color: var(--c-link-deep); }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1199px) {
+    .template-grid { grid-template-columns: repeat(3, 1fr); }
+    .radii-grid { grid-template-columns: repeat(5, 1fr); }
+    .palette-grid { grid-template-columns: repeat(4, 1fr); }
+    .elevation-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 959px) {
+    .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .showcase-dark-grid { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: repeat(2, 1fr); }
+    .template-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 599px) {
+    .nav-links { display: none; }
+    .grid-3 { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: 1fr; }
+    .hero-headline { font-size: 36px; line-height: 40px; letter-spacing: -1.6px; }
+    .template-grid { grid-template-columns: 1fr; }
+    .radii-grid { grid-template-columns: repeat(3, 1fr); }
+    .palette-grid { grid-template-columns: repeat(2, 1fr); }
+    .footer-inner { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .type-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<nav class="nav-bar">
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">
+      <svg width="22" height="20" viewBox="0 0 76 65" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M37.5274 0L75.0548 65H0L37.5274 0Z"/></svg>
+      <span>Vercel</span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-link" href="#">Products</a>
+      <a class="nav-link" href="#">Solutions</a>
+      <a class="nav-link" href="#">Resources</a>
+      <a class="nav-link" href="#">Enterprise</a>
+      <a class="nav-link" href="#">Docs</a>
+      <a class="nav-link" href="#">Pricing</a>
+    </div>
+    <div class="nav-cluster">
+      <button class="nav-cta-ask-ai">Ask AI</button>
+      <button class="nav-cta-login">Log In</button>
+      <button class="nav-cta-signup">Sign Up</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ BANNER ============ -->
+<div class="banner-row">
+  <div class="banner-marketing">
+    <span class="pill-tag">New</span>
+    <span>Introducing Vercel AI Gateway — unified API for every model.</span>
+    <span style="color: var(--c-mute);">→</span>
+  </div>
+</div>
+
+<!-- ============ HERO ============ -->
+<section class="hero-band">
+  <div class="hero-mesh"></div>
+  <div class="hero-inner">
+    <span class="hero-eyebrow t-caption-mono">v54.1.0 — May 2026</span>
+    <h1 class="hero-headline t-display-xl">Build and deploy on the AI Cloud.</h1>
+    <p class="hero-sub t-body-lg">Vercel provides the developer tools and cloud infrastructure to build, scale, and secure a faster, more personalized web.</p>
+    <div class="hero-cta-row">
+      <button class="btn btn-primary">Start Deploying</button>
+      <button class="btn btn-secondary">Get a Demo</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LOGO STRIP ============ -->
+<div class="logo-strip">
+  <div class="logo-strip-inner">
+    <span class="logo-text">Notion</span>
+    <span class="logo-text">Stripe</span>
+    <span class="logo-text">GitHub</span>
+    <span class="logo-text">Adobe</span>
+    <span class="logo-text">Loom</span>
+    <span class="logo-text">Ramp</span>
+    <span class="logo-text">Runway</span>
+  </div>
+</div>
+
+<!-- ============ TAB ROW ============ -->
+<div class="tab-row">
+  <button class="tab-ghost active">AI Apps</button>
+  <button class="tab-ghost">Web Apps</button>
+  <button class="tab-ghost">Ecommerce</button>
+  <button class="tab-ghost">Marketing</button>
+  <button class="tab-ghost">Platforms</button>
+</div>
+
+<!-- ============ FEATURE 3-UP ============ -->
+<section class="section section-soft">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-eyebrow t-caption-mono">// Frontend Cloud</div>
+      <h2 class="section-headline t-display-lg">Your frontend, delivered.</h2>
+      <p class="section-sub t-body-md">Vercel combines the best developer experience with an obsessive focus on end-user performance.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card-marketing">
+        <div class="card-eyebrow t-caption-mono">// 01 — Develop</div>
+        <h3 class="t-display-sm">Web Apps</h3>
+        <p class="t-body-md">Build apps with Next.js, SvelteKit, Nuxt, Astro, and more. Zero-config deploys for every framework.</p>
+        <a href="#" class="card-link t-body-sm-strong">Read more →</a>
+      </div>
+      <div class="card-marketing">
+        <div class="card-eyebrow t-caption-mono">// 02 — Preview</div>
+        <h3 class="t-display-sm">Composable Commerce</h3>
+        <p class="t-body-md">Ship faster with the most performant, scalable platform for ecommerce. Headless by default.</p>
+        <a href="#" class="card-link t-body-sm-strong">Read more →</a>
+      </div>
+      <div class="card-marketing">
+        <div class="card-eyebrow t-caption-mono">// 03 — Ship</div>
+        <h3 class="t-display-sm">Multi-tenant Platforms</h3>
+        <p class="t-body-md">Power thousands of customer sites with custom domains, edge config, and isolated tenant data.</p>
+        <a href="#" class="card-link t-body-sm-strong">Read more →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SHOWCASE DARK BAND ============ -->
+<section class="section section-dark">
+  <div class="container">
+    <div class="showcase-dark-grid">
+      <div>
+        <div class="section-eyebrow t-caption-mono">// Fluid Compute</div>
+        <h2 class="t-display-lg" style="margin: 0 0 var(--sp-md);">A compute model for all workloads.</h2>
+        <p class="t-body-lg" style="color:#a1a1a1; margin: 0 0 var(--sp-xl);">From milliseconds to minutes, Vercel Functions and Fluid Compute auto-scale instances across regions — without the cold-starts of legacy serverless.</p>
+        <div class="hero-cta-row" style="justify-content: flex-start;">
+          <button class="btn btn-secondary">Explore Compute</button>
+          <button class="btn btn-ghost-lg" style="color: var(--c-on-primary);">View Docs →</button>
+        </div>
+      </div>
+      <div class="code-editor-mockup">
+        <div class="code-head"><span></span><span></span><span></span></div>
+        <pre class="code-block" style="margin:0;"><span class="c-com">// app/api/route.ts</span>
+<span class="c-key">import</span> { <span class="c-fn">streamText</span> } <span class="c-key">from</span> <span class="c-str">'ai'</span>;
+<span class="c-key">import</span> { <span class="c-fn">gateway</span> } <span class="c-key">from</span> <span class="c-str">'@ai-sdk/gateway'</span>;
+
+<span class="c-key">export async function</span> <span class="c-fn">POST</span>(req) {
+  <span class="c-key">const</span> result = <span class="c-key">await</span> <span class="c-fn">streamText</span>({
+    model: <span class="c-str">'anthropic/claude-opus-4-7'</span>,
+    prompt: <span class="c-str">'Build me a landing page.'</span>,
+  });
+  <span class="c-key">return</span> result.toDataStreamResponse();
+}</pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TEMPLATES ============ -->
+<section class="section section-canvas">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-eyebrow t-caption-mono">// Templates</div>
+      <h2 class="section-headline t-display-lg">Deploy your first app in seconds.</h2>
+      <p class="section-sub t-body-md">Start from a template, customize, and ship to production in minutes.</p>
+    </div>
+    <div class="template-grid">
+      <div class="template-card">
+        <div class="template-thumb" style="background: linear-gradient(135deg, var(--g-develop-start), var(--g-develop-end));"></div>
+        <h4 class="t-body-md-strong">Next.js Starter</h4>
+        <p class="t-caption-mono">App Router · TypeScript</p>
+      </div>
+      <div class="template-card">
+        <div class="template-thumb" style="background: linear-gradient(135deg, var(--g-preview-start), var(--g-preview-end));"></div>
+        <h4 class="t-body-md-strong">AI Chatbot</h4>
+        <p class="t-caption-mono">AI SDK · Streaming</p>
+      </div>
+      <div class="template-card">
+        <div class="template-thumb" style="background: linear-gradient(135deg, var(--g-ship-start), var(--g-ship-end));"></div>
+        <h4 class="t-body-md-strong">Commerce</h4>
+        <p class="t-caption-mono">Shopify · Stripe</p>
+      </div>
+      <div class="template-card">
+        <div class="template-thumb" style="background: linear-gradient(135deg, var(--c-violet), var(--c-cyan));"></div>
+        <h4 class="t-body-md-strong">Platforms</h4>
+        <p class="t-caption-mono">Multi-tenant SaaS</p>
+      </div>
+      <div class="template-card">
+        <div class="template-thumb" style="background: linear-gradient(135deg, var(--c-highlight-pink), var(--g-ship-end));"></div>
+        <h4 class="t-body-md-strong">Portfolio</h4>
+        <p class="t-caption-mono">Markdown · MDX</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="section section-soft">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-eyebrow t-caption-mono">// Active CPU pricing</div>
+      <h2 class="section-headline t-display-lg">Engineered for trust.</h2>
+      <p class="section-sub t-body-md">Numbers from production workloads across the platform.</p>
+    </div>
+    <div class="stats-row">
+      <div class="stat-tile">
+        <div class="stat-label t-caption-mono">Deploys / Week</div>
+        <div class="stat-value t-display-lg">3.4M</div>
+        <div class="stat-delta t-body-sm-strong">↑ 12.4% vs Q1</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-label t-caption-mono">p99 Latency</div>
+        <div class="stat-value t-display-lg">38ms</div>
+        <div class="stat-delta t-body-sm-strong">↓ 4.1% MoM</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-label t-caption-mono">Uptime SLA</div>
+        <div class="stat-value t-display-lg">99.99%</div>
+        <div class="stat-delta t-body-sm-strong">Trailing 90 days</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-label t-caption-mono">Edge Regions</div>
+        <div class="stat-value t-display-lg">119</div>
+        <div class="stat-delta t-body-sm-strong">+ 6 new in 2026</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section class="section section-canvas">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-eyebrow t-caption-mono">// Plans</div>
+      <h2 class="section-headline t-display-lg">Active CPU pricing.</h2>
+      <p class="section-sub t-body-md">Pay for what you use — no surprises.</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <h3 class="pricing-tier t-display-md">Hobby</h3>
+        <p class="pricing-price t-display-xl">$0<small> /mo</small></p>
+        <ul class="pricing-features">
+          <li>100 GB bandwidth</li>
+          <li>Personal projects</li>
+          <li>Preview deployments</li>
+          <li>Community support</li>
+        </ul>
+        <button class="btn btn-secondary-md" style="width:100%;">Start free</button>
+      </div>
+      <div class="pricing-card-featured">
+        <h3 class="pricing-tier t-display-md">Pro</h3>
+        <p class="pricing-price t-display-xl">$20<small style="color:var(--c-hairline-strong);"> /mo</small></p>
+        <ul class="pricing-features">
+          <li>1 TB bandwidth</li>
+          <li>Fluid Compute</li>
+          <li>Team collaboration</li>
+          <li>Email + chat support</li>
+        </ul>
+        <button class="btn btn-secondary-md" style="width:100%;">Upgrade to Pro</button>
+      </div>
+      <div class="pricing-card">
+        <h3 class="pricing-tier t-display-md">Enterprise</h3>
+        <p class="pricing-price t-display-xl">Custom</p>
+        <ul class="pricing-features">
+          <li>Unlimited bandwidth</li>
+          <li>SAML SSO + RBAC</li>
+          <li>Custom regions</li>
+          <li>24/7 dedicated support</li>
+        </ul>
+        <button class="btn btn-primary-md" style="width:100%;">Contact Sales</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FORM ============ -->
+<section class="section section-soft">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-eyebrow t-caption-mono">// Get in touch</div>
+      <h2 class="section-headline t-display-lg">Talk to our team.</h2>
+      <p class="section-sub t-body-md">Tell us about your project and we'll respond within one business day.</p>
+    </div>
+    <div class="form-card">
+      <h3 class="t-display-md">Request a demo</h3>
+      <p class="form-sub t-body-md">Fields marked * are required.</p>
+      <div class="form-row">
+        <div class="form-field">
+          <label class="form-label">First name *</label>
+          <input class="form-input" type="text" placeholder="Ada">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Last name *</label>
+          <input class="form-input" type="text" placeholder="Lovelace">
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Work email *</label>
+        <input class="form-input-lg" type="email" placeholder="you@company.com">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Company size</label>
+        <input class="form-input-sm" type="text" value="51–200" readonly>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Tell us about your project</label>
+        <textarea class="form-textarea" placeholder="We're migrating from a legacy hosting provider to Vercel..."></textarea>
+      </div>
+      <div style="display:flex; gap: var(--sp-md); margin-top: var(--sp-md);">
+        <button class="btn btn-primary" style="flex:1;">Submit request</button>
+        <button class="btn btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TABLE ============ -->
+<section class="section section-canvas">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-eyebrow t-caption-mono">// Deployments</div>
+      <h2 class="section-headline t-display-lg">Activity, at a glance.</h2>
+      <p class="section-sub t-body-md">Live data from the deployment dashboard.</p>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Deployment</th>
+            <th>Environment</th>
+            <th>Status</th>
+            <th>Region</th>
+            <th>Duration</th>
+            <th>Commit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="t-body-sm-strong">acme-storefront</td>
+            <td>Production</td>
+            <td><span class="status-pill status-live">● Live</span></td>
+            <td class="mono">iad1</td>
+            <td class="mono">42s</td>
+            <td class="mono">a3f7c0b</td>
+          </tr>
+          <tr>
+            <td class="t-body-sm-strong">acme-docs</td>
+            <td>Preview</td>
+            <td><span class="status-pill status-pending">● Building</span></td>
+            <td class="mono">sfo1</td>
+            <td class="mono">1m 04s</td>
+            <td class="mono">9d2e418</td>
+          </tr>
+          <tr>
+            <td class="t-body-sm-strong">acme-platform</td>
+            <td>Production</td>
+            <td><span class="status-pill status-live">● Live</span></td>
+            <td class="mono">fra1</td>
+            <td class="mono">28s</td>
+            <td class="mono">b6cc9a2</td>
+          </tr>
+          <tr>
+            <td class="t-body-sm-strong">acme-admin</td>
+            <td>Preview</td>
+            <td><span class="status-pill status-failed">● Failed</span></td>
+            <td class="mono">hnd1</td>
+            <td class="mono">12s</td>
+            <td class="mono">e10f0d8</td>
+          </tr>
+          <tr>
+            <td class="t-body-sm-strong">acme-marketing</td>
+            <td>Production</td>
+            <td><span class="status-pill status-live">● Live</span></td>
+            <td class="mono">iad1</td>
+            <td class="mono">36s</td>
+            <td class="mono">7741bcd</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BUTTON GALLERY ============ -->
+<section class="section section-soft">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-eyebrow t-caption-mono">// Buttons</div>
+      <h2 class="section-headline t-display-lg">Button system.</h2>
+      <p class="section-sub t-body-md">Marketing pill (100px) and nav scale (6px) coexist deliberately.</p>
+    </div>
+    <div class="btn-gallery">
+      <div class="btn-gallery-label">// Primary · Marketing pill — 100px radius</div>
+      <button class="btn btn-primary">Start Deploying</button>
+      <button class="btn btn-primary-md">Deploy</button>
+      <button class="btn btn-primary-sm">Deploy</button>
+
+      <div class="btn-gallery-label">// Secondary · White pill — 100px radius</div>
+      <button class="btn btn-secondary">Get a Demo</button>
+      <button class="btn btn-secondary-md">Get demo</button>
+      <button class="btn btn-secondary-sm">Get demo</button>
+
+      <div class="btn-gallery-label">// Ghost · Transparent pill</div>
+      <button class="btn-ghost-lg">View Docs →</button>
+      <button class="btn-ghost-md">View Docs →</button>
+      <button class="btn-ghost-sm">View Docs →</button>
+    </div>
+
+    <div style="margin-top: var(--sp-3xl);">
+      <div class="section-eyebrow t-caption-mono">// Nav-scale buttons — 6px radius</div>
+      <div style="display:flex; gap: var(--sp-xs); align-items: center;">
+        <button class="nav-cta-ask-ai">Ask AI</button>
+        <button class="nav-cta-login">Log In</button>
+        <button class="nav-cta-signup">Sign Up</button>
+        <span class="icon-button-circular">?</span>
+        <span class="badge-secondary">New</span>
+        <span class="badge-secondary">Beta</span>
+        <span class="badge-secondary">Live</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TYPE RAMP ============ -->
+<section class="section section-canvas">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-eyebrow t-caption-mono">// Typography</div>
+      <h2 class="section-headline t-display-lg">Type ramp.</h2>
+      <p class="section-sub t-body-md">Negative tracking is part of the voice. Sentence-case, period-terminated.</p>
+    </div>
+    <div class="type-ramp">
+      <div class="type-row">
+        <div class="type-meta">
+          <span class="token">{typography.display-xl}</span>
+          <span class="specs">48 / 48 / 600 / -2.4px</span>
+        </div>
+        <div class="t-display-xl">Build and deploy on the AI Cloud.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <span class="token">{typography.display-lg}</span>
+          <span class="specs">32 / 40 / 600 / -1.28px</span>
+        </div>
+        <div class="t-display-lg">Your frontend, delivered.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <span class="token">{typography.display-md}</span>
+          <span class="specs">24 / 32 / 600 / -0.96px</span>
+        </div>
+        <div class="t-display-md">A compute model for all workloads.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <span class="token">{typography.display-sm}</span>
+          <span class="specs">20 / 28 / 600 / -0.6px</span>
+        </div>
+        <div class="t-display-sm">Inline display micro-heading.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <span class="token">{typography.body-lg}</span>
+          <span class="specs">18 / 28 / 400 / 0</span>
+        </div>
+        <div class="t-body-lg">Vercel provides the developer tools and cloud infrastructure to build, scale, and secure a faster, more personalized web.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <span class="token">{typography.body-md}</span>
+          <span class="specs">16 / 24 / 400 / 0</span>
+        </div>
+        <div class="t-body-md">Default body paragraph used across marketing surfaces and inside cards.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <span class="token">{typography.body-md-strong}</span>
+          <span class="specs">16 / 24 / 500 / 0</span>
+        </div>
+        <div class="t-body-md-strong">Bolded inline body for emphasized terms.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <span class="token">{typography.body-sm}</span>
+          <span class="specs">14 / 20 / 400 / -0.28px</span>
+        </div>
+        <div class="t-body-sm">Secondary body, nav links, table-row text.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <span class="token">{typography.body-sm-strong}</span>
+          <span class="specs">14 / 20 / 500 / -0.28px</span>
+        </div>
+        <div class="t-body-sm-strong">Nav CTA labels and table-row emphasis.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <span class="token">{typography.caption}</span>
+          <span class="specs">12 / 16 / 400 / 0</span>
+        </div>
+        <div class="t-caption">Footer secondary line · badge labels.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <span class="token">{typography.caption-mono}</span>
+          <span class="specs">12 / 16 / 400 / 0 · mono</span>
+        </div>
+        <div class="t-caption-mono">// SECTION EYEBROW · TECHNICAL VOICE</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <span class="token">{typography.code}</span>
+          <span class="specs">13 / 20 / 400 / 0 · mono</span>
+        </div>
+        <div class="t-code">const result = await deploy({ region: 'iad1' });</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <span class="token">{typography.button-md}</span>
+          <span class="specs">14 / 20 / 500 / 0</span>
+        </div>
+        <div class="t-button-md">Sign Up · Log In · Ask AI</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <span class="token">{typography.button-lg}</span>
+          <span class="specs">16 / 24 / 500 / 0</span>
+        </div>
+        <div class="t-button-lg">Start Deploying · Get a Demo</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PALETTE ============ -->
+<section class="section section-soft">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-eyebrow t-caption-mono">// Color tokens</div>
+      <h2 class="section-headline t-display-lg">The palette.</h2>
+      <p class="section-sub t-body-md">Ink + gray scale + four-pair gradient. No sixth accent.</p>
+    </div>
+    <div class="palette-grid">
+      <div class="swatch"><div class="swatch-color" style="background:#171717;"></div><div class="swatch-meta"><div class="name">Ink / Primary</div><div class="hex">#171717</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#50e3c2;"></div><div class="swatch-meta"><div class="name">Cyan</div><div class="hex">#50e3c2</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#ff0080;"></div><div class="swatch-meta"><div class="name">Highlight Pink</div><div class="hex">#ff0080</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#7928ca;"></div><div class="swatch-meta"><div class="name">Violet</div><div class="hex">#7928ca</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#0070f3;"></div><div class="swatch-meta"><div class="name">Link Blue</div><div class="hex">#0070f3</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#ffffff; border-bottom:1px solid var(--c-hairline);"></div><div class="swatch-meta"><div class="name">Canvas</div><div class="hex">#ffffff</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#fafafa;"></div><div class="swatch-meta"><div class="name">Canvas Soft</div><div class="hex">#fafafa</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#f5f5f5;"></div><div class="swatch-meta"><div class="name">Canvas Soft 2</div><div class="hex">#f5f5f5</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#ebebeb;"></div><div class="swatch-meta"><div class="name">Hairline</div><div class="hex">#ebebeb</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#a1a1a1;"></div><div class="swatch-meta"><div class="name">Hairline Strong</div><div class="hex">#a1a1a1</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#4d4d4d;"></div><div class="swatch-meta"><div class="name">Body</div><div class="hex">#4d4d4d</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#888888;"></div><div class="swatch-meta"><div class="name">Mute</div><div class="hex">#888888</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#0070f3;"></div><div class="swatch-meta"><div class="name">Success / Link</div><div class="hex">#0070f3</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#0761d1;"></div><div class="swatch-meta"><div class="name">Link Deep</div><div class="hex">#0761d1</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#d3e5ff;"></div><div class="swatch-meta"><div class="name">Link Bg Soft</div><div class="hex">#d3e5ff</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#ee0000;"></div><div class="swatch-meta"><div class="name">Error</div><div class="hex">#ee0000</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#f7d4d6;"></div><div class="swatch-meta"><div class="name">Error Soft</div><div class="hex">#f7d4d6</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#c50000;"></div><div class="swatch-meta"><div class="name">Error Deep</div><div class="hex">#c50000</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#f5a623;"></div><div class="swatch-meta"><div class="name">Warning</div><div class="hex">#f5a623</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#ffefcf;"></div><div class="swatch-meta"><div class="name">Warning Soft</div><div class="hex">#ffefcf</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#ab570a;"></div><div class="swatch-meta"><div class="name">Warning Deep</div><div class="hex">#ab570a</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#007cf0;"></div><div class="swatch-meta"><div class="name">Develop Start</div><div class="hex">#007cf0</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#00dfd8;"></div><div class="swatch-meta"><div class="name">Develop End</div><div class="hex">#00dfd8</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#ff4d4d;"></div><div class="swatch-meta"><div class="name">Ship Start</div><div class="hex">#ff4d4d</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#f9cb28;"></div><div class="swatch-meta"><div class="name">Ship End</div><div class="hex">#f9cb28</div></div></div>
+    </div>
+
+    <div class="gradient-showcase">
+      <div class="gradient-mesh"></div>
+      <div class="gradient-stops">
+        <div class="gradient-pair">
+          <div class="gradient-pair-bar" style="background: linear-gradient(90deg, var(--g-develop-start), var(--g-develop-end));"></div>
+          <div class="pair-name t-body-md-strong">Develop</div>
+          <div class="pair-stops">#007cf0 → #00dfd8</div>
+        </div>
+        <div class="gradient-pair">
+          <div class="gradient-pair-bar" style="background: linear-gradient(90deg, var(--g-preview-start), var(--g-preview-end));"></div>
+          <div class="pair-name t-body-md-strong">Preview</div>
+          <div class="pair-stops">#7928ca → #ff0080</div>
+        </div>
+        <div class="gradient-pair">
+          <div class="gradient-pair-bar" style="background: linear-gradient(90deg, var(--g-ship-start), var(--g-ship-end));"></div>
+          <div class="pair-name t-body-md-strong">Ship</div>
+          <div class="pair-stops">#ff4d4d → #f9cb28</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RADII ============ -->
+<section class="section section-canvas">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-eyebrow t-caption-mono">// Radii</div>
+      <h2 class="section-headline t-display-lg">Border radius scale.</h2>
+      <p class="section-sub t-body-md">Two pill scales coexist: 100px marketing, 6px nav.</p>
+    </div>
+    <div class="radii-grid">
+      <div class="radius-item"><div class="radius-box" style="border-radius: var(--r-none);"></div><div class="radius-name">none</div><div class="radius-value">0px</div></div>
+      <div class="radius-item"><div class="radius-box" style="border-radius: var(--r-xs);"></div><div class="radius-name">xs</div><div class="radius-value">4px</div></div>
+      <div class="radius-item"><div class="radius-box" style="border-radius: var(--r-sm);"></div><div class="radius-name">sm</div><div class="radius-value">6px</div></div>
+      <div class="radius-item"><div class="radius-box" style="border-radius: var(--r-md);"></div><div class="radius-name">md</div><div class="radius-value">8px</div></div>
+      <div class="radius-item"><div class="radius-box" style="border-radius: var(--r-lg);"></div><div class="radius-name">lg</div><div class="radius-value">12px</div></div>
+      <div class="radius-item"><div class="radius-box" style="border-radius: var(--r-xl);"></div><div class="radius-name">xl</div><div class="radius-value">16px</div></div>
+      <div class="radius-item"><div class="radius-box" style="border-radius: var(--r-pill-sm);"></div><div class="radius-name">pill-sm</div><div class="radius-value">64px</div></div>
+      <div class="radius-item"><div class="radius-box" style="border-radius: var(--r-pill);"></div><div class="radius-name">pill</div><div class="radius-value">100px</div></div>
+      <div class="radius-item"><div class="radius-box" style="border-radius: var(--r-full);"></div><div class="radius-name">full</div><div class="radius-value">9999px</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SPACING ============ -->
+<section class="section section-soft">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-eyebrow t-caption-mono">// Spacing</div>
+      <h2 class="section-headline t-display-lg">Spacing rhythm.</h2>
+      <p class="section-sub t-body-md">Base unit 4px. Every spacing token is a multiple of 4.</p>
+    </div>
+    <div class="spacing-list">
+      <div class="spacing-row"><div class="spacing-token">{spacing.xxs}</div><div><div class="spacing-bar" style="width:4px;"></div></div><div class="spacing-value">4px</div></div>
+      <div class="spacing-row"><div class="spacing-token">{spacing.xs}</div><div><div class="spacing-bar" style="width:8px;"></div></div><div class="spacing-value">8px</div></div>
+      <div class="spacing-row"><div class="spacing-token">{spacing.sm}</div><div><div class="spacing-bar" style="width:12px;"></div></div><div class="spacing-value">12px</div></div>
+      <div class="spacing-row"><div class="spacing-token">{spacing.md}</div><div><div class="spacing-bar" style="width:16px;"></div></div><div class="spacing-value">16px</div></div>
+      <div class="spacing-row"><div class="spacing-token">{spacing.lg}</div><div><div class="spacing-bar" style="width:24px;"></div></div><div class="spacing-value">24px</div></div>
+      <div class="spacing-row"><div class="spacing-token">{spacing.xl}</div><div><div class="spacing-bar" style="width:32px;"></div></div><div class="spacing-value">32px</div></div>
+      <div class="spacing-row"><div class="spacing-token">{spacing.2xl}</div><div><div class="spacing-bar" style="width:40px;"></div></div><div class="spacing-value">40px</div></div>
+      <div class="spacing-row"><div class="spacing-token">{spacing.3xl}</div><div><div class="spacing-bar" style="width:48px;"></div></div><div class="spacing-value">48px</div></div>
+      <div class="spacing-row"><div class="spacing-token">{spacing.4xl}</div><div><div class="spacing-bar" style="width:64px;"></div></div><div class="spacing-value">64px</div></div>
+      <div class="spacing-row"><div class="spacing-token">{spacing.5xl}</div><div><div class="spacing-bar" style="width:96px;"></div></div><div class="spacing-value">96px</div></div>
+      <div class="spacing-row"><div class="spacing-token">{spacing.6xl}</div><div><div class="spacing-bar" style="width:128px;"></div></div><div class="spacing-value">128px</div></div>
+      <div class="spacing-row"><div class="spacing-token">{spacing.section}</div><div><div class="spacing-bar" style="width:192px;"></div></div><div class="spacing-value">192px</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ELEVATION ============ -->
+<section class="section section-canvas">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-eyebrow t-caption-mono">// Elevation</div>
+      <h2 class="section-headline t-display-lg">Stacked shadows, not heavy drops.</h2>
+      <p class="section-sub t-body-md">Inset hairline + multiple small offsets. The brand's elevation is calmer than Material.</p>
+    </div>
+    <div class="elevation-grid">
+      <div class="elev-card elev-0"><div class="elev-name">Level 0</div><div class="elev-desc">Flat — full-bleed bands</div></div>
+      <div class="elev-card elev-1"><div class="elev-name">Level 1</div><div class="elev-desc">Inset hairline ring</div></div>
+      <div class="elev-card elev-2"><div class="elev-name">Level 2</div><div class="elev-desc">Subtle drop + hairline</div></div>
+      <div class="elev-card elev-3"><div class="elev-name">Level 3</div><div class="elev-desc">Soft stack — feature cards</div></div>
+      <div class="elev-card elev-4"><div class="elev-name">Level 4</div><div class="elev-desc">Float stack — pricing</div></div>
+      <div class="elev-card elev-5"><div class="elev-name">Level 5</div><div class="elev-desc">Modal / dialog surfaces</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand-col">
+      <a class="nav-logo" href="#">
+        <svg width="22" height="20" viewBox="0 0 76 65" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M37.5274 0L75.0548 65H0L37.5274 0Z"/></svg>
+        <span>Vercel</span>
+      </a>
+      <p>The frontend cloud — develop, preview, ship.</p>
+      <div style="display:flex; gap: var(--sp-xs);">
+        <span class="icon-button-circular">→</span>
+        <span class="icon-button-circular">↗</span>
+        <span class="icon-button-circular">?</span>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>// Products</h4>
+      <ul>
+        <li><a href="#">AI Gateway</a></li>
+        <li><a href="#">Functions</a></li>
+        <li><a href="#">Sandbox</a></li>
+        <li><a href="#">Workflow</a></li>
+        <li><a href="#">Storage</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>// Resources</h4>
+      <ul>
+        <li><a href="#">Documentation</a></li>
+        <li><a href="#">Guides</a></li>
+        <li><a href="#">Templates</a></li>
+        <li><a href="#">Changelog</a></li>
+        <li><a href="#">Examples</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>// Company</h4>
+      <ul>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Customers</a></li>
+        <li><a href="#">Blog</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>// Legal</h4>
+      <ul>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Cookie Policy</a></li>
+        <li><a href="#">DPA</a></li>
+        <li><a href="#">Acceptable Use</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="t-caption">© 2026 Vercel Inc. All rights reserved.</span>
+    <span class="t-caption-mono">v54.1.0 · iad1</span>
+  </div>
+</footer>
+
+</body>
+</html>

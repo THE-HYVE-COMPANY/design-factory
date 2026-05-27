@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>xAI — Design System Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Universal Sans is proprietary; substituting with Inter weight 400 per design.md note -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Brand & Accent */
+    --primary: #ffffff;
+    --accent-sunset: #ff7a17;
+    --accent-sunset-soft: #ffc285;
+    --accent-dusk: #7c3aed;
+    --accent-twilight: #c4b5fd;
+    --accent-breeze: #a0c3ec;
+    --accent-midnight: #0d1726;
+
+    /* Surface */
+    --canvas: #0a0a0a;
+    --canvas-soft: #1a1c20;
+    --canvas-card: #191919;
+    --canvas-mid: #363a3f;
+    --hairline: #212327;
+
+    /* Text */
+    --ink: #ffffff;
+    --ink-hover: #fafaf7;
+    --body: #dadbdf;
+    --body-mid: #7d8187;
+
+    /* Spacing */
+    --space-xxs: 2px;
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 12px;
+    --space-lg: 16px;
+    --space-xl: 24px;
+    --space-2xl: 32px;
+    --space-3xl: 48px;
+    --space-4xl: 64px;
+
+    /* Radius */
+    --r-none: 0px;
+    --r-sm: 8px;
+    --r-pill: 9999px;
+    --r-full: 9999px;
+
+    /* Translucent white for outline pill */
+    --outline-border: rgba(255, 255, 255, 0.25);
+
+    --font-display: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'Geist Mono', ui-monospace, 'JetBrains Mono', 'IBM Plex Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body { min-height: 100vh; }
+
+  .container { max-width: 1200px; margin: 0 auto; padding-left: var(--space-xl); padding-right: var(--space-xl); }
+
+  /* Typography tokens */
+  .display-xl { font-family: var(--font-display); font-weight: 400; font-size: 96px; line-height: 96px; letter-spacing: -2.4px; }
+  .display-lg { font-family: var(--font-display); font-weight: 400; font-size: 72px; line-height: 72px; letter-spacing: -1.8px; }
+  .display-md { font-family: var(--font-display); font-weight: 400; font-size: 48px; line-height: 48px; letter-spacing: -1.2px; }
+  .display-sm { font-family: var(--font-display); font-weight: 400; font-size: 32px; line-height: 36px; letter-spacing: -0.6px; }
+  .display-xs { font-family: var(--font-display); font-weight: 400; font-size: 20px; line-height: 28px; letter-spacing: 0; }
+  .body-lg { font-family: var(--font-display); font-weight: 400; font-size: 18px; line-height: 28px; letter-spacing: 0; }
+  .body-md { font-family: var(--font-display); font-weight: 400; font-size: 16px; line-height: 24px; letter-spacing: 0; }
+  .body-sm { font-family: var(--font-display); font-weight: 400; font-size: 14px; line-height: 20px; letter-spacing: 0; }
+  .caption-mono { font-family: var(--font-mono); font-weight: 400; font-size: 14px; line-height: 20px; letter-spacing: 1.4px; text-transform: uppercase; }
+  .caption-mono-sm { font-family: var(--font-mono); font-weight: 400; font-size: 12px; line-height: 16px; letter-spacing: 1.2px; text-transform: uppercase; }
+  .button-md { font-family: var(--font-display); font-weight: 400; font-size: 14px; line-height: 20px; letter-spacing: 0; }
+
+  /* Divider */
+  .divider-hairline { border: 0; border-top: 1px solid var(--hairline); margin: 0; }
+
+  /* Nav */
+  .nav-bar {
+    background: var(--canvas);
+    color: var(--ink);
+    padding: var(--space-md) var(--space-xl);
+    border-bottom: 1px solid var(--hairline);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+  .nav-logo {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 20px;
+    letter-spacing: -0.6px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: var(--space-xl); align-items: center; }
+  .nav-link {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .nav-ctas { display: flex; gap: var(--space-sm); align-items: center; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    letter-spacing: 0;
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--r-pill);
+    border: 1px solid var(--outline-border);
+    background: transparent;
+    color: var(--ink);
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: #0a0a0a;
+    border: 1px solid var(--primary);
+  }
+  .btn-outline {
+    background: rgba(0,0,0,0);
+    color: var(--ink);
+    border: 1px solid var(--outline-border);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid transparent;
+  }
+
+  /* Sizes — keeping the pill shape constant per brand */
+  .btn-sm { padding: var(--space-xxs) var(--space-sm); font-size: 12px; line-height: 16px; }
+  .btn-md { padding: var(--space-xs) var(--space-md); font-size: 14px; line-height: 20px; }
+  .btn-lg { padding: var(--space-sm) var(--space-lg); font-size: 14px; line-height: 20px; }
+
+  /* Hero */
+  .hero-band {
+    background: var(--canvas);
+    color: var(--ink);
+    padding: var(--space-4xl) var(--space-xl);
+  }
+  .hero-inner { max-width: 1200px; margin: 0 auto; }
+  .hero-eyebrow { color: var(--ink); margin-bottom: var(--space-xl); }
+  .hero-headline { margin-bottom: var(--space-xl); max-width: 1100px; }
+  .hero-sub { color: var(--body); max-width: 720px; margin-bottom: var(--space-2xl); }
+  .hero-ctas { display: flex; gap: var(--space-sm); flex-wrap: wrap; }
+
+  /* Content band */
+  .content-band {
+    background: var(--canvas);
+    color: var(--ink);
+    padding: var(--space-4xl) var(--space-xl);
+  }
+  .content-inner { max-width: 1200px; margin: 0 auto; }
+  .section-eyebrow { color: var(--ink); margin-bottom: var(--space-lg); }
+  .section-headline { margin-bottom: var(--space-2xl); }
+
+  /* Button gallery grid */
+  .button-gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); max-width: 760px; }
+  .button-cell { display: flex; flex-direction: column; gap: var(--space-sm); }
+  .button-cell-label { color: var(--body-mid); }
+
+  /* Cards */
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); }
+  .card-content {
+    background: var(--canvas-card);
+    color: var(--ink);
+    border: 1px solid var(--hairline);
+    padding: var(--space-xl);
+    border-radius: var(--r-sm);
+  }
+  .card-feature .card-illo {
+    background: var(--accent-midnight);
+    border-radius: var(--r-sm);
+    height: 160px;
+    margin-bottom: var(--space-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .card-title { margin-bottom: var(--space-md); }
+  .card-body { color: var(--body); margin-bottom: var(--space-lg); }
+
+  /* Form */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+    max-width: 720px;
+  }
+  .field { display: flex; flex-direction: column; gap: var(--space-sm); }
+  .field-full { grid-column: 1 / -1; }
+  .field-label { color: var(--ink); }
+  .text-input {
+    background: var(--canvas-soft);
+    color: var(--ink);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-sm);
+    padding: var(--space-md) var(--space-lg);
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+    outline: none;
+    width: 100%;
+  }
+  .text-input::placeholder { color: var(--body-mid); }
+  textarea.text-input { min-height: 96px; resize: vertical; font-family: var(--font-display); }
+
+  /* Stats */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-lg); }
+  .stat-tile {
+    background: var(--canvas-card);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-sm);
+    padding: var(--space-xl);
+  }
+  .stat-eyebrow { color: var(--body-mid); margin-bottom: var(--space-md); }
+  .stat-value { font-family: var(--font-display); font-weight: 400; font-size: 48px; line-height: 48px; letter-spacing: -1.2px; color: var(--ink); margin-bottom: var(--space-sm); }
+  .stat-meta { color: var(--body); }
+
+  /* Table */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--canvas);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-sm);
+    overflow: hidden;
+  }
+  .data-table thead th {
+    background: var(--canvas-soft);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    padding: var(--space-md) var(--space-lg);
+    text-align: left;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .data-table tbody td {
+    color: var(--body);
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .data-table tbody tr:last-child td { border-bottom: 0; }
+
+  /* Type ramp */
+  .ramp-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: var(--space-2xl);
+    padding: var(--space-xl) 0;
+    border-bottom: 1px solid var(--hairline);
+    align-items: baseline;
+  }
+  .ramp-row:last-child { border-bottom: 0; }
+  .ramp-meta { color: var(--body-mid); }
+  .ramp-token { color: var(--ink); margin-bottom: var(--space-xs); }
+  .ramp-spec { color: var(--body-mid); }
+
+  /* Palette */
+  .palette-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-lg); }
+  .swatch {
+    background: var(--canvas-card);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-sm);
+    overflow: hidden;
+  }
+  .swatch-chip { height: 96px; border-bottom: 1px solid var(--hairline); }
+  .swatch-meta { padding: var(--space-md) var(--space-lg); }
+  .swatch-name { color: var(--ink); margin-bottom: var(--space-xxs); }
+  .swatch-hex { color: var(--body-mid); }
+
+  /* Radii showcase */
+  .radii-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-lg); }
+  .radius-cell { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-md); }
+  .radius-box {
+    width: 96px;
+    height: 96px;
+    background: var(--canvas-card);
+    border: 1px solid var(--hairline);
+  }
+  .radius-label { color: var(--ink); }
+  .radius-meta { color: var(--body-mid); }
+
+  /* Spacing rhythm */
+  .spacing-row { display: flex; align-items: center; gap: var(--space-lg); padding: var(--space-sm) 0; }
+  .spacing-label { width: 140px; color: var(--body); }
+  .spacing-bar { background: var(--ink); height: 12px; }
+  .spacing-meta { color: var(--body-mid); margin-left: var(--space-md); }
+
+  /* Footer */
+  .footer {
+    background: var(--canvas);
+    color: var(--body);
+    padding: var(--space-3xl) var(--space-xl);
+    border-top: 1px solid var(--hairline);
+  }
+  .footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: var(--space-2xl); }
+  .footer-col-title { color: var(--ink); margin-bottom: var(--space-lg); }
+  .footer-link { display: block; color: var(--body); text-decoration: none; padding: var(--space-xxs) 0; }
+  .footer-bottom {
+    max-width: 1200px;
+    margin: var(--space-2xl) auto 0;
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--hairline);
+    display: flex;
+    justify-content: space-between;
+    color: var(--body-mid);
+  }
+
+  /* Pricing tier examples */
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-lg); }
+  .pricing-tier {
+    background: var(--canvas-card);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r-sm);
+    padding: var(--space-xl);
+    color: var(--ink);
+  }
+  .pricing-tier-featured {
+    background: var(--ink);
+    color: var(--canvas);
+    border: 1px solid var(--ink);
+    border-radius: var(--r-sm);
+    padding: var(--space-xl);
+  }
+  .pricing-tier-featured .price { color: var(--canvas); }
+  .pricing-tier-featured .pricing-body { color: #2a2a2a; }
+  .price { font-family: var(--font-display); font-weight: 400; font-size: 48px; line-height: 48px; letter-spacing: -1.2px; margin: var(--space-md) 0; }
+  .pricing-body { color: var(--body); margin-bottom: var(--space-lg); }
+  .pricing-tier-featured .btn { background: var(--canvas); color: var(--ink); border: 1px solid var(--canvas); }
+
+  @media (max-width: 768px) {
+    .hero-headline { font-size: 48px; line-height: 48px; letter-spacing: -1.2px; }
+    .nav-links { display: none; }
+    .button-gallery { grid-template-columns: 1fr; }
+    .card-grid { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .palette-grid { grid-template-columns: repeat(2, 1fr); }
+    .radii-grid { grid-template-columns: repeat(2, 1fr); }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav-bar">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">xAI</a>
+      <div class="nav-links">
+        <a href="#" class="nav-link">Grok</a>
+        <a href="#" class="nav-link">API</a>
+        <a href="#" class="nav-link">Company</a>
+        <a href="#" class="nav-link">Colossus</a>
+        <a href="#" class="nav-link">Careers</a>
+        <a href="#" class="nav-link">News</a>
+      </div>
+      <div class="nav-ctas">
+        <a href="#" class="btn btn-outline btn-md">Try Grok</a>
+        <a href="#" class="btn btn-primary btn-md">Sign up now</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero-band">
+    <div class="hero-inner">
+      <div class="hero-eyebrow caption-mono">Announcement / May 2026</div>
+      <h1 class="hero-headline display-xl">Understand the universe.</h1>
+      <p class="hero-sub body-lg">xAI is a frontier AI lab building general-purpose intelligence to accelerate scientific discovery. Our latest model, Grok, is now available to everyone.</p>
+      <div class="hero-ctas">
+        <a href="#" class="btn btn-outline btn-md">Try Grok</a>
+        <a href="#" class="btn btn-outline btn-md">Read announcement</a>
+        <a href="#" class="btn btn-outline btn-md">View API</a>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider-hairline">
+
+  <!-- BUTTONS GALLERY -->
+  <section class="content-band">
+    <div class="content-inner">
+      <div class="section-eyebrow caption-mono">001 / Buttons</div>
+      <h2 class="section-headline display-md">A single pill, three weights.</h2>
+
+      <div class="button-gallery">
+        <div class="button-cell">
+          <div class="button-cell-label caption-mono-sm">Primary / SM</div>
+          <div><a href="#" class="btn btn-primary btn-sm">Sign up now</a></div>
+        </div>
+        <div class="button-cell">
+          <div class="button-cell-label caption-mono-sm">Primary / MD</div>
+          <div><a href="#" class="btn btn-primary btn-md">Sign up now</a></div>
+        </div>
+        <div class="button-cell">
+          <div class="button-cell-label caption-mono-sm">Primary / LG</div>
+          <div><a href="#" class="btn btn-primary btn-lg">Sign up now</a></div>
+        </div>
+
+        <div class="button-cell">
+          <div class="button-cell-label caption-mono-sm">Outline / SM</div>
+          <div><a href="#" class="btn btn-outline btn-sm">Try Grok</a></div>
+        </div>
+        <div class="button-cell">
+          <div class="button-cell-label caption-mono-sm">Outline / MD</div>
+          <div><a href="#" class="btn btn-outline btn-md">Try Grok</a></div>
+        </div>
+        <div class="button-cell">
+          <div class="button-cell-label caption-mono-sm">Outline / LG</div>
+          <div><a href="#" class="btn btn-outline btn-lg">Try Grok</a></div>
+        </div>
+
+        <div class="button-cell">
+          <div class="button-cell-label caption-mono-sm">Ghost / SM</div>
+          <div><a href="#" class="btn btn-ghost btn-sm">Read more</a></div>
+        </div>
+        <div class="button-cell">
+          <div class="button-cell-label caption-mono-sm">Ghost / MD</div>
+          <div><a href="#" class="btn btn-ghost btn-md">Read more</a></div>
+        </div>
+        <div class="button-cell">
+          <div class="button-cell-label caption-mono-sm">Ghost / LG</div>
+          <div><a href="#" class="btn btn-ghost btn-lg">Read more</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider-hairline">
+
+  <!-- FORM -->
+  <section class="content-band">
+    <div class="content-inner">
+      <div class="section-eyebrow caption-mono">002 / Form</div>
+      <h2 class="section-headline display-md">Request access.</h2>
+
+      <form class="form-grid" onsubmit="return false;">
+        <div class="field">
+          <label class="field-label body-sm" for="name">Name</label>
+          <input id="name" class="text-input" type="text" placeholder="Ada Lovelace">
+        </div>
+        <div class="field">
+          <label class="field-label body-sm" for="email">Email</label>
+          <input id="email" class="text-input" type="email" placeholder="ada@xai.com">
+        </div>
+        <div class="field field-full">
+          <label class="field-label body-sm" for="org">Organization</label>
+          <input id="org" class="text-input" type="text" placeholder="Frontier Research Lab">
+        </div>
+        <div class="field field-full">
+          <label class="field-label body-sm" for="msg">What are you building?</label>
+          <textarea id="msg" class="text-input" placeholder="Tell us about your project."></textarea>
+        </div>
+        <div class="field-full">
+          <a href="#" class="btn btn-outline btn-md">Submit request</a>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <hr class="divider-hairline">
+
+  <!-- CARDS -->
+  <section class="content-band">
+    <div class="content-inner">
+      <div class="section-eyebrow caption-mono">003 / Products</div>
+      <h2 class="section-headline display-md">Our work.</h2>
+
+      <div class="card-grid">
+        <article class="card-content card-feature">
+          <div class="card-illo">
+            <svg viewBox="0 0 240 120" width="240" height="120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="80" cy="60" r="40" fill="#ff7a17"/>
+              <circle cx="160" cy="60" r="40" fill="#7c3aed" opacity="0.85"/>
+            </svg>
+          </div>
+          <h3 class="card-title display-sm">Grok</h3>
+          <p class="card-body body-md">An AI assistant with real-time knowledge, designed to answer almost anything and suggest what questions to ask next.</p>
+          <a href="#" class="btn btn-outline btn-sm">Read</a>
+        </article>
+
+        <article class="card-content card-feature">
+          <div class="card-illo" style="background: #0d1726;">
+            <svg viewBox="0 0 240 120" width="240" height="120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect x="20" y="40" width="200" height="6" fill="#a0c3ec" rx="3"/>
+              <rect x="20" y="56" width="160" height="6" fill="#c4b5fd" rx="3"/>
+              <rect x="20" y="72" width="120" height="6" fill="#ffc285" rx="3"/>
+            </svg>
+          </div>
+          <h3 class="card-title display-sm">Voices</h3>
+          <p class="card-body body-md">Custom Voices brings expressive, low-latency speech models to product teams shipping conversational interfaces at scale.</p>
+          <a href="#" class="btn btn-outline btn-sm">Read</a>
+        </article>
+
+        <article class="card-content card-feature">
+          <div class="card-illo" style="background: #191919;">
+            <svg viewBox="0 0 240 120" width="240" height="120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect x="20" y="20" width="200" height="80" rx="8" fill="none" stroke="#ffffff" stroke-opacity="0.35"/>
+              <text x="36" y="50" font-family="ui-monospace, monospace" font-size="11" fill="#dadbdf">$ curl api.x.ai/v1</text>
+              <text x="36" y="72" font-family="ui-monospace, monospace" font-size="11" fill="#7d8187">→ 200 OK</text>
+            </svg>
+          </div>
+          <h3 class="card-title display-sm">API</h3>
+          <p class="card-body body-md">Build with Grok directly. The xAI API exposes the same models we use internally, with predictable pricing and high throughput.</p>
+          <a href="#" class="btn btn-outline btn-sm">Read</a>
+        </article>
+
+        <article class="card-content card-feature">
+          <div class="card-illo" style="background: #0d1726;">
+            <svg viewBox="0 0 240 120" width="240" height="120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M40 90 Q120 20 200 90" stroke="#c4b5fd" stroke-width="2" fill="none"/>
+              <circle cx="40" cy="90" r="4" fill="#ffffff"/>
+              <circle cx="120" cy="50" r="4" fill="#ffffff"/>
+              <circle cx="200" cy="90" r="4" fill="#ffffff"/>
+            </svg>
+          </div>
+          <h3 class="card-title display-sm">Colossus</h3>
+          <p class="card-body body-md">Our supercomputing cluster, purpose-built to train frontier models at unprecedented scale.</p>
+          <a href="#" class="btn btn-outline btn-sm">Read</a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider-hairline">
+
+  <!-- STATS -->
+  <section class="content-band">
+    <div class="content-inner">
+      <div class="section-eyebrow caption-mono">004 / Scale</div>
+      <h2 class="section-headline display-md">Built for frontier work.</h2>
+
+      <div class="stats-row">
+        <div class="stat-tile">
+          <div class="stat-eyebrow caption-mono-sm">GPUs online</div>
+          <div class="stat-value">200K</div>
+          <div class="stat-meta body-sm">Liquid-cooled H100 cluster.</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-eyebrow caption-mono-sm">Params</div>
+          <div class="stat-value">314B</div>
+          <div class="stat-meta body-sm">Grok-1 mixture-of-experts.</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-eyebrow caption-mono-sm">Context</div>
+          <div class="stat-value">128K</div>
+          <div class="stat-meta body-sm">Tokens of real-time context.</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-eyebrow caption-mono-sm">Latency</div>
+          <div class="stat-value">42ms</div>
+          <div class="stat-meta body-sm">First token, median.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider-hairline">
+
+  <!-- TABLE -->
+  <section class="content-band">
+    <div class="content-inner">
+      <div class="section-eyebrow caption-mono">005 / Model Index</div>
+      <h2 class="section-headline display-md">Releases.</h2>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Release</th>
+            <th>Context</th>
+            <th>Use case</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Grok-3</td>
+            <td>Feb 2026</td>
+            <td>1M tokens</td>
+            <td>General reasoning</td>
+            <td>Available</td>
+          </tr>
+          <tr>
+            <td>Grok-2 Vision</td>
+            <td>Oct 2025</td>
+            <td>128K tokens</td>
+            <td>Multimodal</td>
+            <td>Available</td>
+          </tr>
+          <tr>
+            <td>Grok-1.5</td>
+            <td>Apr 2025</td>
+            <td>128K tokens</td>
+            <td>Code &amp; math</td>
+            <td>Available</td>
+          </tr>
+          <tr>
+            <td>Voices v1</td>
+            <td>Jan 2026</td>
+            <td>—</td>
+            <td>Speech synthesis</td>
+            <td>Beta</td>
+          </tr>
+          <tr>
+            <td>Grok-1</td>
+            <td>Nov 2023</td>
+            <td>8K tokens</td>
+            <td>Open weights</td>
+            <td>Archived</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <hr class="divider-hairline">
+
+  <!-- PRICING / EXAMPLES -->
+  <section class="content-band">
+    <div class="content-inner">
+      <div class="section-eyebrow caption-mono">006 / Pricing</div>
+      <h2 class="section-headline display-md">Plans.</h2>
+
+      <div class="pricing-grid">
+        <div class="pricing-tier">
+          <div class="caption-mono-sm" style="color: var(--body-mid);">Free</div>
+          <div class="price">$0</div>
+          <p class="pricing-body body-md">Try Grok with rate limits. For individuals exploring frontier AI.</p>
+          <a href="#" class="btn btn-outline btn-md">Get started</a>
+        </div>
+        <div class="pricing-tier-featured">
+          <div class="caption-mono-sm" style="color: #2a2a2a;">Pro</div>
+          <div class="price">$30</div>
+          <p class="pricing-body body-md">Unlimited Grok, priority API quota, early model access.</p>
+          <a href="#" class="btn">Upgrade</a>
+        </div>
+        <div class="pricing-tier">
+          <div class="caption-mono-sm" style="color: var(--body-mid);">Enterprise</div>
+          <div class="price">Custom</div>
+          <p class="pricing-body body-md">Dedicated capacity, fine-tuning, on-prem deployments.</p>
+          <a href="#" class="btn btn-outline btn-md">Contact sales</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider-hairline">
+
+  <!-- TYPE RAMP -->
+  <section class="content-band">
+    <div class="content-inner">
+      <div class="section-eyebrow caption-mono">007 / Typography</div>
+      <h2 class="section-headline display-md">Type ramp.</h2>
+
+      <div>
+        <div class="ramp-row">
+          <div class="ramp-meta">
+            <div class="ramp-token body-sm">display-xl</div>
+            <div class="ramp-spec caption-mono-sm">96 / 96 / -2.4</div>
+          </div>
+          <div class="display-xl">Understand the universe.</div>
+        </div>
+        <div class="ramp-row">
+          <div class="ramp-meta">
+            <div class="ramp-token body-sm">display-lg</div>
+            <div class="ramp-spec caption-mono-sm">72 / 72 / -1.8</div>
+          </div>
+          <div class="display-lg">A frontier lab.</div>
+        </div>
+        <div class="ramp-row">
+          <div class="ramp-meta">
+            <div class="ramp-token body-sm">display-md</div>
+            <div class="ramp-spec caption-mono-sm">48 / 48 / -1.2</div>
+          </div>
+          <div class="display-md">Section headline scale.</div>
+        </div>
+        <div class="ramp-row">
+          <div class="ramp-meta">
+            <div class="ramp-token body-sm">display-sm</div>
+            <div class="ramp-spec caption-mono-sm">32 / 36 / -0.6</div>
+          </div>
+          <div class="display-sm">Card cluster heading.</div>
+        </div>
+        <div class="ramp-row">
+          <div class="ramp-meta">
+            <div class="ramp-token body-sm">display-xs</div>
+            <div class="ramp-spec caption-mono-sm">20 / 28 / 0</div>
+          </div>
+          <div class="display-xs">Inline display weight.</div>
+        </div>
+        <div class="ramp-row">
+          <div class="ramp-meta">
+            <div class="ramp-token body-sm">body-lg</div>
+            <div class="ramp-spec caption-mono-sm">18 / 28 / 0</div>
+          </div>
+          <div class="body-lg">Lead paragraph sets the tone for the page and carries the brand voice into longer form copy.</div>
+        </div>
+        <div class="ramp-row">
+          <div class="ramp-meta">
+            <div class="ramp-token body-sm">body-md</div>
+            <div class="ramp-spec caption-mono-sm">16 / 24 / 0</div>
+          </div>
+          <div class="body-md">Default body copy used across cards, forms and product surfaces.</div>
+        </div>
+        <div class="ramp-row">
+          <div class="ramp-meta">
+            <div class="ramp-token body-sm">body-sm</div>
+            <div class="ramp-spec caption-mono-sm">14 / 20 / 0</div>
+          </div>
+          <div class="body-sm">Secondary body, used inside dense components like tables, labels, and footers.</div>
+        </div>
+        <div class="ramp-row">
+          <div class="ramp-meta">
+            <div class="ramp-token body-sm">caption-mono</div>
+            <div class="ramp-spec caption-mono-sm">14 / 20 / 1.4</div>
+          </div>
+          <div class="caption-mono">Section eyebrow / mono</div>
+        </div>
+        <div class="ramp-row">
+          <div class="ramp-meta">
+            <div class="ramp-token body-sm">caption-mono-sm</div>
+            <div class="ramp-spec caption-mono-sm">12 / 16 / 1.2</div>
+          </div>
+          <div class="caption-mono-sm">Small mono label</div>
+        </div>
+        <div class="ramp-row">
+          <div class="ramp-meta">
+            <div class="ramp-token body-sm">button-md</div>
+            <div class="ramp-spec caption-mono-sm">14 / 20 / 0</div>
+          </div>
+          <div class="button-md">Read announcement</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider-hairline">
+
+  <!-- PALETTE -->
+  <section class="content-band">
+    <div class="content-inner">
+      <div class="section-eyebrow caption-mono">008 / Palette</div>
+      <h2 class="section-headline display-md">Colors.</h2>
+
+      <div class="palette-grid">
+        <div class="swatch"><div class="swatch-chip" style="background:#ffffff;"></div><div class="swatch-meta"><div class="swatch-name body-sm">White / Primary</div><div class="swatch-hex caption-mono-sm">#ffffff</div></div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#ff7a17;"></div><div class="swatch-meta"><div class="swatch-name body-sm">Sunset Orange</div><div class="swatch-hex caption-mono-sm">#ff7a17</div></div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#ffc285;"></div><div class="swatch-meta"><div class="swatch-name body-sm">Sunset Soft</div><div class="swatch-hex caption-mono-sm">#ffc285</div></div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#7c3aed;"></div><div class="swatch-meta"><div class="swatch-name body-sm">Dusk Purple</div><div class="swatch-hex caption-mono-sm">#7c3aed</div></div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#c4b5fd;"></div><div class="swatch-meta"><div class="swatch-name body-sm">Twilight</div><div class="swatch-hex caption-mono-sm">#c4b5fd</div></div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#a0c3ec;"></div><div class="swatch-meta"><div class="swatch-name body-sm">Breeze Blue</div><div class="swatch-hex caption-mono-sm">#a0c3ec</div></div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#0d1726;"></div><div class="swatch-meta"><div class="swatch-name body-sm">Midnight</div><div class="swatch-hex caption-mono-sm">#0d1726</div></div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#0a0a0a;"></div><div class="swatch-meta"><div class="swatch-name body-sm">Canvas</div><div class="swatch-hex caption-mono-sm">#0a0a0a</div></div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#1a1c20;"></div><div class="swatch-meta"><div class="swatch-name body-sm">Canvas Soft</div><div class="swatch-hex caption-mono-sm">#1a1c20</div></div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#191919;"></div><div class="swatch-meta"><div class="swatch-name body-sm">Canvas Card</div><div class="swatch-hex caption-mono-sm">#191919</div></div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#363a3f;"></div><div class="swatch-meta"><div class="swatch-name body-sm">Canvas Mid</div><div class="swatch-hex caption-mono-sm">#363a3f</div></div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#212327;"></div><div class="swatch-meta"><div class="swatch-name body-sm">Hairline</div><div class="swatch-hex caption-mono-sm">#212327</div></div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#ffffff;"></div><div class="swatch-meta"><div class="swatch-name body-sm">Ink</div><div class="swatch-hex caption-mono-sm">#ffffff</div></div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#fafaf7;"></div><div class="swatch-meta"><div class="swatch-name body-sm">Ink Hover</div><div class="swatch-hex caption-mono-sm">#fafaf7</div></div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#dadbdf;"></div><div class="swatch-meta"><div class="swatch-name body-sm">Body</div><div class="swatch-hex caption-mono-sm">#dadbdf</div></div></div>
+        <div class="swatch"><div class="swatch-chip" style="background:#7d8187;"></div><div class="swatch-meta"><div class="swatch-name body-sm">Body Mid</div><div class="swatch-hex caption-mono-sm">#7d8187</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider-hairline">
+
+  <!-- RADII SHOWCASE -->
+  <section class="content-band">
+    <div class="content-inner">
+      <div class="section-eyebrow caption-mono">009 / Radii</div>
+      <h2 class="section-headline display-md">Shape system.</h2>
+
+      <div class="radii-grid">
+        <div class="radius-cell">
+          <div class="radius-box" style="border-radius: 0;"></div>
+          <div>
+            <div class="radius-label body-sm">rounded.none</div>
+            <div class="radius-meta caption-mono-sm">0px · full-bleed</div>
+          </div>
+        </div>
+        <div class="radius-cell">
+          <div class="radius-box" style="border-radius: 8px;"></div>
+          <div>
+            <div class="radius-label body-sm">rounded.sm</div>
+            <div class="radius-meta caption-mono-sm">8px · card chrome</div>
+          </div>
+        </div>
+        <div class="radius-cell">
+          <div class="radius-box" style="border-radius: 9999px;"></div>
+          <div>
+            <div class="radius-label body-sm">rounded.pill</div>
+            <div class="radius-meta caption-mono-sm">9999px · buttons</div>
+          </div>
+        </div>
+        <div class="radius-cell">
+          <div class="radius-box" style="border-radius: 9999px;"></div>
+          <div>
+            <div class="radius-label body-sm">rounded.full</div>
+            <div class="radius-meta caption-mono-sm">9999px · circular icons</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider-hairline">
+
+  <!-- SPACING RHYTHM -->
+  <section class="content-band">
+    <div class="content-inner">
+      <div class="section-eyebrow caption-mono">010 / Spacing</div>
+      <h2 class="section-headline display-md">Rhythm.</h2>
+
+      <div>
+        <div class="spacing-row">
+          <div class="spacing-label body-sm">spacing.xxs</div>
+          <div class="spacing-bar" style="width: 2px;"></div>
+          <div class="spacing-meta caption-mono-sm">2px</div>
+        </div>
+        <div class="spacing-row">
+          <div class="spacing-label body-sm">spacing.xs</div>
+          <div class="spacing-bar" style="width: 4px;"></div>
+          <div class="spacing-meta caption-mono-sm">4px</div>
+        </div>
+        <div class="spacing-row">
+          <div class="spacing-label body-sm">spacing.sm</div>
+          <div class="spacing-bar" style="width: 8px;"></div>
+          <div class="spacing-meta caption-mono-sm">8px</div>
+        </div>
+        <div class="spacing-row">
+          <div class="spacing-label body-sm">spacing.md</div>
+          <div class="spacing-bar" style="width: 12px;"></div>
+          <div class="spacing-meta caption-mono-sm">12px</div>
+        </div>
+        <div class="spacing-row">
+          <div class="spacing-label body-sm">spacing.lg</div>
+          <div class="spacing-bar" style="width: 16px;"></div>
+          <div class="spacing-meta caption-mono-sm">16px</div>
+        </div>
+        <div class="spacing-row">
+          <div class="spacing-label body-sm">spacing.xl</div>
+          <div class="spacing-bar" style="width: 24px;"></div>
+          <div class="spacing-meta caption-mono-sm">24px</div>
+        </div>
+        <div class="spacing-row">
+          <div class="spacing-label body-sm">spacing.2xl</div>
+          <div class="spacing-bar" style="width: 32px;"></div>
+          <div class="spacing-meta caption-mono-sm">32px</div>
+        </div>
+        <div class="spacing-row">
+          <div class="spacing-label body-sm">spacing.3xl</div>
+          <div class="spacing-bar" style="width: 48px;"></div>
+          <div class="spacing-meta caption-mono-sm">48px</div>
+        </div>
+        <div class="spacing-row">
+          <div class="spacing-label body-sm">spacing.4xl</div>
+          <div class="spacing-bar" style="width: 64px;"></div>
+          <div class="spacing-meta caption-mono-sm">64px</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider-hairline">
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>
+        <div class="nav-logo" style="margin-bottom: var(--space-lg); display: inline-block;">xAI</div>
+        <p class="body-sm" style="color: var(--body-mid); max-width: 320px;">Building artificial intelligence to accelerate human scientific discovery.</p>
+      </div>
+      <div>
+        <div class="footer-col-title caption-mono-sm">Product</div>
+        <a href="#" class="footer-link body-sm">Grok</a>
+        <a href="#" class="footer-link body-sm">API</a>
+        <a href="#" class="footer-link body-sm">Voices</a>
+        <a href="#" class="footer-link body-sm">Colossus</a>
+      </div>
+      <div>
+        <div class="footer-col-title caption-mono-sm">Company</div>
+        <a href="#" class="footer-link body-sm">About</a>
+        <a href="#" class="footer-link body-sm">Careers</a>
+        <a href="#" class="footer-link body-sm">News</a>
+        <a href="#" class="footer-link body-sm">Research</a>
+      </div>
+      <div>
+        <div class="footer-col-title caption-mono-sm">Legal</div>
+        <a href="#" class="footer-link body-sm">Privacy</a>
+        <a href="#" class="footer-link body-sm">Terms</a>
+        <a href="#" class="footer-link body-sm">Brand</a>
+        <a href="#" class="footer-link body-sm">Status</a>
+      </div>
+    </div>
+    <div class="footer-bottom body-sm">
+      <div>© 2026 xAI Corp.</div>
+      <div class="caption-mono-sm">v1.0 / Built in California</div>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,3384 @@
+/* np-canonical-plus.css — additions on top of np-regions-lab.css.
+ *
+ * The screen reuses every region atom from np-regions-lab.css (.reg-bowl,
+ * .reg-engrave, .reg-ds-key, .reg-dir-plaque, .reg-cta…). This file only
+ * adds the NEW pieces needed by the Canonical+ paradigm:
+ *
+ *   1. .cnp-* shell — single-column 720px stage (no left picker).
+ *   2. .cnp-prompt-bowl — large recessed prompt textarea (skeu deeper than
+ *      the prod prompt; users asked for an actual basin shape, not a card).
+ *   3. .cnp-row — 4-up keys row (name/format/direction/ds).
+ *   4. .cnp-format-key + .cnp-anti-key — key + badge variants for the 2 new
+ *      pickers (format key reuses .reg-ds-key visual family; anti is an
+ *      embossed stamp chip).
+ *   5. .cnp-refs — recessed drop zone with chip rail.
+ *   6. .cnp-dial — bipolar rocker dial (the star). Track is a recessed
+ *      channel, indicator is a tactile "knob" that drags (mouse + touch).
+ *
+ * Vocabulary stays 1:1 with regions lab (plate / bowl / engrave / key /
+ * LED / recess) so dark + light themes inherit automatically. Skeu detail:
+ * indicator color flips to bronze at 50 (neutral), accent on either pole.
+ */
+
+/* ─── Shell (single-column 720px) ───────────────────────────────────── */
+.cnp-lab {
+  min-height: 100vh;
+  background: var(--df-bg-base);
+  color: var(--df-text-primary);
+  display: flex;
+  flex-direction: column;
+}
+.cnp-lab-bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--df-border-subtle);
+  background: var(--df-bg-section);
+}
+.cnp-lab-back, .cnp-lab-reset {
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-on-tactile);
+  border: 0;
+  border-radius: var(--df-r-sm);
+  padding: 5px 12px;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: var(--df-shadow-button-tactile);
+}
+.cnp-lab-back:hover, .cnp-lab-reset:hover { box-shadow: var(--df-shadow-button-tactile-hover); }
+.cnp-lab-back:active, .cnp-lab-reset:active { box-shadow: var(--df-shadow-button-tactile-pressed); transform: translateY(1px); }
+.cnp-lab-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: center;
+}
+.cnp-lab-kicker {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: var(--df-tracking-label);
+  text-transform: uppercase;
+  color: var(--df-text-faint);
+}
+.cnp-lab-title {
+  font-family: var(--df-font-sans);
+  font-size: 14px;
+  letter-spacing: -0.005em;
+  color: var(--df-text-primary);
+}
+.cnp-stage {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 32px 24px 56px;
+  overflow-y: auto;
+}
+.cnp-card {
+  width: 100%;
+  max-width: 720px;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-lg);
+  box-shadow: var(--df-shadow-card);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Hide focus rings inside the lab — the recess shadow is the affordance. */
+.cnp-lab input:focus,
+.cnp-lab textarea:focus,
+.cnp-lab button:focus { outline: none; }
+.cnp-lab input:focus-visible,
+.cnp-lab textarea:focus-visible { outline: none; }
+
+/* ─── Prompt bowl (large recessed textarea) ─────────────────────────── */
+.cnp-prompt-bowl {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cnp-prompt-textarea {
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  padding: 14px 16px;
+  font-family: var(--df-font-body);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--df-text-primary);
+  width: 100%;
+  /* Fixed-size textarea — manual resize is intentionally disabled to
+   * keep the modal layout stable. Overflow is handled internally via
+   * scroll inside the textarea. */
+  resize: none;
+  min-height: 132px;
+  max-height: 280px;
+  /* Conteúdo que excede o max-height ganha scroll INTERNO no textarea
+   * (nativo) — modal layout não muda. */
+  overflow-y: auto;
+  box-shadow: var(--df-skeu-recess);
+  outline: 0;
+}
+.cnp-prompt-textarea::placeholder {
+  color: var(--df-text-faint);
+  font-style: italic;
+}
+
+/* ─── 4-key row (name / format / direction / ds) ────────────────────── */
+.cnp-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.cnp-row > * { min-width: 0; }
+.cnp-cell { display: flex; flex-direction: column; gap: 6px; }
+
+/* Compact name input — recessed bowl, fits in a 4-up cell. */
+.cnp-name-bowl {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cnp-name-input-wrap {
+  display: flex;
+  align-items: center;
+  /* v21: cavity contrast — sunken-1 (-4% L) so the input wrap reads as
+   * lightly recessed, not flush. Less deep than the prompt textarea
+   * (sunken-2) — name is secondary surface. */
+  background: var(--df-surface-sunken-1);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  padding: 9px 12px;
+  box-shadow: var(--df-skeu-recess);
+}
+.cnp-name-input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: var(--df-text-primary);
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  letter-spacing: -0.005em;
+  width: 100%;
+  min-width: 0;
+}
+.cnp-name-input::placeholder { color: var(--df-text-faint); }
+
+/* Format key — reuses .reg-ds-key feel but exposes a label slot. */
+.cnp-format-key {
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-on-tactile);
+  border: 0;
+  border-radius: var(--df-r-md);
+  padding: 9px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: var(--df-shadow-button-tactile);
+  font-family: var(--df-font-sans);
+  font-size: 12px;
+  width: 100%;
+  text-align: left;
+}
+.cnp-format-key:hover { box-shadow: var(--df-shadow-button-tactile-hover); }
+.cnp-format-key:active { box-shadow: var(--df-shadow-button-tactile-pressed); transform: translateY(1px); }
+.cnp-format-key-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cnp-format-key-caret { font-size: 9px; opacity: 0.7; flex-shrink: 0; }
+.cnp-format-key.is-on { box-shadow: var(--df-shadow-button-tactile-pressed); }
+
+/* Compact direction — same vibe as .reg-dir-plaque but tighter. */
+.cnp-dir-key {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-on-tactile);
+  border: 0;
+  border-radius: var(--df-r-md);
+  padding: 9px 12px;
+  cursor: pointer;
+  box-shadow: var(--df-shadow-button-tactile);
+  font-family: var(--df-font-sans);
+  font-size: 12px;
+  text-align: left;
+}
+.cnp-dir-key:hover { box-shadow: var(--df-shadow-button-tactile-hover); }
+.cnp-dir-key-bevel {
+  position: absolute; inset: 4px;
+  border: 1px solid rgba(0,0,0,0.3);
+  border-top-color: rgba(255,255,255,0.1);
+  border-radius: calc(var(--df-r-md) - 4px);
+  pointer-events: none;
+}
+.cnp-dir-key-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* DS — reuse .reg-ds-key directly inside .cnp-cell.
+ * The single-key compact form here just renders a tactile key with the
+ * picked DS name (or a placeholder) — the modal handles browse. */
+.cnp-ds-key {
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-on-tactile);
+  border: 0;
+  border-radius: var(--df-r-md);
+  padding: 9px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  box-shadow: var(--df-shadow-button-tactile);
+  width: 100%;
+}
+.cnp-ds-key:hover { box-shadow: var(--df-shadow-button-tactile-hover); }
+.cnp-ds-key:active { box-shadow: var(--df-shadow-button-tactile-pressed); transform: translateY(1px); }
+.cnp-ds-key-swatches {
+  display: flex;
+  gap: 2px;
+  width: 100%;
+  justify-content: center;
+}
+.cnp-ds-key-sw {
+  width: 14px;
+  height: 8px;
+  border-radius: 2px;
+  border: 1px solid rgba(0,0,0,0.4);
+}
+.cnp-ds-key-name {
+  font-family: var(--df-font-sans);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  font-weight: var(--df-fw-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  text-align: center;
+}
+
+/* ─── Model row (rocker) + Anti-slop badge ──────────────────────────── */
+.cnp-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* Model rocker — reuses .reg-model-rocker but stretches to fill cell. */
+.cnp-model-bowl {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cnp-model-rocker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-on-tactile);
+  border: 0;
+  /* v14: pill killed → r-md (8px) — squared rocker, harmonized with cards. */
+  border-radius: var(--df-r-md);
+  padding: 9px 16px;
+  cursor: pointer;
+  box-shadow: var(--df-shadow-button-tactile);
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  width: 100%;
+  text-align: left;
+}
+.cnp-model-rocker:hover { box-shadow: var(--df-shadow-button-tactile-hover); }
+.cnp-model-rocker-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cnp-model-rocker-caret { font-size: 9px; opacity: 0.7; }
+
+/* Anti-slop badge — embossed stamp chip with rule count. */
+.cnp-anti-bowl {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cnp-anti-badge {
+  position: relative;
+  background: var(--df-bg-section);
+  color: var(--df-text-primary);
+  border: 1px dashed var(--df-text-muted);
+  border-radius: var(--df-r-md);
+  padding: 9px 14px;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  box-shadow: inset 0 1px 0 var(--df-skeu-top-light);
+}
+.cnp-anti-badge:hover {
+  background: var(--df-surface-raised);
+  border-color: var(--df-border-strong, var(--df-text-muted));
+  color: var(--df-text-primary);
+}
+.cnp-anti-badge.is-on {
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-on-tactile);
+  border-color: transparent;
+  box-shadow: var(--df-shadow-button-tactile-pressed);
+}
+.cnp-anti-badge-stamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: var(--df-fw-medium);
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+.cnp-anti-badge-label { flex: 1; }
+.cnp-anti-badge-count {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+}
+
+/* ─── Taste dials (the star) ────────────────────────────────────────── */
+/* 5 dials in a row. Each dial = bipolar rocker recess, one tactile knob
+ * inside, optional tick marks. Mouse + touch drag. The neutral midpoint
+ * (50) shows a bronze knob to read as "balanced"; off-50 the knob takes
+ * the accent color and the descriptor word swaps to the closer pole.
+ *
+ * Knob anatomy (skeu):
+ *   - Track: deep recess (skeu-recess) inside the dial frame, full width.
+ *   - Tick row: 5 dots evenly spaced under the track (mostly muted, the
+ *     midpoint slightly brighter so 50 is felt without measuring).
+ *   - Knob: 18×18 circle with linear sheen + drop shadow + outer ring;
+ *     translates along x via inline style. No box-shadow transitions on
+ *     drag (jank-free) — only color flips on pole change.
+ */
+.cnp-dials-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cnp-dials-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+.cnp-dial {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  padding: 10px 10px 12px;
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    var(--df-shadow-sm);
+  user-select: none;
+  -webkit-user-select: none;
+  min-width: 0;
+}
+.cnp-dial-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px;
+}
+.cnp-dial-label {
+  font-family: var(--df-font-mono);
+  font-size: 9px;
+  letter-spacing: var(--df-tracking-label);
+  text-transform: uppercase;
+  color: var(--df-text-muted);
+  text-shadow: 0 1px 0 var(--df-skeu-top-light);
+}
+.cnp-dial-readout {
+  font-family: var(--df-font-mono);
+  font-size: 9px;
+  color: var(--df-text-secondary);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60%;
+  text-align: right;
+}
+.cnp-dial-readout-num {
+  color: var(--df-text-primary);
+  margin-right: 3px;
+  font-weight: var(--df-fw-medium);
+}
+
+/* The actual rocker recess. Width: stretches the cell. Height fixed.
+ * v14: pill killed → r-sm (6px) — matches narrow track aesthetic. */
+.cnp-dial-track {
+  position: relative;
+  height: 28px;
+  border-radius: var(--df-r-sm);
+  /* Track sits at sunken-2 (-8% L) so the well reads as engraved into
+   * the faceplate rather than just a darker panel. Combined with the
+   * longer inset shadow below, the handle floats clearly above. */
+  background: var(--df-surface-sunken-2);
+  box-shadow:
+    inset 0 2px 5px rgba(0, 0, 0, 0.55),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.40),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.025);
+  cursor: grab;
+  touch-action: none; /* required so drag doesn't scroll on touch */
+}
+.cnp-dial-track:active { cursor: grabbing; }
+
+/* Inner channel — narrower so the knob sits "above" the track surface. */
+.cnp-dial-track::before {
+  content: "";
+  position: absolute;
+  left: 11px;
+  right: 11px;
+  top: 50%;
+  height: 4px;
+  margin-top: -2px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.15));
+  box-shadow: inset 0 1px 0 rgba(0,0,0,0.25);
+  pointer-events: none;
+}
+
+/* Tick marks under the track (5 ticks at 0/25/50/75/100). */
+.cnp-dial-ticks {
+  position: relative;
+  height: 6px;
+  margin-top: 2px;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: end;
+  padding: 0 4px;
+}
+.cnp-dial-tick {
+  width: 2px;
+  height: 4px;
+  border-radius: 1px;
+  justify-self: center;
+  background: var(--df-text-faint);
+  opacity: 0.6;
+}
+.cnp-dial-tick.cnp-dial-tick--mid {
+  background: var(--df-text-muted);
+  opacity: 0.95;
+  height: 5px;
+}
+
+/* Knob — circle that slides on the track. The accent / bronze color is
+ * applied via CSS var on the dial root (--cnp-knob) so JS can flip it
+ * cheaply (no class thrash on drag). */
+.cnp-dial {
+  --cnp-knob: var(--df-text-faint); /* bronze-ish neutral tone */
+  --cnp-knob-glow: rgba(0, 0, 0, 0.0);
+}
+.cnp-dial[data-pole="high"] { --cnp-knob: var(--df-accent-user, var(--df-accent-ok)); }
+.cnp-dial[data-pole="low"]  { --cnp-knob: var(--df-accent-user, var(--df-accent-ok)); }
+.cnp-dial[data-pole="mid"]  { --cnp-knob: var(--df-text-muted); }
+
+.cnp-dial-knob {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 22px;
+  height: 22px;
+  margin-top: -11px;
+  margin-left: -11px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255,255,255,0.55), rgba(255,255,255,0) 55%),
+    var(--cnp-knob);
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255,255,255,0.04) inset,
+    0 0 8px var(--cnp-knob-glow);
+  cursor: grab;
+  pointer-events: none; /* drag is on the track */
+  /* Smooth animation when value changes (e.g. on double-click reset
+   * to 50). 240ms cubic-bezier feels like an easing settle, not a
+   * snap. During drag, the parent re-renders fast enough that the
+   * transition is imperceptible. */
+  transition: left 240ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cnp-dial-knob {
+    /* Snap directly when motion is reduced — no animation. */
+    transition: none;
+  }
+}
+/* When the dial is being actively dragged, kill the transition so the
+ * knob tracks the cursor 1:1. We re-enable it on the dial, not the
+ * knob, by having the track signal :active state. */
+.cnp-dial-track:active .cnp-dial-knob {
+  transition: none;
+}
+.cnp-dial[data-pole="high"] .cnp-dial-knob,
+.cnp-dial[data-pole="low"]  .cnp-dial-knob {
+  --cnp-knob-glow: color-mix(in srgb, var(--cnp-knob) 50%, transparent);
+}
+
+.cnp-dial-poles {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--df-font-mono);
+  font-size: 8px;
+  color: var(--df-text-faint);
+  letter-spacing: 0.06em;
+  text-transform: lowercase;
+  margin-top: 2px;
+  padding: 0 2px;
+}
+.cnp-dial-pole {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 48%;
+}
+.cnp-dial-pole--low  { text-align: left;  }
+.cnp-dial-pole--high { text-align: right; }
+.cnp-dial-pole.is-active { color: var(--df-text-secondary); }
+
+/* ─── Refs drop-zone ────────────────────────────────────────────────── */
+.cnp-refs-bowl {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cnp-refs-zone {
+  background: var(--df-bg-base);
+  border: 1px dashed var(--df-text-muted);
+  border-radius: var(--df-r-md);
+  padding: 12px 14px;
+  min-height: 56px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  box-shadow: var(--df-skeu-recess);
+  transition: background var(--df-motion-quick), border-color var(--df-motion-quick);
+}
+.cnp-refs-zone.is-drag-over {
+  background: var(--df-surface-raised);
+  border-color: var(--df-accent-user, var(--df-accent-ok));
+  border-style: solid;
+}
+.cnp-refs-empty {
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  color: var(--df-text-faint);
+  letter-spacing: 0.04em;
+  font-style: italic;
+}
+.cnp-refs-input-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  width: 100%;
+}
+.cnp-refs-input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  color: var(--df-text-primary);
+  letter-spacing: 0.02em;
+  padding: 2px 0;
+  min-width: 80px;
+}
+.cnp-refs-input::placeholder { color: var(--df-text-faint); }
+.cnp-refs-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-on-tactile);
+  border: 0;
+  /* v14: pill killed → r-sm (6px) — tag-like chip. */
+  border-radius: var(--df-r-sm);
+  padding: 4px 10px 4px 12px;
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  box-shadow: var(--df-shadow-button-tactile);
+  max-width: 100%;
+}
+.cnp-refs-chip-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+.cnp-refs-chip-x {
+  background: rgba(0,0,0,0.3);
+  border: 0;
+  color: var(--df-text-on-tactile);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 11px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+}
+.cnp-refs-chip-x:hover { background: rgba(0,0,0,0.5); }
+.cnp-refs-more {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  color: var(--df-text-muted);
+  letter-spacing: 0.04em;
+}
+
+/* ─── Anti-slop modal — multi-select grid ───────────────────────────── */
+.cnp-anti-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.cnp-anti-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.cnp-anti-modal-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+  padding: 10px 12px;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--df-font-sans);
+  font-size: 12px;
+  color: var(--df-text-primary);
+  transition: background var(--df-motion-quick);
+}
+.cnp-anti-modal-row:hover { background: var(--df-surface-raised); }
+.cnp-anti-modal-row.is-on {
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-on-tactile);
+  border-color: transparent;
+  box-shadow: var(--df-shadow-button-tactile-pressed);
+}
+.cnp-anti-modal-check {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--df-text-muted);
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-family: var(--df-font-mono);
+  background: var(--df-bg-base);
+}
+.cnp-anti-modal-row.is-on .cnp-anti-modal-check {
+  background: var(--df-accent-ok);
+  border-color: var(--df-accent-ok);
+  color: var(--df-bg-base);
+}
+.cnp-anti-modal-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 6px;
+  border-top: 1px solid var(--df-border-subtle);
+}
+.cnp-anti-modal-counter {
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  color: var(--df-text-muted);
+  letter-spacing: 0.04em;
+}
+.cnp-anti-modal-clear {
+  background: transparent;
+  border: 0;
+  color: var(--df-text-faint);
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+.cnp-anti-modal-clear:hover { color: var(--df-accent-danger, var(--df-text-primary)); }
+
+/* ─── Format modal — single-select grid ─────────────────────────────── */
+.cnp-format-modal {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.cnp-format-modal-card {
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-on-tactile);
+  border: 0;
+  border-radius: var(--df-r-md);
+  padding: 14px 12px;
+  cursor: pointer;
+  box-shadow: var(--df-shadow-button-tactile);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+  font-family: var(--df-font-sans);
+}
+.cnp-format-modal-card:hover { box-shadow: var(--df-shadow-button-tactile-hover); }
+.cnp-format-modal-card.is-on {
+  box-shadow: var(--df-shadow-button-tactile-pressed);
+  outline: 2px solid var(--df-accent-user, var(--df-accent-ok));
+  outline-offset: 2px;
+}
+.cnp-format-modal-name {
+  font-size: 13px;
+  font-weight: var(--df-fw-medium);
+}
+.cnp-format-modal-meta {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  opacity: 0.75;
+}
+
+/* ─── Begin button (big plate, V1-style) ────────────────────────────── */
+.cnp-begin {
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-on-tactile);
+  border: 0;
+  border-radius: var(--df-r-md);
+  padding: 18px 22px;
+  font-family: var(--df-font-sans);
+  font-size: 16px;
+  font-weight: var(--df-fw-medium);
+  cursor: pointer;
+  box-shadow: var(--df-shadow-button-tactile);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+  letter-spacing: -0.005em;
+}
+.cnp-begin:hover { box-shadow: var(--df-shadow-button-tactile-hover); }
+.cnp-begin:active { box-shadow: var(--df-shadow-button-tactile-pressed); transform: translateY(1px); }
+.cnp-begin:disabled { opacity: 0.5; cursor: not-allowed; }
+.cnp-begin-key {
+  background: rgba(0,0,0,0.3);
+  border-radius: var(--df-r-sm);
+  padding: 5px 10px;
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+/* ─── Hero (V1 — compact production-style) ──────────────────────────── */
+.cnp-hero {
+  position: relative;
+  height: 104px;
+  border-radius: var(--df-r-lg);
+  overflow: hidden;
+  background: var(--df-bg-section);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 14px 16px;
+}
+.cnp-hero-ascii {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  color: var(--df-text-faint);
+  opacity: 0.32;
+  white-space: pre;
+  line-height: 1.06;
+  padding: 10px 14px;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+  user-select: none;
+}
+.cnp-hero-mark {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 26px;
+  height: 26px;
+  color: var(--df-text-primary);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 1;
+}
+.cnp-hero-copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.cnp-hero-kicker {
+  font-family: var(--df-font-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--df-text-muted);
+}
+.cnp-hero-title {
+  font-family: var(--df-font-display, var(--df-font-sans));
+  font-size: 22px;
+  font-weight: var(--df-fw-bold, 700);
+  letter-spacing: var(--df-tracking-display, -0.01em);
+  color: var(--df-text-primary);
+}
+
+/* ─── Section engrave (label between blocks) ────────────────────────── */
+.cnp-section-engrave {
+  font-family: var(--df-font-mono);
+  font-size: 9px;
+  letter-spacing: var(--df-tracking-label);
+  text-transform: uppercase;
+  color: var(--df-text-muted);
+  text-shadow: 0 1px 0 var(--df-skeu-top-light);
+  padding-left: 2px;
+}
+.cnp-section { display: flex; flex-direction: column; gap: 6px; }
+
+/* ─── Light mode overrides ──────────────────────────────────────────── */
+[data-theme="light"] .cnp-format-key,
+[data-theme="light"] .cnp-dir-key,
+[data-theme="light"] .cnp-ds-key,
+[data-theme="light"] .cnp-model-rocker {
+  background: var(--df-surface-raised);
+  color: var(--df-text-primary);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 1px 2px var(--df-skeu-contact),
+    0 4px 10px -2px var(--df-skeu-near);
+}
+[data-theme="light"] .cnp-format-key:hover,
+[data-theme="light"] .cnp-dir-key:hover,
+[data-theme="light"] .cnp-ds-key:hover,
+[data-theme="light"] .cnp-model-rocker:hover {
+  background: var(--df-surface-elevated);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-hover),
+    0 2px 4px var(--df-skeu-contact),
+    0 8px 18px -2px var(--df-skeu-near);
+}
+[data-theme="light"] .cnp-dir-key-bevel {
+  border-color: var(--df-border-subtle);
+  border-top-color: rgba(255,255,255,0.5);
+}
+[data-theme="light"] .cnp-ds-key-sw {
+  border-color: var(--df-border-subtle);
+}
+[data-theme="light"] .cnp-anti-badge {
+  background: var(--df-surface-raised);
+  color: var(--df-text-primary);
+  border-color: var(--df-text-muted);
+}
+[data-theme="light"] .cnp-anti-badge:hover {
+  background: var(--df-surface-elevated);
+}
+[data-theme="light"] .cnp-anti-badge.is-on {
+  background: var(--df-text-primary);
+  color: var(--df-text-inverse);
+  box-shadow: var(--df-shadow-md);
+}
+[data-theme="light"] .cnp-anti-badge-stamp {
+  border-color: currentColor;
+}
+[data-theme="light"] .cnp-refs-zone {
+  background: var(--df-surface-raised);
+}
+[data-theme="light"] .cnp-refs-chip {
+  background: var(--df-surface-raised);
+  color: var(--df-text-primary);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 1px 2px var(--df-skeu-contact);
+}
+[data-theme="light"] .cnp-refs-chip-x {
+  background: var(--df-bg-section);
+  color: var(--df-text-secondary);
+}
+[data-theme="light"] .cnp-refs-chip-x:hover {
+  background: var(--df-text-muted);
+  color: var(--df-bg-base);
+}
+[data-theme="light"] .cnp-dial {
+  background: var(--df-surface-raised);
+}
+[data-theme="light"] .cnp-dial-track {
+  /* v21: paper recess — warm umber tint, softer inset alpha. */
+  background: var(--df-surface-sunken-2);
+  box-shadow:
+    inset 0 1px 3px rgba(40, 30, 22, 0.18),
+    inset 0 0 0 1px rgba(40, 30, 22, 0.12),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.4);
+}
+[data-theme="light"] .cnp-dial-knob {
+  border-color: rgba(0,0,0,0.25);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.18),
+    0 0 0 1px rgba(255,255,255,0.5) inset,
+    0 0 8px var(--cnp-knob-glow);
+}
+[data-theme="light"] .cnp-begin {
+  background: var(--df-text-primary);
+  color: var(--df-text-inverse);
+  box-shadow: var(--df-shadow-md);
+}
+[data-theme="light"] .cnp-begin-key {
+  /* Tactile button bg in light is cream now (PR fix/np-light-tactile-
+   * buttons). The shortcut chip sits ON TOP of that cream key, so it
+   * needs a warm dark recess (not white-on-white). */
+  background: rgba(40, 30, 22, 0.10);
+  box-shadow: inset 0 1px 0 rgba(40, 30, 22, 0.12);
+}
+[data-theme="light"] .cnp-name-input-wrap {
+  /* v21: paper-recess parity with dark sunken-1. */
+  background: var(--df-surface-sunken-1);
+}
+[data-theme="light"] .cnp-prompt-textarea {
+  /* Keep --df-surface-raised for the BASE .cnp-prompt-textarea (used in
+   * non-modal contexts). The modal-specific override at
+   * `.cnp-prompt-bowl-v2 .cnp-prompt-textarea` swaps to sunken-2. */
+  background: var(--df-surface-raised);
+}
+[data-theme="light"] .cnp-format-modal-card {
+  background: var(--df-surface-raised);
+  color: var(--df-text-primary);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 1px 2px var(--df-skeu-contact);
+}
+[data-theme="light"] .cnp-format-modal-card:hover {
+  background: var(--df-surface-elevated);
+}
+[data-theme="light"] .cnp-anti-modal-row.is-on {
+  background: var(--df-text-primary);
+  color: var(--df-text-inverse);
+}
+
+/* ─── Form footer (reset + begin) ───────────────────────────────────── */
+.cnp-foot-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: stretch;
+  margin-top: 4px;
+}
+.cnp-foot-reset {
+  background: var(--df-bg-section);
+  color: var(--df-text-faint);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  padding: 0 18px;
+  /* v27b (user): flat sentence-case Geist, sem mono uppercase. */
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 var(--df-skeu-top-light);
+  transition: color var(--df-motion-quick), background var(--df-motion-quick);
+}
+.cnp-foot-reset:hover:not(:disabled) {
+  color: var(--df-text-secondary);
+  background: var(--df-surface-raised);
+}
+.cnp-foot-reset:active:not(:disabled) { box-shadow: var(--df-skeu-recess); }
+.cnp-foot-reset:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* When inside the foot row, the begin button stretches to fill. */
+.cnp-foot-row .cnp-begin { margin-top: 0; }
+
+/* Bare card variant — used when host (e.g., modal) provides its own
+   chrome and we just need the form content stack. */
+.cnp-card.cnp-card--bare {
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-lg);
+  box-shadow: var(--df-shadow-card);
+  padding: 22px;
+  max-width: 720px;
+  width: 100%;
+}
+
+/* Submit error toast — sits directly above the foot row when the form
+   surfaces an error from the host's onCreate. */
+.cnp-error {
+  background: var(--df-bg-section);
+  color: var(--df-accent-danger, var(--df-text-primary));
+  border: 1px solid var(--df-accent-danger, var(--df-border-subtle));
+  border-radius: var(--df-r-md);
+  padding: 10px 14px;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  box-shadow: inset 0 1px 0 var(--df-skeu-top-light);
+}
+[data-theme="light"] .cnp-error {
+  background: var(--df-surface-raised);
+}
+
+[data-theme="light"] .cnp-foot-reset {
+  background: var(--df-surface-raised);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Modal zones, anti-slop card, refs workspace
+ * ════════════════════════════════════════════════════════════════════════
+ * The existing skeu vocabulary stays intact (atoms unchanged); these
+ * styles compose them into 4 hierarchical zones (PROMPT hero / PROJETO
+ * + MOTOR 50/50 / CONTEXTO with anti-slop CARD + refs WORKSPACE) so
+ * each block has its own visual gravity instead of a flat single-column
+ * layout.
+ */
+
+/* ─── Zone shell ───────────────────────────────────────────────────── */
+/* Each zone is a "panel" inside the stage: own engrave header (label
+ * with engrave underline), own content. Used as the stagger target by
+ * np-modal.css (.cnp-zone fades in 50ms apart). */
+.cnp-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.cnp-zone-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 0 2px 8px;
+  border-bottom: 1px solid transparent;
+  /* Engrave underline — top 1px shadow + bottom 1px highlight. Uses
+   * border + box-shadow trick so the line aligns with the text width
+   * (full-row underline reads heavier than this elegant micro-rule). */
+  position: relative;
+}
+/* No micro-rule under the engrave header — labels stand on their own. */
+.cnp-zone-engrave {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--df-text-muted);
+  text-shadow: 0 1px 0 var(--df-skeu-top-light);
+  font-weight: var(--df-fw-medium);
+}
+.cnp-zone-meta {
+  font-family: var(--df-font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--df-text-faint);
+  margin-left: auto;
+}
+.cnp-zone-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ─── Zone 2/3 split (PROJETO + MOTOR) ────────────────────────────── */
+.cnp-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.cnp-split-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+@media (max-width: 1023px) {
+  .cnp-split { grid-template-columns: 1fr; gap: 18px; }
+}
+
+/* ─── Zone 1 — PROMPT hero (large bowl) ──────────────────────────── */
+/* The prompt textarea is the hero. v2: bigger min-height, deeper bowl
+ * (extra recess shadow), placeholder gets a little instruction line. */
+.cnp-prompt-bowl-v2 {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cnp-prompt-bowl-v2 .cnp-prompt-textarea {
+  min-height: 156px;
+  max-height: 320px;
+  font-size: 15px;
+  padding: 16px 18px;
+  /* Cavity contrast — the surface drops to sunken-2 (-8% L vs the
+   * faceplate) so the prompt box reads as physically recessed into the
+   * modal stage. Without this drop, the box flattens against the panel
+   * and loses its dimensional read. */
+  background: var(--df-surface-sunken-2);
+  /* Deeper recess: 3-layer inset shadow — top inner-edge, mid darkness,
+   * faint bottom counter-light so the bowl floor doesn't feel infinite. */
+  box-shadow:
+    inset 0 2px 5px rgba(0, 0, 0, 0.50),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.36),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.025);
+}
+[data-theme="light"] .cnp-prompt-bowl-v2 .cnp-prompt-textarea {
+  background: var(--df-surface-sunken-2);
+  /* Light cavities use warm umber inset (matches paper recess vibe).
+   * Softer alphas — light backdrops eat shadow. */
+  box-shadow:
+    inset 0 1px 3px rgba(40, 30, 22, 0.14),
+    inset 0 0 0 1px rgba(40, 30, 22, 0.10),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.45);
+}
+
+/* ─── PROJETO row — name + format + direction + DS in single column ─ */
+/* Stacks vertically inside the zone-2 cell so the right side (MOTOR)
+ * has room for dials. Each control gets a tiny inline engrave label. */
+.cnp-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.cnp-stack-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cnp-stack-label {
+  font-family: var(--df-font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--df-text-faint);
+  padding-left: 2px;
+  text-shadow: 0 1px 0 var(--df-skeu-top-light);
+}
+
+/* ─── ENGINE column — model rocker on top, dials block below ─────── */
+.cnp-engine-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Dials inside engine column — tighter (5 in a row, smaller cells than
+ * the standalone lab so they fit a 50% column). On tablet/mobile they
+ * collapse to 3+2 grid via auto-fill. */
+.cnp-engine-col .cnp-dials-row {
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+@media (max-width: 1023px) {
+  .cnp-engine-col .cnp-dials-row {
+    grid-template-columns: repeat(auto-fill, minmax(94px, 1fr));
+  }
+}
+
+/* ─── Zone 4 — CONTEXTO (anti-slop CARD + refs WORKSPACE) ────────── */
+/* Both blocks get visual weight via a recessed plaque (shallower than
+ * a bowl, but still reads as "embedded in the stage"). Each has its own
+ * micro-header (icon + label + count/meta). */
+.cnp-context-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+@media (max-width: 1023px) {
+  .cnp-context-grid { grid-template-columns: 1fr; }
+}
+
+/* ─── Anti-slop CARD (v2 — replaces .cnp-anti-badge) ─────────────── */
+/* No longer a tiny stamp. Now a full plaque with:
+ *   - Header line: icon + "Anti-slop" + selected count + (info dot)
+ *   - Selected chips inline (truncated 2-line, +N more)
+ *   - "Browse N rules" trigger key (skeu key, full width)
+ *   - Empty state: italic muted text instead of chips
+ */
+.cnp-anti-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-lg);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    inset 0 4px 8px -6px rgba(0, 0, 0, 0.32);
+  transition:
+    box-shadow var(--df-motion-quick),
+    border-color var(--df-motion-quick);
+}
+.cnp-anti-card:hover {
+  border-color: var(--df-border-hover);
+}
+.cnp-anti-card.is-on {
+  /* Subtle activation: top inset bright (the rule set is "live") */
+  box-shadow:
+    inset 0 1.5px 0 var(--df-skeu-top-light),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.22),
+    inset 0 4px 8px -6px rgba(0, 0, 0, 0.32),
+    0 0 0 1px var(--df-border-strong);
+}
+
+.cnp-anti-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--df-border-subtle);
+  box-shadow: 0 1px 0 var(--df-skeu-top-light);
+}
+.cnp-anti-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--df-text-muted);
+  color: var(--df-text-muted);
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  font-weight: var(--df-fw-bold);
+  flex-shrink: 0;
+  background: var(--df-bg-section);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.16);
+}
+.cnp-anti-card.is-on .cnp-anti-card-icon {
+  border-color: var(--df-text-secondary);
+  color: var(--df-text-primary);
+}
+.cnp-anti-card-title {
+  font-family: var(--df-font-sans);
+  font-size: 12px;
+  font-weight: var(--df-fw-medium);
+  letter-spacing: 0.02em;
+  color: var(--df-text-primary);
+  flex: 1;
+}
+.cnp-anti-card-count {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--df-text-muted);
+  white-space: nowrap;
+}
+
+/* Selected pill rail */
+.cnp-anti-card-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-height: 24px;
+  align-items: center;
+}
+.cnp-anti-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--df-bg-section);
+  color: var(--df-text-secondary);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+  padding: 3px 8px;
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  box-shadow: inset 0 1px 0 var(--df-skeu-top-light);
+  max-width: 100%;
+}
+.cnp-anti-pill-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 130px;
+}
+.cnp-anti-pill-x {
+  background: transparent;
+  border: 0;
+  color: var(--df-text-faint);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+  margin-left: 2px;
+}
+.cnp-anti-pill-x:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+}
+.cnp-anti-pill-more {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  color: var(--df-text-faint);
+  letter-spacing: 0.04em;
+  padding: 3px 6px;
+}
+.cnp-anti-card-empty {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  font-style: italic;
+  color: var(--df-text-faint);
+  letter-spacing: 0.02em;
+  padding: 4px 0;
+}
+
+/* Browse trigger — wide skeu key inside the card */
+.cnp-anti-card-trigger {
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-on-tactile);
+  border: 0;
+  border-radius: var(--df-r-md);
+  padding: 9px 14px;
+  font-family: var(--df-font-sans);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: var(--df-shadow-button-tactile);
+  width: 100%;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: box-shadow var(--df-motion-quick);
+}
+.cnp-anti-card-trigger:hover { box-shadow: var(--df-shadow-button-tactile-hover); }
+.cnp-anti-card-trigger:active {
+  box-shadow: var(--df-shadow-button-tactile-pressed);
+  transform: translateY(1px);
+}
+.cnp-anti-card-trigger-icon {
+  font-family: var(--df-font-mono);
+  font-weight: var(--df-fw-bold);
+  opacity: 0.85;
+}
+
+/* Light theme overrides for anti-slop card */
+[data-theme="light"] .cnp-anti-card {
+  background: var(--df-surface-raised);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 -1px 0 rgba(40, 30, 22, 0.05),
+    inset 0 4px 8px -6px rgba(40, 30, 22, 0.10);
+}
+[data-theme="light"] .cnp-anti-card-icon {
+  background: var(--df-bg-section);
+}
+[data-theme="light"] .cnp-anti-pill {
+  background: var(--df-surface-elevated);
+  color: var(--df-text-primary);
+}
+[data-theme="light"] .cnp-anti-card-trigger {
+  background: var(--df-surface-elevated);
+  color: var(--df-text-primary);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 1px 2px var(--df-skeu-contact),
+    0 4px 10px -2px var(--df-skeu-near);
+}
+[data-theme="light"] .cnp-anti-card-trigger:hover {
+  background: var(--df-bg-section);
+}
+
+/* ─── Refs WORKSPACE (v2 — replaces .cnp-refs-zone single-line) ──── */
+/* Two distinct entries:
+ *   - BIG drop area (40-80px tall, dashed border, hover→solid accent)
+ *   - Inline paste input (small bowl, "https://...")
+ *   - Chip rail BELOW (was inline in v1)
+ * The dashed border is the signature distinguishing the drop area from
+ * the prompt textarea.
+ */
+.cnp-refs-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-lg);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    inset 0 4px 8px -6px rgba(0, 0, 0, 0.32);
+}
+[data-theme="light"] .cnp-refs-card {
+  background: var(--df-surface-raised);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 -1px 0 rgba(40, 30, 22, 0.05),
+    inset 0 4px 8px -6px rgba(40, 30, 22, 0.10);
+}
+
+.cnp-refs-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--df-border-subtle);
+  box-shadow: 0 1px 0 var(--df-skeu-top-light);
+}
+.cnp-refs-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--df-r-sm);
+  background: var(--df-bg-section);
+  color: var(--df-text-muted);
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  font-weight: var(--df-fw-bold);
+  flex-shrink: 0;
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.16);
+}
+.cnp-refs-card-title {
+  font-family: var(--df-font-sans);
+  font-size: 12px;
+  font-weight: var(--df-fw-medium);
+  letter-spacing: 0.02em;
+  color: var(--df-text-primary);
+  flex: 1;
+}
+.cnp-refs-card-count {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--df-text-muted);
+  white-space: nowrap;
+}
+[data-theme="light"] .cnp-refs-card-icon {
+  background: var(--df-bg-section);
+}
+
+/* Drop area — dashed by default, solid + accent on hover/dragover */
+.cnp-refs-drop {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 18px 16px;
+  min-height: 76px;
+  background: var(--df-bg-section);
+  border: 1px dashed var(--df-text-muted);
+  border-radius: var(--df-r-md);
+  box-shadow:
+    inset 0 4px 8px -6px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(0, 0, 0, 0.12);
+  transition:
+    background var(--df-motion-ui),
+    border-color var(--df-motion-ui),
+    border-style 0ms;
+  text-align: center;
+}
+[data-theme="light"] .cnp-refs-drop {
+  background: var(--df-bg-base);
+  box-shadow:
+    inset 0 4px 8px -6px rgba(40, 30, 22, 0.10),
+    inset 0 1px 0 rgba(40, 30, 22, 0.04);
+}
+.cnp-refs-drop:hover,
+.cnp-refs-drop.is-drag-over {
+  background: var(--df-surface-raised);
+  border-color: var(--df-accent-user);
+  border-style: solid;
+}
+[data-theme="light"] .cnp-refs-drop:hover,
+[data-theme="light"] .cnp-refs-drop.is-drag-over {
+  background: var(--df-surface-elevated);
+}
+.cnp-refs-drop-icon {
+  font-family: var(--df-font-mono);
+  font-size: 18px;
+  color: var(--df-text-faint);
+  line-height: 1;
+  transition: color var(--df-motion-ui), transform var(--df-motion-ui);
+}
+.cnp-refs-drop:hover .cnp-refs-drop-icon,
+.cnp-refs-drop.is-drag-over .cnp-refs-drop-icon {
+  color: var(--df-accent-user);
+  transform: translateY(2px);
+}
+.cnp-refs-drop-label {
+  font-family: var(--df-font-sans);
+  font-size: 12px;
+  color: var(--df-text-muted);
+  letter-spacing: 0.01em;
+}
+.cnp-refs-drop-hint {
+  font-family: var(--df-font-mono);
+  font-size: 9px;
+  color: var(--df-text-faint);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* Inline paste bowl — small bowl input under the drop area */
+.cnp-refs-paste {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  padding: 8px 12px;
+  box-shadow: var(--df-skeu-recess);
+}
+[data-theme="light"] .cnp-refs-paste {
+  background: var(--df-surface-elevated);
+}
+.cnp-refs-paste-prefix {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--df-text-faint);
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+.cnp-refs-paste-input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  color: var(--df-text-primary);
+  letter-spacing: 0.02em;
+  padding: 0;
+  min-width: 0;
+}
+.cnp-refs-paste-input::placeholder {
+  color: var(--df-text-faint);
+}
+
+/* Chips rail — appears below the inputs once refs exist */
+.cnp-refs-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-top: 2px;
+}
+/* re-uses .cnp-refs-chip + .cnp-refs-chip-x + .cnp-refs-chip-label
+ * already defined above (kept compatible) */
+
+/* ─── Engrave separator (between zones) ──────────────────────────── */
+/* Used inside the form between zone groups when we want a horizontal
+ * rule rather than just whitespace. Top 1px shadow + bottom 1px highlight. */
+.cnp-engrave-rule {
+  height: 0;
+  border: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.32);
+  box-shadow: 0 1px 0 var(--df-skeu-top-light);
+  margin: 4px 0;
+}
+[data-theme="light"] .cnp-engrave-rule {
+  border-top-color: rgba(40, 30, 22, 0.12);
+}
+
+/* ─── Foot row v2 (separator engrave + sticky on mobile) ─────────── */
+/* The foot row gets an engrave rule on top so the visual hierarchy
+ * reads: stage content → engrave divider → footer (sits on the bezel). */
+.np-modal-stage .cnp-foot-row {
+  position: relative;
+  margin-top: 14px;
+  padding-top: 14px;
+}
+.np-modal-stage .cnp-foot-row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -12px;
+  right: -12px;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.32);
+  box-shadow: 0 1px 0 var(--df-skeu-top-light);
+}
+[data-theme="light"] .np-modal-stage .cnp-foot-row::before {
+  background: rgba(40, 30, 22, 0.12);
+}
+
+/* Mobile — sticky foot in safe-area */
+@media (max-width: 767px) {
+  .np-modal-stage .cnp-foot-row {
+    position: sticky;
+    bottom: 0;
+    background:
+      linear-gradient(180deg,
+        transparent 0%,
+        var(--df-bg-base) 30%,
+        var(--df-bg-base) 100%);
+    margin: 14px -16px 0;
+    padding: 18px 16px max(18px, env(safe-area-inset-bottom));
+    z-index: 2;
+  }
+  [data-theme="light"] .np-modal-stage .cnp-foot-row {
+    background:
+      linear-gradient(180deg,
+        transparent 0%,
+        var(--df-bg-section) 30%,
+        var(--df-bg-section) 100%);
+  }
+  .np-modal-stage .cnp-foot-row::before {
+    left: 0;
+    right: 0;
+  }
+}
+
+/* ─── Begin button v2 — wider hit area, status text variants ─────── */
+/* "Iniciando…" loading state via :disabled + class-less inline spinner
+ * (the form uses submitting state to swap label). */
+.cnp-begin-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: cnp-begin-spin 700ms linear infinite;
+  margin-right: 8px;
+  vertical-align: -1px;
+}
+@keyframes cnp-begin-spin {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cnp-begin-spinner { animation: none; }
+}
+
+/* ─── Format key cell width safety inside zone stack ─────────────── */
+/* In v1 the 4-up cnp-row constrained format/dir/ds keys to 1/4 width;
+ * inside the new zone-2 stack they need to fill the full column width.
+ * No change to the atom — they already use width:100%. */
+
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Rules unified + 2×2 dials + viewport-fit + composer
+ * ════════════════════════════════════════════════════════════════════════
+ *
+ * Layout invariants for the New Project modal:
+ *   1. Direction → Rules (hyve-taste format, 30 builtin)
+ *   2. Modal does NOT scroll — fixed height adapts to the viewport
+ *   3. Zone CONTEXTO removed (rules + attachments replace it)
+ *   4. Composer mirrors EditorScreen features (file picker + mic + paste)
+ *   5. Taste dials reduced 5 → 4 in a 2×2 grid
+ */
+
+/* ─── Card v4: aproveita a grid do np-modal.css ─────────────────────── */
+.cnp-card.cnp-card--v4 {
+  /* Inside the modal np-modal.css turns this into display:grid.
+   * Standalone (lab) — keep the original flex stack. */
+  gap: 18px;
+}
+
+/* Each zone collapses tighter inside the modal, but keeps comfy padding
+   in standalone usage. */
+.np-modal-stage .cnp-card--v4 .cnp-zone {
+  gap: 8px;
+}
+.np-modal-stage .cnp-card--v4 .cnp-zone-header {
+  padding: 0 2px 6px;
+}
+.np-modal-stage .cnp-card--v4 .cnp-stack { gap: 10px; }
+.np-modal-stage .cnp-card--v4 .cnp-stack-row { gap: 4px; }
+
+/* ─── 2×2 dial grid (new) ───────────────────────────────────────────── */
+.cnp-dials-grid-2x2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 8px;
+}
+.cnp-dials-grid-2x2 .cnp-dial {
+  /* Compact dials inside the 2×2 — drop the tick row to save vertical
+   * real estate, since the 4-cell layout is more legible than 5-in-a-row.
+   * Pole labels still under the track. */
+  padding: 8px 10px 10px;
+  gap: 4px;
+}
+.cnp-dials-grid-2x2 .cnp-dial-track { height: 24px; }
+.cnp-dials-grid-2x2 .cnp-dial-knob {
+  width: 18px; height: 18px;
+  margin-top: -9px; margin-left: -9px;
+}
+/* Hide the optional tick row in 2x2 layout — keeps the dial visually
+ * tighter. The pole labels carry the affordance. */
+.cnp-dials-grid-2x2 .cnp-dial-ticks { display: none; }
+
+/* On very tight viewports (≤720 height) shrink another notch. */
+@media (max-height: 720px) {
+  .cnp-dials-grid-2x2 { gap: 6px; }
+  .cnp-dials-grid-2x2 .cnp-dial { padding: 6px 8px 8px; }
+  .cnp-dials-grid-2x2 .cnp-dial-track { height: 22px; }
+  .cnp-dials-grid-2x2 .cnp-dial-knob {
+    width: 16px; height: 16px;
+    margin-top: -8px; margin-left: -8px;
+  }
+  .cnp-dials-grid-2x2 .cnp-dial-label { font-size: 8.5px; }
+  .cnp-dials-grid-2x2 .cnp-dial-readout { font-size: 8.5px; }
+}
+
+/* ─── Chat composer (replaces refs zone) ────────────────────────────── */
+.np-composer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  position: relative;
+}
+.np-composer-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 4px 0;
+}
+.np-composer-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px 3px 6px;
+  background: var(--df-surface-raised);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  color: var(--df-text-secondary);
+  max-width: 220px;
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    var(--df-shadow-sm);
+}
+.np-composer-chip-kind {
+  font-size: 11px;
+  flex-shrink: 0;
+  filter: saturate(0) brightness(1.15);
+  opacity: 0.85;
+}
+.np-composer-chip-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.np-composer-chip-size {
+  color: var(--df-text-faint);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+.np-composer-chip-x {
+  background: transparent;
+  border: 0;
+  color: var(--df-text-faint);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+}
+.np-composer-chip-x:hover { color: var(--df-text-primary); }
+
+/* ─── chip variants: primary badge + html accent + drag states ─── */
+.np-composer-chip {
+  /* override font-size for chips need a touch more presence so the
+   * PRINCIPAL badge fits without crowding. Same density as legacy. */
+  cursor: default;
+  user-select: none;
+  transition: opacity 140ms ease, border-color 140ms ease, background-color 140ms ease;
+}
+.np-composer-chip[draggable="true"] {
+  cursor: grab;
+}
+.np-composer-chip[draggable="true"]:active {
+  cursor: grabbing;
+}
+.np-composer-chip.is-html {
+  /* HTML attachment — slight accent on the kind glyph + border so the
+   * user sees at a glance which file is going to land in the canvas. */
+  border-color: color-mix(in srgb, var(--df-accent) 28%, var(--df-border-subtle));
+}
+.np-composer-chip.is-html .np-composer-chip-kind {
+  color: var(--df-accent);
+  filter: none;
+  opacity: 1;
+}
+.np-composer-chip.is-primary {
+  /* Primary chip — slightly raised, accent-tinted left edge via border. */
+  border-left: 2px solid var(--df-accent);
+  padding-left: 5px;
+  background: color-mix(in srgb, var(--df-accent) 4%, var(--df-surface-raised));
+}
+.np-composer-chip-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--df-font-mono);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--df-accent);
+  background: color-mix(in srgb, var(--df-accent) 12%, transparent);
+  border-radius: 2px;
+  padding: 1px 4px;
+  margin-right: 1px;
+  flex-shrink: 0;
+}
+.np-composer-chip.is-dragged {
+  opacity: 0.4;
+}
+.np-composer-chip.is-over {
+  /* Drop target — leading-edge insertion bar, accent colored. */
+  box-shadow:
+    inset 2px 0 0 var(--df-accent),
+    inset 0 1px 0 var(--df-skeu-top-light),
+    var(--df-shadow-sm);
+  border-color: color-mix(in srgb, var(--df-accent) 50%, var(--df-border-subtle));
+}
+@media (prefers-reduced-motion: reduce) {
+  .np-composer-chip {
+    transition: none;
+  }
+}
+
+/* Textarea — inherits .cnp-prompt-textarea recess via class compose. */
+.np-composer-textarea {
+  /* the cnp-prompt-textarea class already paints recess + bowl; we only
+   * tweak min-height for the modal context. Manual resize is locked to
+   * none to keep the modal layout stable. */
+  min-height: 92px;
+  resize: none;
+}
+@media (max-height: 720px) {
+  .np-composer-textarea { min-height: 76px; }
+}
+@media (max-height: 640px) {
+  .np-composer-textarea { min-height: 64px; }
+}
+
+/* Bar below the textarea — file picker + mic + hint. Skeu key style. */
+.np-composer-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    var(--df-shadow-sm);
+}
+.np-composer-tool {
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-on-tactile);
+  border: 0;
+  border-radius: var(--df-r-sm);
+  width: 28px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--df-shadow-button-tactile);
+  flex-shrink: 0;
+  transition: transform 80ms ease-out;
+}
+.np-composer-tool:hover { box-shadow: var(--df-shadow-button-tactile-hover); }
+.np-composer-tool:active {
+  box-shadow: var(--df-shadow-button-tactile-pressed);
+  transform: translateY(1px);
+}
+.np-composer-tool.is-rec {
+  color: var(--df-accent-danger, var(--df-accent-warn));
+  box-shadow: var(--df-shadow-button-tactile-pressed);
+  /* gentle pulse so the user sees recording is live */
+  animation: np-composer-pulse 1200ms ease-in-out infinite;
+}
+@keyframes np-composer-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .np-composer-tool.is-rec { animation: none; }
+}
+.np-composer-bar-spacer { flex: 1; }
+.np-composer-bar-hint {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--df-text-faint);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+/* ─── RuleCreateModal form ──────────────────────────────────────────── */
+.rcm-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 20px 14px;
+}
+.rcm-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.rcm-label {
+  font-family: var(--df-font-mono);
+  font-size: 9px;
+  letter-spacing: var(--df-tracking-label, 0.14em);
+  text-transform: uppercase;
+  color: var(--df-text-faint);
+  padding-left: 2px;
+  text-shadow: 0 1px 0 var(--df-skeu-top-light);
+}
+.rcm-input,
+.rcm-select {
+  /* Cavity contrast — sunken-1 (-4% L) so RuleCreate form inputs read
+   * as recessed into the modal faceplate. */
+  background: var(--df-surface-sunken-1);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+  padding: 8px 10px;
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  color: var(--df-text-primary);
+  width: 100%;
+  outline: 0;
+  box-shadow: var(--df-skeu-recess);
+}
+.rcm-select {
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  background-image: linear-gradient(45deg, transparent 50%, var(--df-text-faint) 50%),
+                    linear-gradient(-45deg, transparent 50%, var(--df-text-faint) 50%);
+  background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 26px;
+}
+.rcm-input::placeholder { color: var(--df-text-faint); }
+.rcm-help {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  color: var(--df-text-faint);
+  letter-spacing: 0.02em;
+  padding-left: 2px;
+}
+
+/* ─── DirectionModalV2 footer extra — accent text button ───────────── */
+.dmv2-btn-text--accent {
+  color: var(--df-accent-user, var(--df-accent-ok));
+}
+.dmv2-btn-text--accent:hover {
+  color: var(--df-text-primary);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+ * NAME hero + extended composer surface
+ *   - 6-dial 3×2 grid + active-only state (neutral dials muted)
+ *   - DS picker shows a row of inline cards plus a "Ver mais" overflow
+ *   - Model selector sits in the composer toolbar (prompt-box footer)
+ *   - Name + HYVE logo above the prompt — the logo lights with accent +
+ *     glow once the name is filled
+ *   - TASTE engrave label replaces MOTOR in the dial-column header
+ * ════════════════════════════════════════════════════════════════════ */
+
+/* ─── Zone 0 — NAME hero ──────────────────────────────────────────────
+ * Row flex (logo + input). Logo color/glow depende de data-name-touched.
+ * O input é borderless e usa um engrave inferior em vez de bowl recessed
+ * para se diferenciar do prompt textarea logo abaixo. */
+.cnp-zone--name {
+  /* Header-less zone — só o input + logo. */
+}
+.cnp-name-hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 4px 2px 8px;
+  position: relative;
+}
+/* Engrave divider — linha sutil abaixo do input que vira accent quando o
+ * nome está preenchido. Pseudo-element para não bagunçar o layout. */
+.cnp-name-hero::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  bottom: 0;
+  height: 1px;
+  background: var(--df-border-subtle);
+  transition: background 240ms ease-out;
+  pointer-events: none;
+}
+.cnp-name-hero.is-active::after {
+  background: var(--df-accent-user, var(--df-accent-ok));
+  box-shadow: 0 0 8px var(--df-accent-user, var(--df-accent-ok));
+}
+.cnp-name-hero-logo {
+  flex-shrink: 0;
+  /* color e filter transicionam — currentColor controla o fill no SVG. */
+  color: var(--df-text-faint);
+  filter: drop-shadow(0 0 0px transparent);
+  transition:
+    color 240ms ease-out,
+    filter 240ms ease-out;
+}
+.cnp-name-hero.is-active .cnp-name-hero-logo {
+  color: var(--df-accent-user, var(--df-accent-ok));
+  filter: drop-shadow(0 0 12px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 60%, transparent));
+}
+@media (prefers-reduced-motion: reduce) {
+  .cnp-name-hero::after,
+  .cnp-name-hero-logo {
+    transition: none;
+  }
+}
+.cnp-name-hero-input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: var(--df-text-primary);
+  font-family: var(--df-font-display, var(--df-font-sans));
+  font-size: 22px;
+  letter-spacing: -0.012em;
+  font-weight: var(--df-fw-medium, 500);
+  padding: 6px 0;
+  width: 100%;
+  min-width: 0;
+}
+.cnp-name-hero-input::placeholder {
+  color: var(--df-text-faint);
+  font-style: italic;
+  font-weight: 400;
+}
+@media (max-height: 720px) {
+  .cnp-name-hero { padding: 2px 2px 6px; }
+  .cnp-name-hero-input { font-size: 19px; padding: 4px 0; }
+}
+
+/* ─── Composer toolbar extra slot (model rocker home) ──────────────── */
+.np-composer-bar-extra {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 6px;
+  padding-left: 8px;
+  border-left: 1px solid var(--df-border-subtle);
+  flex-shrink: 0;
+}
+/* Tighten the rocker so it fits inside the composer bar without pushing
+ * the bar height. Width clamps so long model names ellipsize. */
+.np-composer-bar-extra .cnp-model-rocker {
+  padding: 4px 8px;
+  font-size: 11px;
+  height: 24px;
+  min-width: 0;
+  max-width: 200px;
+}
+.np-composer-bar-extra .cnp-model-rocker-label {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* v5: a v5 prompt bowl é só uma marker class — o textarea do composer já
+ * estende cnp-prompt-textarea, então o aumento de altura sai direto da
+ * `rows={6}` que o form passa pro composer. */
+.cnp-prompt-bowl-v5 .np-composer-textarea {
+  min-height: 168px;
+}
+@media (max-height: 800px) {
+  .cnp-prompt-bowl-v5 .np-composer-textarea { min-height: 132px; }
+}
+@media (max-height: 720px) {
+  .cnp-prompt-bowl-v5 .np-composer-textarea { min-height: 108px; }
+}
+@media (max-height: 640px) {
+  .cnp-prompt-bowl-v5 .np-composer-textarea { min-height: 88px; }
+}
+
+/* ─── 3×2 dial grid (v5) ─────────────────────────────────────────────
+ * 6 dials: density / motion / contrast / interactions / surface / originality.
+ * Mantém o mesmo recess + knob skeu. Active-only state (data-active="false")
+ * fica em standby — knob cinza, label muted, sem engrave-bottom. */
+.cnp-dials-grid-3x2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 8px;
+}
+.cnp-dials-grid-3x2 .cnp-dial {
+  padding: 8px 10px 10px;
+  gap: 4px;
+  position: relative;
+  transition: opacity 200ms ease-out;
+}
+.cnp-dials-grid-3x2 .cnp-dial-track { height: 24px; }
+.cnp-dials-grid-3x2 .cnp-dial-knob {
+  width: 18px; height: 18px;
+  margin-top: -9px; margin-left: -9px;
+}
+.cnp-dials-grid-3x2 .cnp-dial-ticks { display: none; }
+
+/* The active-state accent underline was removed — colour cues live in
+ * the knob and the readout, the cell stays clean. */
+/* Inactive dial — content recedes a notch. Label paler, knob neutral
+ * (via data-pole="mid"), readout fades (via .cnp-dial-readout-num
+ * only rendering when value !== 50). */
+.cnp-dials-grid-3x2 .cnp-dial[data-active="false"] .cnp-dial-label {
+  color: var(--df-text-faint);
+}
+.cnp-dials-grid-3x2 .cnp-dial[data-active="false"] .cnp-dial-readout {
+  opacity: 0.7;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cnp-dials-grid-3x2 .cnp-dial {
+    transition: none;
+  }
+}
+/* Tablet/mobile — 2 cols (3+3 stacks). */
+@media (max-width: 1023px) {
+  .cnp-dials-grid-3x2 {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(3, 1fr);
+  }
+}
+/* Tight viewports — shrink padding + dimensions another notch. */
+@media (max-height: 720px) {
+  .cnp-dials-grid-3x2 { gap: 6px; }
+  .cnp-dials-grid-3x2 .cnp-dial { padding: 6px 8px 8px; }
+  .cnp-dials-grid-3x2 .cnp-dial-track { height: 22px; }
+  .cnp-dials-grid-3x2 .cnp-dial-knob {
+    width: 16px; height: 16px;
+    margin-top: -8px; margin-left: -8px;
+  }
+  .cnp-dials-grid-3x2 .cnp-dial-label { font-size: 8.5px; }
+  .cnp-dials-grid-3x2 .cnp-dial-readout { font-size: 8.5px; }
+}
+
+/* ─── DS cards row (v5) ──────────────────────────────────────────────
+ * Substitui o botão skeu único "Choose DS" por uma row inline com até 3
+ * cards (swatches + nome) e um botão "Ver mais" pra abrir o modal. */
+.cnp-ds-cards-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 6px;
+  align-items: stretch;
+}
+.cnp-ds-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-on-tactile);
+  border: 0;
+  border-radius: var(--df-r-md);
+  padding: 7px 7px 7px;
+  cursor: pointer;
+  box-shadow: var(--df-shadow-button-tactile);
+  width: 100%;
+  text-align: left;
+  font-family: var(--df-font-sans);
+  transition:
+    box-shadow 80ms ease-out,
+    transform 80ms ease-out;
+}
+.cnp-ds-card:hover {
+  box-shadow: var(--df-shadow-button-tactile-hover);
+  transform: translateY(1px);
+}
+.cnp-ds-card:active {
+  box-shadow: var(--df-shadow-button-tactile-pressed);
+  transform: translateY(1px);
+}
+.cnp-ds-card.is-on {
+  box-shadow:
+    0 0 0 1px var(--df-accent-user, var(--df-accent-ok)),
+    var(--df-shadow-button-tactile-pressed);
+}
+.cnp-ds-card-swatches {
+  display: flex;
+  gap: 2px;
+  width: 100%;
+  border-radius: var(--df-r-xs, 3px);
+  overflow: hidden;
+  height: 14px;
+}
+.cnp-ds-card-sw {
+  flex: 1;
+  height: 100%;
+  border: 1px solid rgba(0,0,0,0.35);
+  border-radius: 2px;
+}
+.cnp-ds-card-name {
+  font-family: var(--df-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  font-weight: var(--df-fw-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+.cnp-ds-card-check {
+  position: absolute;
+  top: 4px;
+  right: 5px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--df-accent-user, var(--df-accent-ok));
+  color: var(--df-bg-base);
+  font-size: 8px;
+  line-height: 12px;
+  text-align: center;
+  font-weight: 700;
+}
+.cnp-ds-more-key {
+  background: var(--df-bg-section);
+  color: var(--df-text-muted);
+  border: 1px dashed var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  padding: 6px 8px;
+  cursor: pointer;
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  text-align: center;
+  transition: color 120ms ease-out, border-color 120ms ease-out;
+}
+.cnp-ds-more-key:hover {
+  color: var(--df-text-primary);
+  border-color: var(--df-text-muted);
+}
+.cnp-ds-more-caret {
+  font-size: 12px;
+  line-height: 1;
+}
+.cnp-ds-empty-key {
+  background: var(--df-bg-section);
+  color: var(--df-text-muted);
+  border: 1px dashed var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  padding: 9px 12px;
+  cursor: pointer;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-align: left;
+  width: 100%;
+  transition: color 120ms ease-out, border-color 120ms ease-out;
+}
+.cnp-ds-empty-key:hover {
+  color: var(--df-text-primary);
+  border-color: var(--df-text-muted);
+}
+
+/* Light mode parity — keep names readable on cream paper. */
+[data-theme="light"] .cnp-ds-card {
+  background: var(--df-surface-elevated);
+  color: var(--df-text-primary);
+}
+[data-theme="light"] .cnp-ds-card-sw {
+  border-color: rgba(40, 30, 22, 0.18);
+}
+[data-theme="light"] .cnp-ds-more-key,
+[data-theme="light"] .cnp-ds-empty-key {
+  background: var(--df-surface-elevated);
+  color: var(--df-text-secondary);
+}
+
+/* ─── Engrave meta variant — used on TASTE column header ──────────── */
+.cnp-zone-meta--mute {
+  color: var(--df-text-faint);
+  font-style: italic;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+ * Composer + name input — layout invariants
+ *   1. Composer bar breathes — ~70px tall, two internal rows (tools+meta).
+ *   2. Model rocker is large (44–48px tall, 220–320px wide), with the
+ *      dropdown anchored below it (not viewport-fixed).
+ *   3. Trigger dots (.cnp-trigger-dot) light up on the external keys
+ *      (Canvas / Formato / Regras) when a selection is active.
+ *   4. Name input is fully borderless, no bottom engrave. The glow lives
+ *      on the faceplate topbar (.np-modal-face-mark.is-active).
+ *   5. Responsive checkbox — toggle in the CanvasModal footer.
+ * ════════════════════════════════════════════════════════════════════ */
+
+/* ─── 1. Composer bar — taller, breathy, 2 internal rows ─────────────
+ *
+ * The DS dropdown lives in the toolbar middle slot, replacing the
+ * static "soltar · colar · arrastar" hint. Bar layout (left → right):
+ * [📎] [🎤] [empty flex] [DS + Model cluster].
+ */
+.cnp-prompt-bowl-v5 .np-composer-bar {
+  /* Override the compact composer (4px 6px, 28x24 tools). The bar grows
+   * to ~70px tall and organizes tools + extra into two conceptual rows
+   * (flex-wrap). The larger padding gives the bar room to breathe.
+   *
+   * Layout: [📎] [🎤] [empty flex] [DS + Model cluster]. Flex with
+   * margin-left: auto on the cluster pushes it to the right edge while
+   * the static hint is suppressed via hideHint=true. */
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  min-height: 64px;
+}
+.cnp-prompt-bowl-v5 .np-composer-tool {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--df-r-sm);
+}
+.cnp-prompt-bowl-v5 .np-composer-tool svg {
+  width: 16px;
+  height: 16px;
+}
+.cnp-prompt-bowl-v5 .np-composer-bar-spacer {
+  /* v12: bar reverted to flex layout (was grid). Spacer is now a real
+   * flex:1 element so the cluster (DS + Model) is pushed to the right. */
+  display: block;
+  flex: 1;
+}
+.cnp-prompt-bowl-v5 .np-composer-bar-hint {
+  /* Move hint to a softer position (centered between tools group and
+   * model rocker) and keep typographic weight low. */
+  font-size: 9.5px;
+  text-align: right;
+  max-width: none;
+  padding-right: 6px;
+}
+@media (max-width: 800px) {
+  .cnp-prompt-bowl-v5 .np-composer-bar {
+    grid-template-columns: auto auto 1fr;
+    grid-template-areas:
+      "attach mic rocker"
+      "hint hint hint";
+    row-gap: 6px;
+  }
+  .cnp-prompt-bowl-v5 .np-composer-bar > .np-composer-bar-hint {
+    grid-area: hint;
+    text-align: left;
+    padding-right: 0;
+  }
+}
+
+/* ─── 2. Model rocker v6 — bigger, anchored dropdown ───────────────── */
+.cnp-model-rocker-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  /* Same fix as .cnp-ds-dropdown-wrap (PR #125). Lift the wrap above
+   * sibling stacking contexts in the np-modal so the rocker's
+   * anchored menu doesn't get covered by adjacent buttons / picker-
+   * keys that create transient contexts via :active transforms.
+   * isolation: isolate forces a clean stacking root for the popover
+   * subtree. */
+  z-index: 80;
+  isolation: isolate;
+}
+/* Override the v5 footer-extra constraint — rocker is now a primary
+ * control, not a tucked-in sibling. */
+.np-composer-bar-extra {
+  display: contents; /* let the wrap participate in the grid layout */
+}
+.cnp-model-rocker--v6 {
+  /* v6 dimensions — meets the user's "nice and big" ask. */
+  height: 44px;
+  min-width: 220px;
+  max-width: 320px;
+  padding: 10px 14px;
+  border-radius: var(--df-r-md);
+  font-size: 12.5px;
+  gap: 10px;
+}
+.cnp-model-rocker--v6 .cnp-model-rocker-label {
+  font-size: 12.5px;
+  font-weight: var(--df-fw-medium, 500);
+  max-width: none;
+}
+.cnp-model-rocker--v6 .cnp-model-rocker-caret {
+  font-size: 11px;
+}
+/* Tighter slot caps from v5 are now obsolete — undo so the v6 rocker
+ * occupies its full size inside the composer bar. */
+.np-composer-bar-extra .cnp-model-rocker {
+  padding: 10px 14px;
+  font-size: 12.5px;
+  height: 44px;
+  min-width: 220px;
+  max-width: 320px;
+}
+.np-composer-bar-extra .cnp-model-rocker-label {
+  max-width: none;
+}
+
+/* Anchored dropdown — sits 4px below the rocker, left-aligned, matches
+ * rocker width but expands a bit for legibility, scrollable past 50vh. */
+.reg-model-menu--anchored {
+  /* Override the v5 viewport-fixed positioning. */
+  position: absolute;
+  bottom: auto;
+  right: auto;
+  top: calc(100% + 4px);
+  left: 0;
+  width: max(260px, 100%);
+  max-width: 360px;
+  max-height: 50vh;
+  overflow-y: auto;
+  z-index: var(--df-z-popover, 50);
+  /* Keep the v5 chrome but lift the shadow stack a bit. */
+  box-shadow: var(--df-shadow-xl);
+}
+/* If the rocker sits near the bottom edge of the viewport (composer is
+ * usually below the prompt), the dropdown might clip — fall back to
+ * opening upward when there isn't room. We nudge with a CSS-only hint:
+ * inside short viewports the menu opens above. */
+@media (max-height: 720px) {
+  .reg-model-menu--anchored {
+    /* Open upward when viewport is tight. JS-less heuristic. */
+    top: auto;
+    bottom: calc(100% + 4px);
+  }
+}
+
+/* ─── 3. Trigger dot — accent dot on Canvas/Format/Rules outer keys ── */
+.cnp-trigger-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  /* Default: empty bowl recess — sits invisible/subtle on the key. */
+  background: var(--df-bg-bowl, var(--df-surface-elevated));
+  box-shadow:
+    inset 0 1px 1px rgba(0, 0, 0, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+  flex-shrink: 0;
+  transition:
+    background 100ms ease-out,
+    box-shadow 100ms ease-out,
+    transform 80ms cubic-bezier(0.5, 1.5, 0.5, 1);
+  transform: scale(0.6);
+  opacity: 0.5;
+}
+.cnp-format-key.is-on .cnp-trigger-dot,
+.cnp-dir-key.is-on .cnp-trigger-dot,
+.cnp-picker-key.is-on .cnp-trigger-dot {
+  /* Small skeu LED — flat accent fill, single soft halo, tiny specular.
+   * Sized for a 6x6 dot, so any halo larger than ~4px reads as glow
+   * smear rather than light source. */
+  background: var(--df-accent-user, var(--df-accent-ok));
+  box-shadow:
+    0 0 4px 0 color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 55%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: scale(1);
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cnp-trigger-dot { transition: none; }
+}
+
+/* ─── 4. Name input v6 — borderless, no engrave bottom ──────────────── */
+.cnp-name-hero--v6 {
+  /* Cancel the v5 engrave line + accent flip — input now floats clean
+   * on the faceplate. The glow lives on the modal topbar logo instead. */
+  padding: 6px 2px 8px;
+}
+.cnp-name-hero--v6::after {
+  display: none; /* kill the engrave-bottom pseudo */
+}
+.cnp-name-hero--v6 .cnp-name-hero-input {
+  background: transparent;
+  border: 0;
+  outline: 0;
+  box-shadow: none;
+  /* font-size kept ~22px from v5; cursor visibility handled by browser
+   * default caret on focus. */
+}
+.cnp-name-hero--v6.is-active .cnp-name-hero-input {
+  /* Active state is silent on the input itself — glow lives on the logo
+   * of the faceplate header. */
+  color: var(--df-text-primary);
+}
+
+/* ─── 5. Faceplate logo glow (np-modal-face-mark) ──────────────────── */
+.np-modal-face-mark {
+  /* Inherit base from np-modal.css; we just add the transition + active
+   * state for v6. */
+  transition:
+    color 240ms ease-out,
+    box-shadow 240ms ease-out,
+    background 240ms ease-out,
+    opacity 240ms ease-out;
+}
+.np-modal-face-mark.is-active {
+  /* Logo turns accent + glow when the user starts typing the name. */
+  color: var(--df-accent-user, var(--df-accent-ok));
+  background: var(--df-bg-base);
+  opacity: 1;
+  box-shadow:
+    var(--df-skeu-recess),
+    0 0 12px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 60%, transparent);
+}
+.np-modal-face-mark.is-active svg {
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 70%, transparent));
+}
+@media (prefers-reduced-motion: reduce) {
+  .np-modal-face-mark { transition: none; }
+  .np-modal-face-mark.is-active svg { filter: none; }
+}
+
+/* ─── 6. Responsive checkbox in CanvasModal footer ─────────────────── */
+/* v28: hint sub-label removed (lives in subtitle now); toggle becomes
+ * a compact pill in footer-left next to the stat. */
+.cnv-responsive-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  padding: 5px 10px 5px 8px;
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+  background: var(--df-bg-section);
+  font-family: var(--df-font-sans);
+  font-size: 12px;
+  color: var(--df-text-secondary);
+  transition: color 120ms ease-out, background 120ms ease-out, border-color 120ms ease-out;
+}
+.cnv-responsive-toggle:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+}
+.cnv-responsive-toggle input[type="checkbox"] {
+  /* Hidden but still semantic + focusable. */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.cnv-responsive-bowl {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: var(--df-bg-bowl, var(--df-surface-elevated));
+  border: 1px solid var(--df-border-subtle);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.02);
+  flex-shrink: 0;
+  position: relative;
+}
+.cnv-responsive-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--df-accent-user, var(--df-accent-ok));
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--df-accent-user, var(--df-accent-ok)) 60%, transparent 40%),
+    0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: scale(0);
+  transition: transform 100ms cubic-bezier(0.5, 1.5, 0.5, 1);
+}
+.cnv-responsive-toggle[data-on="true"] .cnv-responsive-dot {
+  transform: scale(1);
+}
+.cnv-responsive-toggle[data-on="true"] {
+  color: var(--df-accent-user, var(--df-accent-ok));
+  border-color: var(--df-accent-user, var(--df-accent-ok));
+}
+.cnv-responsive-label {
+  font-weight: var(--df-fw-medium, 500);
+  letter-spacing: -0.005em;
+}
+.cnv-responsive-hint {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  color: var(--df-text-faint);
+  letter-spacing: 0.04em;
+}
+.cnv-responsive-toggle:focus-within .cnv-responsive-bowl {
+  outline: 2px solid var(--df-accent);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cnv-responsive-dot { transition: none; }
+}
+
+/* CanvasModal footer needs to be a flex with the toggle in the middle. */
+.cnv-modal .dmv2-foot {
+  flex-wrap: wrap;
+  row-gap: 8px;
+}
+
+/* ─── 7. Row meta column-fit — kill any 50% ellipsis cap ───────────── */
+/* The v5 .dmv2-row-desc had max-width: 50% which truncated long descs
+ * even when there was room. Switch to flex-shrink: 0 + tight clamp. */
+.dmv2-row-desc {
+  max-width: 60%;
+}
+.dmv2-row-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ─── Light mode parity for v6 additions ───────────────────────────── */
+[data-theme="light"] .cnp-trigger-dot {
+  background: var(--df-surface-elevated);
+}
+[data-theme="light"] .cnp-format-key.is-on .cnp-trigger-dot,
+[data-theme="light"] .cnp-dir-key.is-on .cnp-trigger-dot,
+[data-theme="light"] .cnp-picker-key.is-on .cnp-trigger-dot {
+  /* Light mode: same flat fill, slightly wider halo (paper eats shadow). */
+  background: var(--df-accent-user, var(--df-accent-ok));
+  box-shadow:
+    0 0 5px 0 color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 50%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+[data-theme="light"] .reg-model-menu--anchored {
+  background: var(--df-surface-elevated);
+  border-color: var(--df-border-subtle);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+ * Picker key + DS card refinements
+ *   1. Unified picker key — Canvas / Formato / Regras share one shape.
+ *      Height 44px (matches the model rocker), one bezel, one caret.
+ *   2. DS cards bigger — minmax grows 96 → 138, height grows, names
+ *      have room to breathe.
+ *   3. is-on accent ring on .cnp-picker-key (replaces the shadow-only
+ *      flip that didn't read clearly).
+ *   4. Light mode parity for the picker key.
+ * ════════════════════════════════════════════════════════════════════ */
+
+/* ─── 1. Unified picker key (Canvas / Formato / Regras) ────────────── */
+.cnp-picker-key {
+  /* Same skeu bg/shadow as the existing tactile keys. */
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-on-tactile);
+  border: 0;
+  border-radius: var(--df-r-md);
+  box-shadow: var(--df-shadow-button-tactile);
+
+  /* Default geometry — 44px tall to match the model rocker. The PROJETO
+   * column overrides height to 100% so cards stretch to fill. */
+  height: 44px;
+  width: 100%;
+  padding: 0 14px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+
+  cursor: pointer;
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  letter-spacing: -0.005em;
+  text-align: left;
+
+  transition:
+    box-shadow 100ms ease-out,
+    transform 80ms ease-out,
+    color 120ms ease-out;
+}
+
+.cnp-picker-key:hover {
+  box-shadow: var(--df-shadow-button-tactile-hover);
+}
+.cnp-picker-key:active {
+  box-shadow: var(--df-shadow-button-tactile-pressed);
+  transform: translateY(1px);
+}
+.cnp-picker-key:focus-visible {
+  outline: 2px solid var(--df-accent-user, var(--df-accent-ok));
+  outline-offset: 2px;
+}
+.cnp-picker-key:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: var(--df-shadow-button-tactile);
+}
+
+.cnp-picker-key.is-on {
+  /* Pressed-feel shadow when something is picked. No accent ring around
+   * the card — the LED dot is the only colour cue, the bezel reads as
+   * recessed via shadow alone. */
+  box-shadow: var(--df-shadow-button-tactile-pressed);
+}
+
+.cnp-picker-key-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Slightly stronger weight when active so the value reads as a "chosen"
+   * thing, not a placeholder. */
+  font-weight: 500;
+}
+.cnp-picker-key:not(.is-on) .cnp-picker-key-label {
+  color: var(--df-text-on-tactile);
+  opacity: 0.78;
+}
+.cnp-picker-key.is-on .cnp-picker-key-label {
+  color: var(--df-text-on-tactile);
+  opacity: 1;
+}
+
+.cnp-picker-key-dot {
+  /* Inherits cnp-trigger-dot animation/colors. Sized 6x6 to match the
+   * AgentPicker provider dot for visual consistency across the app. */
+  width: 6px;
+  height: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cnp-picker-key { transition: none; }
+}
+
+/* ─── 2. DS cards — sized so swatches and names have breathing room ─── */
+/* minmax(138px, 1fr); padding 10px; swatches 22px; name 12px. */
+.cnp-ds-cards-row {
+  /* Override v5 grid template — bigger min so cards don't squeeze. */
+  grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
+  gap: 8px;
+}
+.cnp-ds-card {
+  /* Override v5 padding (7px) for more breathing room. */
+  padding: 10px 10px 11px;
+  gap: 8px;
+  /* Lock min-height so all cards in a row line up even if names wrap. */
+  min-height: 64px;
+}
+.cnp-ds-card-swatches {
+  /* Was 14px tall — bumped to 22px so the swatches actually read. */
+  height: 22px;
+  border-radius: 4px;
+}
+.cnp-ds-card-sw {
+  border-radius: 3px;
+}
+.cnp-ds-card-name {
+  /* Was 10.5px mono — bumped to 12px sans for clearer reading. */
+  font-family: var(--df-font-sans);
+  font-size: 12px;
+  letter-spacing: -0.005em;
+  font-weight: 500;
+}
+.cnp-ds-card-check {
+  /* Slightly larger so it's visible against the bigger card. */
+  width: 14px;
+  height: 14px;
+  font-size: 9px;
+  line-height: 14px;
+  top: 6px;
+  right: 7px;
+}
+.cnp-ds-more-key,
+.cnp-ds-empty-key {
+  /* Match the new card height so the row reads as one stripe. */
+  min-height: 64px;
+  padding: 10px 12px;
+  font-size: 11px;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+ * Composer + dial-grid corrections
+ *   1. DS dropdown in the composer toolbar (replaces the static hint).
+ *   2. Mini-caption surfaces char-count / error when the DS dropdown is
+ *      shown.
+ *   3. Taste dials use a 2×3 grid (gives each dial more breathing room
+ *      than the original 3×2).
+ *   4. Footer rises (the modal shrinks ~80px once the DS row is gone).
+ * ════════════════════════════════════════════════════════════════════ */
+
+/* ─── 1. Composer bar — DS dropdown mid slot + mini-caption ──────── */
+.cnp-prompt-bowl-v5 .np-composer-bar-mid {
+  /* Sits between mic and rocker, next to a tiny mini-caption sibling. */
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.cnp-prompt-bowl-v5 .np-composer-bar-mini {
+  /* Compact hint that replaces the full-size hint when the DS dropdown
+   * occupies the middle slot. Mono, faint, tabular nums. */
+  font-family: var(--df-font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  color: var(--df-text-faint);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  align-self: center;
+  padding-left: 4px;
+}
+
+/* When the DS dropdown is the mid slot AND value is empty (no mini),
+ * the mid slot expands. Hide the legacy hint span (we render the
+ * dropdown inline instead). */
+.cnp-prompt-bowl-v5 .np-composer-bar > .np-composer-bar-mid + .np-composer-bar-spacer {
+  /* spacer is `display: none` already from v5/v6 override; this rule
+   * documents the intent for clarity. */
+}
+
+@media (max-width: 800px) {
+  .cnp-prompt-bowl-v5 .np-composer-bar {
+    /* On narrow viewports the DS dropdown gets its own row above the
+     * mic/attach + rocker line. */
+    grid-template-columns: auto auto 1fr auto;
+    grid-template-areas:
+      "attach mic mid rocker"
+      "mini  mini mini mini";
+    row-gap: 6px;
+  }
+  .cnp-prompt-bowl-v5 .np-composer-bar-mid {
+    grid-area: mid;
+    justify-self: end;
+  }
+  .cnp-prompt-bowl-v5 .np-composer-bar-mini {
+    grid-area: mini;
+  }
+}
+
+/* ─── 2. DS dropdown trigger ─────────────────────────────────────── */
+.cnp-ds-dropdown-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  /* Lift the wrap above sibling stacking contexts inside the np-modal
+   * (composer rocker, taste dials, format/rules keys all create their
+   * own contexts via transform on :active). Without this, the popover
+   * (z-index 200 relative to this wrap) is still trapped below later
+   * DOM siblings that paint on top. isolation: isolate forces a clean
+   * stacking root so the popover lifts the whole wrap subtree. */
+  z-index: 80;
+  isolation: isolate;
+}
+.cnp-ds-dropdown-trigger {
+  /* PickerKey-style 44px tactile pill — same chrome as ModelRocker so
+   * the two pills feel like the same instrument family. */
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  min-width: 180px;
+  max-width: 260px;
+  padding: 10px 14px;
+  background: var(--df-bg-button-tactile);
+  border: 0;
+  border-radius: var(--df-r-md);
+  font-family: var(--df-font-sans);
+  font-size: 12.5px;
+  font-weight: var(--df-fw-medium, 500);
+  color: var(--df-text-on-tactile);
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  box-shadow: var(--df-shadow-button-tactile);
+  transition: transform 80ms ease-out, box-shadow 80ms ease-out;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.cnp-ds-dropdown-trigger:hover {
+  box-shadow: var(--df-shadow-button-tactile-hover);
+}
+/* Compact variant for surfaces where the trigger sits in a 36px button
+ * row (chat input bar). Matches .chat-input-send dimensions so the row
+ * stays visually balanced. */
+.cnp-ds-dropdown-trigger.is-compact {
+  height: 36px;
+  min-width: 140px;
+  max-width: 200px;
+  padding: 8px 12px;
+  gap: 8px;
+  font-size: 12px;
+  border-radius: var(--df-r-md);
+}
+.cnp-ds-dropdown-trigger:active {
+  box-shadow: var(--df-shadow-button-tactile-pressed);
+  transform: translateY(1px);
+}
+.cnp-ds-dropdown-trigger.is-on {
+  /* Selected state — accent dot on the right via ::before pseudo not
+   * used here; instead the swatches strip on the left signals selection. */
+  box-shadow:
+    var(--df-shadow-button-tactile),
+    inset 0 0 0 1px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 40%, transparent);
+}
+.cnp-ds-dropdown-swatches {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  border-radius: 2px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.cnp-ds-dropdown-sw {
+  width: 5px;
+  height: 16px;
+  display: inline-block;
+}
+.cnp-ds-dropdown-label {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cnp-ds-dropdown-caret {
+  font-size: 11px;
+  color: var(--df-text-on-tactile);
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+/* ─── 3. DS dropdown menu — anchored, opens UPWARD from composer bar ── */
+.cnp-ds-dropdown-menu {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  min-width: 240px;
+  max-width: 320px;
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--df-surface-elevated);
+  border: 1px solid var(--df-border-divider);
+  border-radius: var(--df-r-md);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 var(--df-skeu-top-light),
+    0 16px 32px -8px rgba(0, 0, 0, 0.5),
+    0 32px 64px -16px rgba(0, 0, 0, 0.4);
+  padding: 4px;
+  z-index: 60;
+  animation: cnp-ds-dropdown-in 180ms cubic-bezier(0.18, 0.82, 0.32, 1.18);
+}
+[data-theme="light"] .cnp-ds-dropdown-menu {
+  background: var(--df-surface-raised);
+  box-shadow:
+    0 0 0 1px var(--df-border-strong, rgba(0, 0, 0, 0.16)),
+    inset 0 1px 0 var(--df-skeu-top-light),
+    0 12px 24px -6px rgba(0, 0, 0, 0.16),
+    0 24px 48px -12px rgba(0, 0, 0, 0.18);
+}
+@keyframes cnp-ds-dropdown-in {
+  0%   { opacity: 0; transform: translateY(4px) scale(0.98); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cnp-ds-dropdown-menu { animation: none; }
+}
+
+.cnp-ds-dropdown-opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  background: transparent;
+  border: 0;
+  border-radius: var(--df-r-sm);
+  font-family: var(--df-font-sans);
+  font-size: 12.5px;
+  color: var(--df-text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: background 80ms ease-out;
+}
+.cnp-ds-dropdown-opt:hover {
+  background: var(--df-interactive-hover);
+}
+.cnp-ds-dropdown-opt.is-on {
+  background: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 12%, transparent);
+}
+.cnp-ds-dropdown-opt-swatches {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  border-radius: 2px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.cnp-ds-dropdown-opt-sw {
+  width: 6px;
+  height: 18px;
+  display: inline-block;
+}
+.cnp-ds-dropdown-opt-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cnp-ds-dropdown-opt-check {
+  color: var(--df-accent-ok);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.cnp-ds-dropdown-opt-caret {
+  color: var(--df-text-faint);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.cnp-ds-dropdown-opt--clear {
+  border-bottom: 1px solid var(--df-border-subtle);
+  border-radius: 0;
+  margin-bottom: 4px;
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--df-text-muted);
+}
+.cnp-ds-dropdown-opt--more {
+  border-top: 1px solid var(--df-border-subtle);
+  border-radius: 0;
+  margin-top: 4px;
+  color: var(--df-text-muted);
+  font-family: var(--df-font-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ─── 4. Taste 2×3 dial grid (replaces 3×2) ──────────────────────────
+ *
+ * Spec 2026-05-05 (v11): "parte de taste poderiamos
+ * ter 2 colunas e 3 linhas, pra dar mais respiro pra cada slider e
+ * textos". Each dial gets ~50% width — the slider track and pole labels
+ * breathe more.
+ */
+.cnp-dials-grid-2x3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 10px;
+}
+.cnp-dials-grid-2x3 .cnp-dial {
+  padding: 10px 14px 12px;
+  gap: 6px;
+  position: relative;
+  transition: opacity 200ms ease-out;
+}
+.cnp-dials-grid-2x3 .cnp-dial-track { height: 26px; }
+.cnp-dials-grid-2x3 .cnp-dial-knob {
+  width: 20px; height: 20px;
+  margin-top: -10px; margin-left: -10px;
+}
+.cnp-dials-grid-2x3 .cnp-dial-ticks { display: none; }
+.cnp-dials-grid-2x3 .cnp-dial-poles {
+  /* More space between min/max labels — bigger letter-spacing as the
+   * dial is wider now. */
+  letter-spacing: 0.06em;
+}
+.cnp-dials-grid-2x3 .cnp-dial-label {
+  font-size: 11px;
+}
+.cnp-dials-grid-2x3 .cnp-dial-readout {
+  font-size: 11px;
+}
+
+/* The active-state accent underline was removed — colour cues live in
+ * the knob and the readout, the cell stays clean. */
+.cnp-dials-grid-2x3 .cnp-dial[data-active="false"] .cnp-dial-label {
+  color: var(--df-text-faint);
+}
+.cnp-dials-grid-2x3 .cnp-dial[data-active="false"] .cnp-dial-readout {
+  opacity: 0.7;
+}
+
+@media (max-width: 720px) {
+  .cnp-dials-grid-2x3 {
+    /* Below 720px, one dial per row keeps everything legible. */
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(6, auto);
+    gap: 8px;
+  }
+}
+
+/* ─── 5. PROJETO column distribution (v11) ───────────────────────────
+ *
+ * After the DS row migrated to the composer toolbar, PROJETO holds only
+ * 3 picker keys (Canvas / Formato / Regras). TASTE 2×3 is taller than
+ * before (~280px). Distribute the PROJETO keys vertically so the cell
+ * fills the column without an awkward white tail at the bottom.
+ *
+ * `justify-content: space-evenly` on the inner stack spreads the 3 keys
+ * across the available height. Header + meta stay top-anchored.
+ */
+.np-modal-stage .cnp-card--v4 .cnp-split-cell:first-child > .cnp-zone-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+.np-modal-stage .cnp-card--v4 .cnp-split-cell:first-child > .cnp-zone-body > .cnp-stack {
+  /* Stack itself stretches; rows distribute via justify-content above. */
+  flex: 1;
+  justify-content: space-evenly;
+  gap: 0;
+}
+
+/* ─── 6. Modal-specific 2×3 dial compaction (v11) ─────────────────────
+ *
+ * In the modal (./np-modal-stage), squeeze the 2×3 grid slightly so the
+ * 3 rows fit without the last row clipping. Outside the modal (lab
+ * route), dials keep their roomier defaults.
+ */
+.np-modal-stage .cnp-dials-grid-2x3 {
+  gap: 8px;
+}
+.np-modal-stage .cnp-dials-grid-2x3 .cnp-dial {
+  padding: 8px 12px 10px;
+  gap: 4px;
+}
+.np-modal-stage .cnp-dials-grid-2x3 .cnp-dial-track { height: 22px; }
+.np-modal-stage .cnp-dials-grid-2x3 .cnp-dial-knob {
+  width: 18px; height: 18px;
+  margin-top: -9px; margin-left: -9px;
+}
+.np-modal-stage .cnp-dials-grid-2x3 .cnp-dial-label {
+  font-size: 10.5px;
+}
+.np-modal-stage .cnp-dials-grid-2x3 .cnp-dial-readout {
+  font-size: 10.5px;
+}
+.np-modal-stage .cnp-dials-grid-2x3 .cnp-dial-poles {
+  font-size: 9px;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+ * Six user-flagged corrections.
+ *
+ * 1. DS card padronizado com Project/Template (handled in HomeScreen;
+ *    DS thumb component renders via EntityCard now).
+ * 2. Modal title input borderless inclusive on focus (np-v8.css).
+ * 3. SearchableDropdown — DS + Model use the same OpenRouter-style
+ *    popover with search + keyboard nav.
+ * 4. Overflow visible on picker keys + dials (this file, below).
+ * 5. PROJETO column: 3 picker keys top-justified gap 12px (this file,
+ *    overrides §5 above which used `space-evenly`).
+ * 6. Toolbar: DS + Model dropdowns clustered on the right (this file).
+ * ════════════════════════════════════════════════════════════════════ */
+
+/* ─── 6. Toolbar cluster — DS + Model side-by-side (right-anchored) ─── */
+.cnp-composer-toolbar-cluster {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  /* Pushed to the right edge by the spacer (np-composer-bar-spacer flex:1).
+   * margin-left: auto is a belt-and-braces — works even if the bar reverts
+   * to grid in a future iteration. */
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* ─── 4. Overflow relax — picker key + dial hover/active glow ────────
+ *
+ * Before v12, hover/active effects on .cnp-picker-key and the dials
+ * were clipped by the ancestor chain:
+ *   .np-modal-stage > .cnp-card > .cnp-zone--split > .cnp-split-cell >
+ *   .cnp-zone-body ← had `overflow-y: auto` from np-modal.css
+ *
+ * The cnp-zone-body overflow:auto was there to scroll inner content on
+ * extreme viewports, but it also clips the LED/accent ring shadows that
+ * the picker keys + dials cast on hover/drag. The fix is to relax that
+ * clip on the PROJETO column (which holds 3 picker keys in a stack
+ * shorter than its container) and on the TASTE column wrapper around
+ * the dial grid. The dial grid itself remains visible so accent flashes
+ * during drag escape the cell.
+ *
+ * Trade-off: if a viewport is so tight that picker keys would overflow,
+ * the keys themselves are 44px tall × 3 = ~132px + headers + gaps =
+ * comfortably under any modal stage min-height. The taste 2×3 grid was
+ * already engineered with compact padding (§6 above) for the same
+ * reason. So overflow:visible is safe.
+ */
+.np-modal-stage .cnp-card--v4 .cnp-split-cell > .cnp-zone-body {
+  /* Was: overflow-y: auto; */
+  overflow: visible;
+}
+.np-modal-stage .cnp-card--v4 .cnp-zone--split,
+.np-modal-stage .cnp-card--v4 .cnp-split,
+.np-modal-stage .cnp-card--v4 .cnp-split-cell {
+  overflow: visible;
+}
+.np-modal-stage .cnp-card--v4 .cnp-stack,
+.np-modal-stage .cnp-card--v4 .cnp-engine-col,
+.np-modal-stage .cnp-card--v4 .cnp-dials-grid-2x3 {
+  overflow: visible;
+}
+
+/* ─── 5. PROJETO column — 3 picker keys top-justified gap 12px ───────
+ *
+ * Spec v12: "esse espaçamento de canvas formato e regras ta mt
+ * feio ajeite justificando pra cima com espaçamento padronizado".
+ * Overrides the v11 `justify-content: space-evenly` (lines 3078-3088
+ * above) which spread the keys across the column height — the result
+ * looked like the keys were floating with awkward gaps.
+ *
+ * Now: keys hug the top, gap 12px between them (matches dial gap in
+ * the TASTE column for a unified rhythm). Empty space falls at the
+ * bottom of the column when the TASTE side is taller — that's fine,
+ * cleaner than uneven distribution.
+ */
+.np-modal-stage .cnp-card--v4 .cnp-split-cell:first-child > .cnp-zone-body {
+  justify-content: stretch;
+}
+.np-modal-stage .cnp-card--v4 .cnp-split-cell:first-child > .cnp-zone-body > .cnp-stack {
+  flex: 1 1 auto;
+  justify-content: stretch;
+  gap: 12px;
+  min-height: 0;
+}
+
+/* ─── 7. PROJETO column — picker keys fill the column height ─────────
+ *
+ * The 3 picker keys (Canvas / Formato / Regras) stretch to fill the
+ * available height of the PROJETO column instead of hugging the top.
+ * Each row gets `flex: 1 1 0` so they share the column equally; each
+ * key's height: 100% (override the default 44px) so the bezel + LED
+ * scale up. Aligns with the TASTE 2x3 dial grid on the right side —
+ * both columns reach the same baseline.
+ */
+.np-modal-stage .cnp-card--v4 .cnp-split-cell:first-child .cnp-stack-row {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+}
+.np-modal-stage .cnp-card--v4 .cnp-split-cell:first-child .cnp-picker-key {
+  height: 100%;
+  min-height: 64px;
+  /* Bigger label for the larger card surface. The LED stays 6x6 to
+   * keep parity with the AgentPicker provider dot — it is a status
+   * cue, not a focal element. */
+  font-size: 14px;
+  padding: 0 18px;
+}
+
+/* ─── 8. No scroll on PROJETO/TASTE column bodies + extra breathing ───
+ *
+ * User 2026-05-17: "tira esse scroll nos botoes de canvas, formato
+ * e tal, muito desnecessário, da mais respiro pra tudo no modal".
+ *
+ * Two things going on:
+ *   1. The base rule in np-modal.css sets `overflow-y: auto` on every
+ *      .np-modal-stage .cnp-card--v4 .cnp-split-cell > .cnp-zone-body.
+ *      Earlier overrides (§4 above) set it to visible but the order
+ *      across stylesheets is fragile. Force `visible` here with the
+ *      same selector — last rule in the cascade wins regardless.
+ *   2. Bump split column gap + card gap + card padding so the picker
+ *      column and dial column don't crowd each other.
+ */
+.np-modal-stage .cnp-card--v4 .cnp-split-cell > .cnp-zone-body,
+.np-modal-stage .cnp-card--v4 .cnp-split-cell:first-child > .cnp-zone-body,
+.np-modal-stage .cnp-card--v4 .cnp-split-cell:last-child > .cnp-zone-body {
+  overflow: visible;
+}
+.np-modal-stage .cnp-card--v4 .cnp-stack,
+.np-modal-stage .cnp-card--v4 .cnp-engine-col,
+.np-modal-stage .cnp-card--v4 .cnp-dials-grid-2x3 {
+  overflow: visible;
+}
+/* Breathing — bump the split gap (between PROJETO and TASTE columns),
+ * the inter-row gap on picker keys, and the grid's vertical rhythm. */
+.np-modal-stage .cnp-card--v4 .cnp-split {
+  gap: 20px;
+}
+.np-modal-stage .cnp-card--v4 .cnp-split-cell:first-child > .cnp-zone-body > .cnp-stack {
+  gap: 16px;
+}
+.np-modal-stage .cnp-card.cnp-card--v4 {
+  /* Was: gap 14px between rows (name | prompt | split | foot). Bump to
+   * 18px so the split row has visible breathing top + bottom — easier on
+   * the eye than the old "tudo colado". */
+  gap: 18px;
+}
+

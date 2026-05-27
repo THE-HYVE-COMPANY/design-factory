@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linear — Design System Preview</title>
+<!-- Linear's custom typeface isn't publicly distributed. Inter is the closest cross-platform substitute per the doc. JetBrains Mono substitutes Linear Mono. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Brand & Accent */
+    --c-primary: #5e6ad2;
+    --c-primary-hover: #828fff;
+    --c-primary-focus: #5e69d1;
+    --c-brand-secure: #7a7fad;
+    --c-on-primary: #ffffff;
+
+    /* Surface */
+    --c-canvas: #010102;
+    --c-surface-1: #0f1011;
+    --c-surface-2: #181a1c;
+    --c-surface-3: #1f2124;
+    --c-surface-4: #26282c;
+    --c-hairline: #23252a;
+    --c-hairline-strong: #2e3036;
+    --c-hairline-tertiary: #1a1c1f;
+    --c-inverse-canvas: #ffffff;
+    --c-inverse-surface-1: #f4f5f6;
+    --c-inverse-surface-2: #e8eaec;
+    --c-inverse-ink: #08090a;
+
+    /* Text */
+    --c-ink: #f7f8f8;
+    --c-ink-muted: #d0d6e0;
+    --c-ink-subtle: #8a8f98;
+    --c-ink-tertiary: #62666d;
+
+    /* Semantic */
+    --c-success: #27a644;
+    --c-overlay: rgba(0,0,0,0.75);
+
+    /* Spacing */
+    --s-xxs: 4px;
+    --s-xs: 8px;
+    --s-sm: 12px;
+    --s-md: 16px;
+    --s-lg: 24px;
+    --s-xl: 32px;
+    --s-xxl: 48px;
+    --s-section: 96px;
+
+    /* Radius */
+    --r-xs: 4px;
+    --r-sm: 6px;
+    --r-md: 8px;
+    --r-lg: 12px;
+    --r-xl: 16px;
+    --r-xxl: 24px;
+    --r-pill: 9999px;
+    --r-full: 9999px;
+
+    /* Families */
+    --ff-display: 'Inter', 'SF Pro Display', -apple-system, system-ui, 'Segoe UI', Roboto, sans-serif;
+    --ff-text: 'Inter', 'SF Pro Display', -apple-system, system-ui, 'Segoe UI', Roboto, sans-serif;
+    --ff-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--c-canvas);
+    color: var(--c-ink);
+    font-family: var(--ff-text);
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: -0.05px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 var(--s-xl);
+  }
+
+  /* ------- Typography utilities ------- */
+  .t-display-xl { font-family: var(--ff-display); font-size: 80px; font-weight: 600; line-height: 1.05; letter-spacing: -3.0px; }
+  .t-display-lg { font-family: var(--ff-display); font-size: 56px; font-weight: 600; line-height: 1.10; letter-spacing: -1.8px; }
+  .t-display-md { font-family: var(--ff-display); font-size: 40px; font-weight: 600; line-height: 1.15; letter-spacing: -1.0px; }
+  .t-headline   { font-family: var(--ff-display); font-size: 28px; font-weight: 600; line-height: 1.20; letter-spacing: -0.6px; }
+  .t-card-title { font-family: var(--ff-display); font-size: 22px; font-weight: 500; line-height: 1.25; letter-spacing: -0.4px; }
+  .t-subhead    { font-family: var(--ff-text);    font-size: 20px; font-weight: 400; line-height: 1.40; letter-spacing: -0.2px; }
+  .t-body-lg    { font-family: var(--ff-text);    font-size: 18px; font-weight: 400; line-height: 1.50; letter-spacing: -0.1px; }
+  .t-body       { font-family: var(--ff-text);    font-size: 16px; font-weight: 400; line-height: 1.50; letter-spacing: -0.05px; }
+  .t-body-sm    { font-family: var(--ff-text);    font-size: 14px; font-weight: 400; line-height: 1.50; letter-spacing: 0; }
+  .t-caption    { font-family: var(--ff-text);    font-size: 12px; font-weight: 400; line-height: 1.40; letter-spacing: 0; }
+  .t-button     { font-family: var(--ff-text);    font-size: 14px; font-weight: 500; line-height: 1.20; letter-spacing: 0; }
+  .t-eyebrow    { font-family: var(--ff-text);    font-size: 13px; font-weight: 500; line-height: 1.30; letter-spacing: 0.4px; text-transform: uppercase; color: var(--c-ink-subtle); }
+  .t-mono       { font-family: var(--ff-mono);    font-size: 13px; font-weight: 400; line-height: 1.50; letter-spacing: 0; }
+
+  /* ------- Top nav ------- */
+  .top-nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--c-canvas);
+    border-bottom: 1px solid var(--c-hairline);
+    height: 56px;
+  }
+  .top-nav-inner {
+    display: flex;
+    align-items: center;
+    height: 56px;
+    gap: var(--s-xl);
+  }
+  .brand {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--ff-display); font-weight: 600; font-size: 17px; letter-spacing: -0.5px;
+    color: var(--c-ink);
+  }
+  .brand-mark {
+    width: 22px; height: 22px;
+    border-radius: var(--r-sm);
+    background: linear-gradient(135deg, var(--c-primary), var(--c-primary-focus));
+    display: inline-block;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+  .nav-links {
+    display: flex; gap: var(--s-lg); flex: 1;
+    margin-left: var(--s-xl);
+  }
+  .nav-links a {
+    color: var(--c-ink-subtle);
+    font-family: var(--ff-text);
+    font-size: 14px; font-weight: 500; letter-spacing: 0;
+    transition: color .15s ease;
+  }
+  .nav-links a:hover { color: var(--c-ink); }
+  .nav-cta { display: flex; gap: var(--s-xs); align-items: center; }
+
+  /* ------- Buttons ------- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: var(--ff-text); font-size: 14px; font-weight: 500; line-height: 1.20; letter-spacing: 0;
+    padding: 8px 14px;
+    border-radius: var(--r-md);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease, border-color .15s ease;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  .btn-primary {
+    background: var(--c-primary);
+    color: var(--c-on-primary);
+  }
+  .btn-primary:hover { background: var(--c-primary-hover); }
+  .btn-secondary {
+    background: var(--c-surface-1);
+    color: var(--c-ink);
+    border-color: var(--c-hairline);
+  }
+  .btn-secondary:hover { background: var(--c-surface-2); border-color: var(--c-hairline-strong); }
+  .btn-tertiary {
+    background: var(--c-canvas);
+    color: var(--c-ink);
+  }
+  .btn-tertiary:hover { color: var(--c-ink-muted); }
+  .btn-inverse {
+    background: var(--c-inverse-canvas);
+    color: var(--c-inverse-ink);
+  }
+  .btn-inverse:hover { background: var(--c-inverse-surface-2); }
+
+  /* Sizes */
+  .btn-sm { padding: 6px 10px; font-size: 13px; }
+  .btn-md { padding: 8px 14px; font-size: 14px; }
+  .btn-lg { padding: 12px 20px; font-size: 15px; }
+
+  /* ------- Section frame ------- */
+  section { padding: var(--s-section) 0; }
+  .section-head { margin-bottom: var(--s-xxl); max-width: 720px; }
+  .section-head .t-eyebrow { display: block; margin-bottom: var(--s-md); }
+  .section-head h2 { margin-bottom: var(--s-md); }
+  .section-head p { color: var(--c-ink-muted); }
+
+  /* ------- Hero ------- */
+  .hero {
+    padding: 120px 0 var(--s-section);
+    border-bottom: 1px solid var(--c-hairline);
+    position: relative;
+  }
+  .hero-inner { max-width: 880px; }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: var(--s-xs);
+    padding: 6px 12px;
+    border-radius: var(--r-pill);
+    background: var(--c-surface-1);
+    border: 1px solid var(--c-hairline);
+    color: var(--c-ink-muted);
+    font-size: 13px; font-weight: 500; letter-spacing: 0;
+    margin-bottom: var(--s-lg);
+  }
+  .hero-eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--c-primary); }
+  .hero h1 { margin-bottom: var(--s-lg); }
+  .hero h1 .accent { color: var(--c-ink-subtle); }
+  .hero .lead { color: var(--c-ink-muted); margin-bottom: var(--s-xl); max-width: 640px; }
+  .hero-ctas { display: flex; gap: var(--s-sm); align-items: center; }
+
+  /* Product screenshot panel */
+  .product-screenshot-card {
+    background: var(--c-surface-1);
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-xl);
+    padding: var(--s-lg);
+    margin-top: var(--s-xxl);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .product-frame {
+    background: var(--c-surface-2);
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .product-titlebar {
+    height: 36px;
+    display: flex; align-items: center;
+    padding: 0 var(--s-md);
+    gap: var(--s-xs);
+    border-bottom: 1px solid var(--c-hairline);
+    background: var(--c-surface-3);
+  }
+  .product-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c-surface-4); }
+  .product-body {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 380px;
+  }
+  .product-sidebar {
+    background: var(--c-surface-2);
+    border-right: 1px solid var(--c-hairline);
+    padding: var(--s-md);
+    display: flex; flex-direction: column; gap: var(--s-xs);
+  }
+  .sidebar-section {
+    color: var(--c-ink-tertiary);
+    font-family: var(--ff-text);
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    padding: var(--s-sm) var(--s-xs) 4px;
+  }
+  .sidebar-item {
+    display: flex; align-items: center; gap: var(--s-xs);
+    padding: 6px var(--s-xs);
+    border-radius: var(--r-sm);
+    color: var(--c-ink-muted);
+    font-size: 13px;
+  }
+  .sidebar-item.active { background: var(--c-surface-3); color: var(--c-ink); }
+  .sidebar-item .ico {
+    width: 14px; height: 14px; border-radius: 3px;
+    background: var(--c-surface-4);
+    display: inline-block;
+  }
+  .sidebar-item.active .ico { background: var(--c-primary); }
+
+  .product-main { padding: var(--s-md) var(--s-lg); }
+  .issue-row {
+    display: grid;
+    grid-template-columns: 80px 16px 1fr 80px 28px;
+    align-items: center;
+    gap: var(--s-sm);
+    padding: 10px 0;
+    border-bottom: 1px solid var(--c-hairline-tertiary);
+    font-size: 13px;
+  }
+  .issue-row:last-child { border-bottom: none; }
+  .issue-id { font-family: var(--ff-mono); font-size: 12px; color: var(--c-ink-tertiary); }
+  .issue-status {
+    width: 12px; height: 12px; border-radius: 50%;
+    border: 1.5px solid var(--c-ink-subtle);
+  }
+  .issue-status.done { background: var(--c-success); border-color: var(--c-success); }
+  .issue-status.progress { border-color: var(--c-primary); background: conic-gradient(var(--c-primary) 0 60%, transparent 60% 100%); }
+  .issue-title { color: var(--c-ink); }
+  .issue-date { color: var(--c-ink-tertiary); font-size: 12px; text-align: right; }
+  .issue-avatar { width: 22px; height: 22px; border-radius: 50%; background: var(--c-surface-4); border: 1px solid var(--c-hairline); }
+
+  /* ------- Buttons gallery ------- */
+  .btn-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-lg);
+  }
+  .btn-cell {
+    background: var(--c-surface-1);
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-lg);
+    padding: var(--s-lg);
+    display: flex; flex-direction: column; gap: var(--s-md);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+  }
+  .btn-cell-label { color: var(--c-ink-subtle); }
+  .btn-row { display: flex; gap: var(--s-xs); align-items: center; flex-wrap: wrap; }
+
+  /* ------- Form ------- */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s-md);
+    max-width: 720px;
+  }
+  .form-field { display: flex; flex-direction: column; gap: 6px; }
+  .form-field.full { grid-column: 1 / -1; }
+  .form-label {
+    font-family: var(--ff-text);
+    font-size: 13px; font-weight: 500; color: var(--c-ink-muted);
+    letter-spacing: 0;
+  }
+  .text-input, .text-area {
+    background: var(--c-surface-1);
+    color: var(--c-ink);
+    font-family: var(--ff-text);
+    font-size: 14px;
+    line-height: 1.5;
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-md);
+    padding: 8px 12px;
+    width: 100%;
+    outline: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+  .text-input:focus, .text-area:focus {
+    border-color: var(--c-hairline-strong);
+    box-shadow: 0 0 0 2px rgba(94, 105, 209, 0.5);
+  }
+  .text-input::placeholder, .text-area::placeholder { color: var(--c-ink-tertiary); }
+  .text-area { min-height: 120px; resize: vertical; }
+  .form-submit-row { display: flex; justify-content: flex-end; margin-top: var(--s-md); }
+
+  /* ------- Cards grid ------- */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-lg);
+  }
+  .feature-card {
+    background: var(--c-surface-1);
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-lg);
+    padding: var(--s-lg);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    display: flex; flex-direction: column; gap: var(--s-md);
+  }
+  .feature-card-icon {
+    width: 32px; height: 32px;
+    border-radius: var(--r-md);
+    background: var(--c-surface-3);
+    border: 1px solid var(--c-hairline);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .feature-card-icon::after {
+    content: "";
+    width: 12px; height: 12px;
+    background: var(--c-primary);
+    border-radius: 3px;
+  }
+  .feature-card p { color: var(--c-ink-subtle); }
+
+  /* Pricing cards */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--s-md);
+    margin-top: var(--s-xl);
+  }
+  .pricing-tabs {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    background: var(--c-surface-1);
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-pill);
+  }
+  .pricing-tab {
+    padding: 6px 14px;
+    border-radius: var(--r-pill);
+    color: var(--c-ink-subtle);
+    font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+  }
+  .pricing-tab.selected {
+    background: var(--c-surface-2);
+    color: var(--c-ink);
+  }
+  .pricing-card {
+    background: var(--c-surface-1);
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-lg);
+    padding: var(--s-lg);
+    display: flex; flex-direction: column; gap: var(--s-md);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+  }
+  .pricing-card-featured {
+    background: var(--c-surface-2);
+    border-color: var(--c-hairline-strong);
+  }
+  .pricing-tier { color: var(--c-ink-subtle); font-size: 13px; font-weight: 500; }
+  .pricing-price { display: flex; align-items: baseline; gap: 6px; }
+  .pricing-price .num { font-family: var(--ff-display); font-size: 40px; font-weight: 600; letter-spacing: -1.0px; }
+  .pricing-price .unit { color: var(--c-ink-subtle); font-size: 13px; }
+  .pricing-features { list-style: none; display: flex; flex-direction: column; gap: var(--s-xs); }
+  .pricing-features li {
+    color: var(--c-ink-muted);
+    font-size: 14px;
+    display: flex; align-items: flex-start; gap: var(--s-xs);
+  }
+  .pricing-features li::before {
+    content: "";
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--c-surface-3);
+    border: 1px solid var(--c-hairline);
+    flex-shrink: 0;
+    margin-top: 4px;
+    position: relative;
+  }
+
+  /* ------- Stats row ------- */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s-md);
+  }
+  .stat-tile {
+    background: var(--c-surface-1);
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-lg);
+    padding: var(--s-lg);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+  }
+  .stat-num {
+    font-family: var(--ff-display);
+    font-size: 40px; font-weight: 600; letter-spacing: -1.0px; line-height: 1.15;
+    color: var(--c-ink);
+    margin-bottom: var(--s-xs);
+  }
+  .stat-label { color: var(--c-ink-subtle); font-size: 14px; }
+
+  /* ------- Data table ------- */
+  .table-wrap {
+    background: var(--c-surface-1);
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th, td {
+    text-align: left;
+    padding: var(--s-sm) var(--s-md);
+    border-bottom: 1px solid var(--c-hairline-tertiary);
+    font-size: 14px;
+  }
+  th {
+    color: var(--c-ink-subtle);
+    font-weight: 500;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    background: var(--c-surface-2);
+  }
+  tr:last-child td { border-bottom: none; }
+  td .id { font-family: var(--ff-mono); font-size: 12px; color: var(--c-ink-tertiary); }
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--c-surface-2);
+    color: var(--c-ink-muted);
+    border-radius: var(--r-pill);
+    padding: 2px 8px;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .status-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--c-ink-subtle); }
+  .status-badge.success .dot { background: var(--c-success); }
+  .status-badge.brand .dot { background: var(--c-primary); }
+
+  /* ------- Type ramp ------- */
+  .ramp { display: flex; flex-direction: column; }
+  .ramp-row {
+    display: grid;
+    grid-template-columns: 200px 120px 1fr;
+    gap: var(--s-lg);
+    align-items: baseline;
+    padding: var(--s-lg) 0;
+    border-bottom: 1px solid var(--c-hairline);
+  }
+  .ramp-row:last-child { border-bottom: none; }
+  .ramp-token { color: var(--c-ink-subtle); font-family: var(--ff-mono); font-size: 12px; }
+  .ramp-spec { color: var(--c-ink-tertiary); font-family: var(--ff-mono); font-size: 11px; }
+  .ramp-sample { color: var(--c-ink); overflow: hidden; }
+
+  /* ------- Palette swatches ------- */
+  .swatch-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s-md);
+  }
+  .swatch {
+    background: var(--c-surface-1);
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-lg);
+    overflow: hidden;
+  }
+  .swatch-chip {
+    height: 88px;
+    border-bottom: 1px solid var(--c-hairline);
+  }
+  .swatch-meta { padding: var(--s-sm) var(--s-md) var(--s-md); }
+  .swatch-name { color: var(--c-ink); font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+  .swatch-hex { color: var(--c-ink-subtle); font-family: var(--ff-mono); font-size: 11px; }
+
+  /* ------- Radii showcase ------- */
+  .radii-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--s-md);
+  }
+  .radius-cell {
+    display: flex; flex-direction: column; align-items: center; gap: var(--s-sm);
+  }
+  .radius-box {
+    width: 96px; height: 96px;
+    background: var(--c-surface-2);
+    border: 1px solid var(--c-hairline-strong);
+  }
+  .radius-meta { text-align: center; }
+  .radius-name { font-family: var(--ff-mono); font-size: 12px; color: var(--c-ink); }
+  .radius-val { font-family: var(--ff-mono); font-size: 11px; color: var(--c-ink-subtle); }
+
+  /* ------- Spacing rhythm ------- */
+  .spacing-list { display: flex; flex-direction: column; gap: var(--s-sm); }
+  .spacing-row {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    align-items: center;
+    gap: var(--s-md);
+  }
+  .spacing-label { font-family: var(--ff-mono); font-size: 12px; color: var(--c-ink-subtle); }
+  .spacing-label .val { color: var(--c-ink); margin-left: var(--s-xs); }
+  .spacing-bar {
+    height: 12px;
+    background: var(--c-primary);
+    border-radius: var(--r-xs);
+    opacity: 0.85;
+  }
+
+  /* ------- Customer logos ------- */
+  .logo-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--s-md);
+    margin-top: var(--s-xl);
+  }
+  .customer-logo-tile {
+    background: var(--c-canvas);
+    border: 1px solid var(--c-hairline-tertiary);
+    border-radius: var(--r-xs);
+    padding: var(--s-md);
+    color: var(--c-ink-subtle);
+    font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--ff-display);
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    height: 56px;
+  }
+
+  /* ------- Testimonial ------- */
+  .testimonial-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s-md);
+  }
+  .testimonial-card {
+    background: var(--c-surface-1);
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-lg);
+    padding: var(--s-xl);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    display: flex; flex-direction: column; gap: var(--s-lg);
+  }
+  .testimonial-card p {
+    font-family: var(--ff-text);
+    font-size: 18px; font-weight: 400; line-height: 1.50; letter-spacing: -0.1px;
+    color: var(--c-ink);
+  }
+  .author { display: flex; align-items: center; gap: var(--s-sm); }
+  .avatar {
+    width: 40px; height: 40px;
+    border-radius: var(--r-full);
+    background: linear-gradient(135deg, var(--c-surface-3), var(--c-surface-4));
+    border: 1px solid var(--c-hairline);
+  }
+  .author-meta .name { color: var(--c-ink); font-size: 14px; font-weight: 500; }
+  .author-meta .role { color: var(--c-ink-subtle); font-size: 13px; }
+
+  /* ------- CTA banner ------- */
+  .cta-banner {
+    background: var(--c-surface-1);
+    border: 1px solid var(--c-hairline);
+    border-radius: var(--r-lg);
+    padding: var(--s-xxl);
+    text-align: center;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .cta-banner h3 { margin-bottom: var(--s-md); }
+  .cta-banner p { color: var(--c-ink-muted); margin-bottom: var(--s-lg); }
+  .cta-banner .btn-row { display: flex; gap: var(--s-xs); justify-content: center; }
+
+  /* ------- Changelog ------- */
+  .changelog { display: flex; flex-direction: column; }
+  .changelog-row {
+    padding: var(--s-lg) 0;
+    border-bottom: 1px solid var(--c-hairline);
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: var(--s-xl);
+    align-items: start;
+  }
+  .changelog-meta { color: var(--c-ink-subtle); font-size: 14px; }
+  .changelog-meta .ver { color: var(--c-ink); font-family: var(--ff-mono); font-size: 13px; display: block; margin-bottom: 4px; }
+  .changelog-body h4 { font-family: var(--ff-display); font-size: 22px; font-weight: 500; line-height: 1.25; letter-spacing: -0.4px; margin-bottom: var(--s-xs); }
+  .changelog-body p { color: var(--c-ink-muted); }
+
+  /* ------- Footer ------- */
+  footer {
+    background: var(--c-canvas);
+    border-top: 1px solid var(--c-hairline);
+    padding: 64px 32px;
+  }
+  .footer-grid {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    gap: var(--s-xl);
+  }
+  .footer-brand { display: flex; flex-direction: column; gap: var(--s-sm); }
+  .footer-brand .copy { color: var(--c-ink-tertiary); font-size: 12px; }
+  .footer-col h5 {
+    color: var(--c-ink);
+    font-size: 13px; font-weight: 500;
+    margin-bottom: var(--s-md);
+    letter-spacing: 0;
+  }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: var(--s-xs); }
+  .footer-col a { color: var(--c-ink-subtle); font-size: 12px; }
+  .footer-col a:hover { color: var(--c-ink); }
+
+  /* ------- Responsive ------- */
+  @media (max-width: 1024px) {
+    .card-grid, .pricing-grid, .btn-gallery, .swatch-grid { grid-template-columns: repeat(2, 1fr); }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .logo-row { grid-template-columns: repeat(3, 1fr); }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .testimonial-grid { grid-template-columns: 1fr; }
+    .product-body { grid-template-columns: 1fr; }
+    .product-sidebar { display: none; }
+  }
+  @media (max-width: 768px) {
+    .t-display-xl { font-size: 40px; letter-spacing: -1.0px; }
+    .nav-links { display: none; }
+    .card-grid, .pricing-grid, .btn-gallery, .swatch-grid, .stats-row { grid-template-columns: 1fr; }
+    .ramp-row { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ TOP NAV ============ -->
+<nav class="top-nav">
+  <div class="container top-nav-inner">
+    <a href="#" class="brand">
+      <span class="brand-mark"></span>
+      Linear
+    </a>
+    <div class="nav-links">
+      <a href="#">Product</a>
+      <a href="#">Method</a>
+      <a href="#">Customers</a>
+      <a href="#">Changelog</a>
+      <a href="#">Pricing</a>
+      <a href="#">Company</a>
+      <a href="#">Contact</a>
+    </div>
+    <div class="nav-cta">
+      <a href="#" class="btn btn-secondary btn-md">Sign in</a>
+      <a href="#" class="btn btn-primary btn-md">Get started</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="container hero-inner">
+    <span class="hero-eyebrow"><span class="dot"></span> Linear 2026.1 — Now in early access</span>
+    <h1 class="t-display-xl">Linear is a purpose-built tool for <span class="accent">planning and building products.</span></h1>
+    <p class="t-body-lg lead">Meet the system for modern software development. Streamline issues, projects, and product roadmaps — built for the speed of high-performance teams.</p>
+    <div class="hero-ctas">
+      <a href="#" class="btn btn-primary btn-lg">Start building</a>
+      <a href="#" class="btn btn-secondary btn-lg">Read changelog</a>
+      <a href="#" class="btn btn-tertiary btn-md">See pricing &rarr;</a>
+    </div>
+
+    <!-- Product screenshot -->
+    <div class="product-screenshot-card">
+      <div class="product-frame">
+        <div class="product-titlebar">
+          <span class="product-dot"></span>
+          <span class="product-dot"></span>
+          <span class="product-dot"></span>
+        </div>
+        <div class="product-body">
+          <aside class="product-sidebar">
+            <div class="sidebar-section">Workspace</div>
+            <div class="sidebar-item"><span class="ico"></span> Inbox</div>
+            <div class="sidebar-item active"><span class="ico"></span> My Issues</div>
+            <div class="sidebar-item"><span class="ico"></span> Projects</div>
+            <div class="sidebar-item"><span class="ico"></span> Views</div>
+            <div class="sidebar-section">Teams</div>
+            <div class="sidebar-item"><span class="ico"></span> Design</div>
+            <div class="sidebar-item"><span class="ico"></span> Engineering</div>
+            <div class="sidebar-item"><span class="ico"></span> Product</div>
+          </aside>
+          <div class="product-main">
+            <div class="issue-row">
+              <span class="issue-id">ENG-1841</span>
+              <span class="issue-status progress"></span>
+              <span class="issue-title">Refactor sync engine to reduce websocket payload</span>
+              <span class="issue-date">May 17</span>
+              <span class="issue-avatar"></span>
+            </div>
+            <div class="issue-row">
+              <span class="issue-id">ENG-1840</span>
+              <span class="issue-status done"></span>
+              <span class="issue-title">Fix flicker on view transition when filters change</span>
+              <span class="issue-date">May 16</span>
+              <span class="issue-avatar"></span>
+            </div>
+            <div class="issue-row">
+              <span class="issue-id">DES-322</span>
+              <span class="issue-status"></span>
+              <span class="issue-title">Audit empty states across project pages</span>
+              <span class="issue-date">May 15</span>
+              <span class="issue-avatar"></span>
+            </div>
+            <div class="issue-row">
+              <span class="issue-id">ENG-1839</span>
+              <span class="issue-status progress"></span>
+              <span class="issue-title">Implement offline-first conflict resolution for comments</span>
+              <span class="issue-date">May 14</span>
+              <span class="issue-avatar"></span>
+            </div>
+            <div class="issue-row">
+              <span class="issue-id">PRD-118</span>
+              <span class="issue-status done"></span>
+              <span class="issue-title">Spec out triage automation for incoming bugs</span>
+              <span class="issue-date">May 13</span>
+              <span class="issue-avatar"></span>
+            </div>
+            <div class="issue-row">
+              <span class="issue-id">ENG-1838</span>
+              <span class="issue-status"></span>
+              <span class="issue-title">Investigate slow loads on large workspaces (&gt;10k issues)</span>
+              <span class="issue-date">May 13</span>
+              <span class="issue-avatar"></span>
+            </div>
+            <div class="issue-row">
+              <span class="issue-id">DES-321</span>
+              <span class="issue-status progress"></span>
+              <span class="issue-title">New cycle review surface</span>
+              <span class="issue-date">May 12</span>
+              <span class="issue-avatar"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customer logo marquee -->
+    <div class="logo-row">
+      <div class="customer-logo-tile">RAMP</div>
+      <div class="customer-logo-tile">VERCEL</div>
+      <div class="customer-logo-tile">RETOOL</div>
+      <div class="customer-logo-tile">PERPLEXITY</div>
+      <div class="customer-logo-tile">ARC</div>
+      <div class="customer-logo-tile">LOOM</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <span class="t-eyebrow">The product</span>
+      <h2 class="t-display-lg">Built for high-performance teams.</h2>
+      <p class="t-body-lg">Linear unifies issues, projects, and roadmaps in one tool — designed for teams that ship.</p>
+    </div>
+    <div class="card-grid">
+      <div class="feature-card">
+        <div class="feature-card-icon"></div>
+        <h3 class="t-card-title">Issue tracking you'll enjoy using</h3>
+        <p class="t-body-sm">Optimized for speed and efficiency, with a single source of truth across your team's work.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon"></div>
+        <h3 class="t-card-title">Set the product direction</h3>
+        <p class="t-body-sm">Connect day-to-day execution to a long-term vision with projects, milestones, and cycles.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon"></div>
+        <h3 class="t-card-title">Build momentum with cycles</h3>
+        <p class="t-body-sm">Create a healthy rhythm of work with cycles that automate sprint planning and reporting.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon"></div>
+        <h3 class="t-card-title">Triage incoming work</h3>
+        <p class="t-body-sm">Triage manages incoming bug reports, feature requests, and support tickets in one place.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon"></div>
+        <h3 class="t-card-title">Integrations that fit your stack</h3>
+        <p class="t-body-sm">GitHub, Figma, Slack, Sentry — Linear connects deeply with the tools your team already uses.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon"></div>
+        <h3 class="t-card-title">An API for everything</h3>
+        <p class="t-body-sm">Build custom workflows, sync data, and extend Linear with a fully documented GraphQL API.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section style="padding-top: 0;">
+  <div class="container">
+    <div class="stats-row">
+      <div class="stat-tile">
+        <div class="stat-num">10,000+</div>
+        <div class="stat-label">Teams building with Linear</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-num">99.99%</div>
+        <div class="stat-label">Sync engine uptime</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-num">&lt;50ms</div>
+        <div class="stat-label">P95 keystroke latency</div>
+      </div>
+      <div class="stat-tile">
+        <div class="stat-num">170+</div>
+        <div class="stat-label">Countries shipping in Linear</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BUTTONS GALLERY ============ -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <span class="t-eyebrow">Components — Buttons</span>
+      <h2 class="t-display-md">Compact CTA system.</h2>
+      <p class="t-body">Primary, secondary, tertiary — three variants × three sizes. Every CTA is <code class="t-mono">rounded.md</code> 8px. Lavender appears scarcely.</p>
+    </div>
+    <div class="btn-gallery">
+      <div class="btn-cell">
+        <span class="t-eyebrow btn-cell-label">button-primary</span>
+        <div class="btn-row">
+          <button class="btn btn-primary btn-sm">Get started</button>
+          <button class="btn btn-primary btn-md">Get started</button>
+          <button class="btn btn-primary btn-lg">Get started</button>
+        </div>
+      </div>
+      <div class="btn-cell">
+        <span class="t-eyebrow btn-cell-label">button-secondary</span>
+        <div class="btn-row">
+          <button class="btn btn-secondary btn-sm">Sign in</button>
+          <button class="btn btn-secondary btn-md">Sign in</button>
+          <button class="btn btn-secondary btn-lg">Sign in</button>
+        </div>
+      </div>
+      <div class="btn-cell">
+        <span class="t-eyebrow btn-cell-label">button-tertiary</span>
+        <div class="btn-row">
+          <button class="btn btn-tertiary btn-sm">Read more &rarr;</button>
+          <button class="btn btn-tertiary btn-md">Read more &rarr;</button>
+          <button class="btn btn-tertiary btn-lg">Read more &rarr;</button>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top: var(--s-lg);">
+      <div class="btn-cell">
+        <span class="t-eyebrow btn-cell-label">button-inverse — rare use</span>
+        <div class="btn-row">
+          <button class="btn btn-inverse btn-sm">Talk to sales</button>
+          <button class="btn btn-inverse btn-md">Talk to sales</button>
+          <button class="btn btn-inverse btn-lg">Talk to sales</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FORM (Contact Sales) ============ -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <span class="t-eyebrow">Components — Forms</span>
+      <h2 class="t-display-md">Talk to our sales team.</h2>
+      <p class="t-body">Inputs sit on <code class="t-mono">surface-1</code> with hairline borders; focus rings are a 2px <code class="t-mono">primary-focus</code> at 50%.</p>
+    </div>
+    <form class="form-grid" onsubmit="return false;">
+      <div class="form-field">
+        <label class="form-label" for="fn">First name</label>
+        <input id="fn" class="text-input" placeholder="Karri" type="text">
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="ln">Last name</label>
+        <input id="ln" class="text-input" placeholder="Saarinen" type="text">
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="em">Work email</label>
+        <input id="em" class="text-input" placeholder="you@company.com" type="email">
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="co">Company</label>
+        <input id="co" class="text-input" placeholder="Linear" type="text">
+      </div>
+      <div class="form-field full">
+        <label class="form-label" for="msg">How can we help?</label>
+        <textarea id="msg" class="text-area" placeholder="Tell us about your team, current tools, and goals."></textarea>
+      </div>
+      <div class="form-field full form-submit-row">
+        <button class="btn btn-primary btn-md" type="submit">Send message</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <span class="t-eyebrow">Pricing</span>
+      <h2 class="t-display-lg">Made for modern product teams.</h2>
+      <p class="t-body-lg">Linear is built for teams of all sizes — from early-stage startups to large enterprises.</p>
+      <div style="margin-top: var(--s-lg);">
+        <div class="pricing-tabs">
+          <button class="pricing-tab selected">Monthly</button>
+          <button class="pricing-tab">Annually · save 20%</button>
+        </div>
+      </div>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <span class="pricing-tier">Free</span>
+        <div class="pricing-price"><span class="num">$0</span><span class="unit">/ forever</span></div>
+        <p class="t-body-sm" style="color: var(--c-ink-subtle);">For small teams just getting started.</p>
+        <ul class="pricing-features">
+          <li>Unlimited members</li>
+          <li>Up to 250 issues</li>
+          <li>Slack &amp; GitHub integrations</li>
+          <li>API access</li>
+        </ul>
+        <a href="#" class="btn btn-secondary btn-md" style="margin-top: auto;">Get started</a>
+      </div>
+      <div class="pricing-card pricing-card-featured">
+        <span class="pricing-tier" style="color: var(--c-primary);">Standard · Recommended</span>
+        <div class="pricing-price"><span class="num">$10</span><span class="unit">/ user / mo</span></div>
+        <p class="t-body-sm" style="color: var(--c-ink-subtle);">For teams that need more flexibility and power.</p>
+        <ul class="pricing-features">
+          <li>Unlimited issues &amp; file uploads</li>
+          <li>Cycles &amp; projects</li>
+          <li>Triage inbox</li>
+          <li>Admin roles &amp; audit log</li>
+        </ul>
+        <a href="#" class="btn btn-primary btn-md" style="margin-top: auto;">Start free trial</a>
+      </div>
+      <div class="pricing-card">
+        <span class="pricing-tier">Plus</span>
+        <div class="pricing-price"><span class="num">$16</span><span class="unit">/ user / mo</span></div>
+        <p class="t-body-sm" style="color: var(--c-ink-subtle);">For large teams and organizations.</p>
+        <ul class="pricing-features">
+          <li>Everything in Standard</li>
+          <li>Sub-teams &amp; private teams</li>
+          <li>SCIM provisioning</li>
+          <li>Priority support</li>
+        </ul>
+        <a href="#" class="btn btn-secondary btn-md" style="margin-top: auto;">Contact sales</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DATA TABLE ============ -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <span class="t-eyebrow">Components — Data</span>
+      <h2 class="t-display-md">Issue table.</h2>
+      <p class="t-body">Tables use <code class="t-mono">surface-2</code> headers, <code class="t-mono">hairline-tertiary</code> row rules. Status pills carry <code class="t-mono">caption</code> type on <code class="t-mono">surface-2</code>.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 110px;">ID</th>
+            <th>Title</th>
+            <th style="width: 140px;">Status</th>
+            <th style="width: 120px;">Assignee</th>
+            <th style="width: 100px;">Updated</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="id">ENG-1841</span></td>
+            <td>Refactor sync engine to reduce websocket payload</td>
+            <td><span class="status-badge brand"><span class="dot"></span> In Progress</span></td>
+            <td>Jori Lallo</td>
+            <td><span class="t-caption" style="color: var(--c-ink-subtle);">2h ago</span></td>
+          </tr>
+          <tr>
+            <td><span class="id">ENG-1840</span></td>
+            <td>Fix flicker on view transition when filters change</td>
+            <td><span class="status-badge success"><span class="dot"></span> Done</span></td>
+            <td>Tuomas Artman</td>
+            <td><span class="t-caption" style="color: var(--c-ink-subtle);">1d ago</span></td>
+          </tr>
+          <tr>
+            <td><span class="id">DES-322</span></td>
+            <td>Audit empty states across project pages</td>
+            <td><span class="status-badge"><span class="dot"></span> Backlog</span></td>
+            <td>Karri Saarinen</td>
+            <td><span class="t-caption" style="color: var(--c-ink-subtle);">2d ago</span></td>
+          </tr>
+          <tr>
+            <td><span class="id">ENG-1839</span></td>
+            <td>Implement offline-first conflict resolution for comments</td>
+            <td><span class="status-badge brand"><span class="dot"></span> In Progress</span></td>
+            <td>Cristina Cordova</td>
+            <td><span class="t-caption" style="color: var(--c-ink-subtle);">3d ago</span></td>
+          </tr>
+          <tr>
+            <td><span class="id">PRD-118</span></td>
+            <td>Spec out triage automation for incoming bugs</td>
+            <td><span class="status-badge success"><span class="dot"></span> Done</span></td>
+            <td>Nan Yu</td>
+            <td><span class="t-caption" style="color: var(--c-ink-subtle);">4d ago</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIAL ============ -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <span class="t-eyebrow">Customer love</span>
+      <h2 class="t-display-md">Teams that ship with Linear.</h2>
+    </div>
+    <div class="testimonial-grid">
+      <div class="testimonial-card">
+        <p>"Linear is the best product management tool we've ever used. It's fast, well-designed, and lets our team focus on shipping."</p>
+        <div class="author">
+          <div class="avatar"></div>
+          <div class="author-meta">
+            <div class="name">Guillermo Rauch</div>
+            <div class="role">CEO, Vercel</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <p>"Linear is the perfect product for those who care about craft, intentionality, and how decisions are made — and shared."</p>
+        <div class="author">
+          <div class="avatar"></div>
+          <div class="author-meta">
+            <div class="name">Aravind Srinivas</div>
+            <div class="role">CEO, Perplexity</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TYPE RAMP ============ -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <span class="t-eyebrow">Foundations — Typography</span>
+      <h2 class="t-display-md">Type ramp.</h2>
+      <p class="t-body">Display weights at 600 paired with body at 400. Aggressive negative tracking on display (-3.0px at 80px ≈ 4% of size). Eyebrow uses positive tracking (+0.4px) as taxonomy.</p>
+    </div>
+    <div class="ramp">
+      <div class="ramp-row">
+        <div class="ramp-token">typography.display-xl</div>
+        <div class="ramp-spec">80 / 600 / -3.0</div>
+        <div class="ramp-sample t-display-xl">Plan and build.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">typography.display-lg</div>
+        <div class="ramp-spec">56 / 600 / -1.8</div>
+        <div class="ramp-sample t-display-lg">Section opener headline.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">typography.display-md</div>
+        <div class="ramp-spec">40 / 600 / -1.0</div>
+        <div class="ramp-sample t-display-md">Sub-section headline.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">typography.headline</div>
+        <div class="ramp-spec">28 / 600 / -0.6</div>
+        <div class="ramp-sample t-headline">Pricing tier title or CTA banner heading.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">typography.card-title</div>
+        <div class="ramp-spec">22 / 500 / -0.4</div>
+        <div class="ramp-sample t-card-title">Feature card title.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">typography.subhead</div>
+        <div class="ramp-spec">20 / 400 / -0.2</div>
+        <div class="ramp-sample t-subhead">Lead body, intro paragraphs.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">typography.body-lg</div>
+        <div class="ramp-spec">18 / 400 / -0.1</div>
+        <div class="ramp-sample t-body-lg">Hero subhead and lead paragraphs sit at this weight.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">typography.body</div>
+        <div class="ramp-spec">16 / 400 / -0.05</div>
+        <div class="ramp-sample t-body">Default body type — readable across long passages.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">typography.body-sm</div>
+        <div class="ramp-spec">14 / 400 / 0</div>
+        <div class="ramp-sample t-body-sm">Card body and footer columns use this size.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">typography.caption</div>
+        <div class="ramp-spec">12 / 400 / 0</div>
+        <div class="ramp-sample t-caption">Captions, meta, status pills.</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">typography.button</div>
+        <div class="ramp-spec">14 / 500 / 0</div>
+        <div class="ramp-sample t-button">All button labels — Start building</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">typography.eyebrow</div>
+        <div class="ramp-spec">13 / 500 / +0.4</div>
+        <div class="ramp-sample t-eyebrow">Section eyebrow uppercase</div>
+      </div>
+      <div class="ramp-row">
+        <div class="ramp-token">typography.mono</div>
+        <div class="ramp-spec">13 / 400 / 0</div>
+        <div class="ramp-sample t-mono">const status = "in_progress" /* Linear Mono */</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PALETTE ============ -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <span class="t-eyebrow">Foundations — Color</span>
+      <h2 class="t-display-md">Palette.</h2>
+      <p class="t-body">A four-step surface ladder on a near-black canvas, anchored by a single lavender-blue accent. No second chromatic color exists on the marketing surface.</p>
+    </div>
+    <div class="swatch-grid">
+      <div class="swatch"><div class="swatch-chip" style="background: #5e6ad2;"></div><div class="swatch-meta"><div class="swatch-name">primary</div><div class="swatch-hex">#5e6ad2</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background: #828fff;"></div><div class="swatch-meta"><div class="swatch-name">primary-hover</div><div class="swatch-hex">#828fff</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background: #5e69d1;"></div><div class="swatch-meta"><div class="swatch-name">primary-focus</div><div class="swatch-hex">#5e69d1</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background: #7a7fad;"></div><div class="swatch-meta"><div class="swatch-name">brand-secure</div><div class="swatch-hex">#7a7fad</div></div></div>
+
+      <div class="swatch"><div class="swatch-chip" style="background: #010102;"></div><div class="swatch-meta"><div class="swatch-name">canvas</div><div class="swatch-hex">#010102</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background: #0f1011;"></div><div class="swatch-meta"><div class="swatch-name">surface-1</div><div class="swatch-hex">#0f1011</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background: #181a1c;"></div><div class="swatch-meta"><div class="swatch-name">surface-2</div><div class="swatch-hex">#181a1c</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background: #1f2124;"></div><div class="swatch-meta"><div class="swatch-name">surface-3</div><div class="swatch-hex">#1f2124</div></div></div>
+
+      <div class="swatch"><div class="swatch-chip" style="background: #26282c;"></div><div class="swatch-meta"><div class="swatch-name">surface-4</div><div class="swatch-hex">#26282c</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background: #23252a;"></div><div class="swatch-meta"><div class="swatch-name">hairline</div><div class="swatch-hex">#23252a</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background: #2e3036;"></div><div class="swatch-meta"><div class="swatch-name">hairline-strong</div><div class="swatch-hex">#2e3036</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background: #1a1c1f;"></div><div class="swatch-meta"><div class="swatch-name">hairline-tertiary</div><div class="swatch-hex">#1a1c1f</div></div></div>
+
+      <div class="swatch"><div class="swatch-chip" style="background: #ffffff;"></div><div class="swatch-meta"><div class="swatch-name">inverse-canvas</div><div class="swatch-hex">#ffffff</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background: #f4f5f6;"></div><div class="swatch-meta"><div class="swatch-name">inverse-surface-1</div><div class="swatch-hex">#f4f5f6</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background: #e8eaec;"></div><div class="swatch-meta"><div class="swatch-name">inverse-surface-2</div><div class="swatch-hex">#e8eaec</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background: #f7f8f8;"></div><div class="swatch-meta"><div class="swatch-name">ink</div><div class="swatch-hex">#f7f8f8</div></div></div>
+
+      <div class="swatch"><div class="swatch-chip" style="background: #d0d6e0;"></div><div class="swatch-meta"><div class="swatch-name">ink-muted</div><div class="swatch-hex">#d0d6e0</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background: #8a8f98;"></div><div class="swatch-meta"><div class="swatch-name">ink-subtle</div><div class="swatch-hex">#8a8f98</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background: #62666d;"></div><div class="swatch-meta"><div class="swatch-name">ink-tertiary</div><div class="swatch-hex">#62666d</div></div></div>
+      <div class="swatch"><div class="swatch-chip" style="background: #27a644;"></div><div class="swatch-meta"><div class="swatch-name">semantic-success</div><div class="swatch-hex">#27a644</div></div></div>
+
+      <div class="swatch"><div class="swatch-chip" style="background: rgba(0,0,0,0.75);"></div><div class="swatch-meta"><div class="swatch-name">semantic-overlay</div><div class="swatch-hex">rgba(0,0,0,.75)</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ RADII ============ -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <span class="t-eyebrow">Foundations — Shapes</span>
+      <h2 class="t-display-md">Radius scale.</h2>
+      <p class="t-body">CTAs and inputs sit at <code class="t-mono">rounded.md</code> 8px. Cards at 12. Product screenshot panels at 16. Pills are reserved for status and tab toggles — never CTAs.</p>
+    </div>
+    <div class="radii-row">
+      <div class="radius-cell"><div class="radius-box" style="border-radius: 4px;"></div><div class="radius-meta"><div class="radius-name">rounded.xs</div><div class="radius-val">4px</div></div></div>
+      <div class="radius-cell"><div class="radius-box" style="border-radius: 6px;"></div><div class="radius-meta"><div class="radius-name">rounded.sm</div><div class="radius-val">6px</div></div></div>
+      <div class="radius-cell"><div class="radius-box" style="border-radius: 8px;"></div><div class="radius-meta"><div class="radius-name">rounded.md</div><div class="radius-val">8px</div></div></div>
+      <div class="radius-cell"><div class="radius-box" style="border-radius: 12px;"></div><div class="radius-meta"><div class="radius-name">rounded.lg</div><div class="radius-val">12px</div></div></div>
+      <div class="radius-cell"><div class="radius-box" style="border-radius: 16px;"></div><div class="radius-meta"><div class="radius-name">rounded.xl</div><div class="radius-val">16px</div></div></div>
+      <div class="radius-cell"><div class="radius-box" style="border-radius: 24px;"></div><div class="radius-meta"><div class="radius-name">rounded.xxl</div><div class="radius-val">24px</div></div></div>
+      <div class="radius-cell"><div class="radius-box" style="border-radius: 9999px;"></div><div class="radius-meta"><div class="radius-name">rounded.pill</div><div class="radius-val">9999px</div></div></div>
+      <div class="radius-cell"><div class="radius-box" style="border-radius: 50%;"></div><div class="radius-meta"><div class="radius-name">rounded.full</div><div class="radius-val">9999px</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SPACING ============ -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <span class="t-eyebrow">Foundations — Spacing</span>
+      <h2 class="t-display-md">Spacing rhythm.</h2>
+      <p class="t-body">A 4px base unit ladders out to a 96px section gap. The dark canvas IS the whitespace — sections separate by lift onto surface-1 panels, not by margin.</p>
+    </div>
+    <div class="spacing-list">
+      <div class="spacing-row"><div class="spacing-label">spacing.xxs <span class="val">4px</span></div><div class="spacing-bar" style="width: 4px;"></div></div>
+      <div class="spacing-row"><div class="spacing-label">spacing.xs <span class="val">8px</span></div><div class="spacing-bar" style="width: 8px;"></div></div>
+      <div class="spacing-row"><div class="spacing-label">spacing.sm <span class="val">12px</span></div><div class="spacing-bar" style="width: 12px;"></div></div>
+      <div class="spacing-row"><div class="spacing-label">spacing.md <span class="val">16px</span></div><div class="spacing-bar" style="width: 16px;"></div></div>
+      <div class="spacing-row"><div class="spacing-label">spacing.lg <span class="val">24px</span></div><div class="spacing-bar" style="width: 24px;"></div></div>
+      <div class="spacing-row"><div class="spacing-label">spacing.xl <span class="val">32px</span></div><div class="spacing-bar" style="width: 32px;"></div></div>
+      <div class="spacing-row"><div class="spacing-label">spacing.xxl <span class="val">48px</span></div><div class="spacing-bar" style="width: 48px;"></div></div>
+      <div class="spacing-row"><div class="spacing-label">spacing.section <span class="val">96px</span></div><div class="spacing-bar" style="width: 96px;"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CHANGELOG ============ -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <span class="t-eyebrow">/build</span>
+      <h2 class="t-display-md">Changelog.</h2>
+      <p class="t-body">Every row sits on <code class="t-mono">canvas</code> with a hairline bottom rule — version and date left, copy right.</p>
+    </div>
+    <div class="changelog">
+      <div class="changelog-row">
+        <div class="changelog-meta">
+          <span class="ver">2026.1.4</span>
+          May 17, 2026
+        </div>
+        <div class="changelog-body">
+          <h4>Inbox revamp</h4>
+          <p>Inbox now groups notifications by source — issues, PRs, comments. Snooze any notification with a single keystroke.</p>
+        </div>
+      </div>
+      <div class="changelog-row">
+        <div class="changelog-meta">
+          <span class="ver">2026.1.3</span>
+          May 10, 2026
+        </div>
+        <div class="changelog-body">
+          <h4>Project milestones, redesigned</h4>
+          <p>Milestones now render as a single timeline view with drag-to-reorder, dependencies, and at-a-glance status.</p>
+        </div>
+      </div>
+      <div class="changelog-row">
+        <div class="changelog-meta">
+          <span class="ver">2026.1.2</span>
+          May 3, 2026
+        </div>
+        <div class="changelog-body">
+          <h4>Faster sync engine</h4>
+          <p>Refactored the websocket transport to cut payload size by 38% on average — keystroke latency drops below 50ms in large workspaces.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA BANNER ============ -->
+<section>
+  <div class="container">
+    <div class="cta-banner">
+      <h3 class="t-headline">Plan the present.<br>Build the future.</h3>
+      <p class="t-body-lg">Linear is shaped by the practices and principles that distinguish world-class product teams.</p>
+      <div class="btn-row">
+        <a href="#" class="btn btn-primary btn-lg">Get started</a>
+        <a href="#" class="btn btn-secondary btn-lg">Talk to sales</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="#" class="brand">
+        <span class="brand-mark"></span>
+        Linear
+      </a>
+      <p class="copy">© 2026 Linear · The issue tracking tool you'll enjoy using.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Product</h5>
+      <ul>
+        <li><a href="#">Features</a></li>
+        <li><a href="#">Integrations</a></li>
+        <li><a href="#">Pricing</a></li>
+        <li><a href="#">Changelog</a></li>
+        <li><a href="#">Download</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Company</h5>
+      <ul>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Customers</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Brand</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Resources</h5>
+      <ul>
+        <li><a href="#">Documentation</a></li>
+        <li><a href="#">API</a></li>
+        <li><a href="#">Status</a></li>
+        <li><a href="#">Method</a></li>
+        <li><a href="#">Community</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h5>Legal</h5>
+      <ul>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Privacy</a></li>
+        <li><a href="#">DPA</a></li>
+        <li><a href="#">Security</a></li>
+        <li><a href="#">Cookies</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
