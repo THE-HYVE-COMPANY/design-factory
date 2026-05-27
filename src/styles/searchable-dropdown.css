@@ -1,0 +1,282 @@
+/* searchable-dropdown.css — generic OpenRouter-style picker popover.
+ *
+ * Used by SearchableDropdown.tsx. The component is generic; the styling
+ * here aims to feel native to the HYVE/DF DS (skeu surface, mono caret,
+ * accent dot for selection, weight-shift on hover).
+ *
+ * Anatomy:
+ *   .sd-pop — popover root (absolute, anchored)
+ *     .sd-pop-search — sticky top input
+ *       .sd-pop-search-input — the <input>
+ *     .sd-pop-opt--clear — optional clear row
+ *     .sd-pop-list — scrollable list
+ *       .sd-pop-opt — option row
+ *         .sd-pop-opt-leading — swatches/icons
+ *         .sd-pop-opt-text — label + sub stack
+ *         .sd-pop-opt-check — selected ✓
+ *         .sd-pop-opt-caret — footer action ›
+ *       .sd-pop-empty — empty state
+ *
+ * Animation: 160ms scale + opacity. Disabled under prefers-reduced-motion.
+ */
+
+.sd-pop {
+  position: absolute;
+  /* High enough to clear the dial track stacking context inside the
+   * NewProject modal (dials have hover/drag transforms that create
+   * their own contexts; z-index 60 lost the layer war when the dropdown
+   * opened over the TASTE column). */
+  z-index: 200;
+
+  /* v14: skeu surface gradient + r-xl matches Aqua tab radius for kinship.
+   * Uses --df-surface-elevated-grad (1.5-2% delta) so the popover reads
+   * as a raised plate, not a flat overlay. */
+  background: var(--df-surface-elevated-grad);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-xl);
+  /* v14: replaced ad-hoc shadow with --df-skeu-shadow-xl (Apple-grade).
+   * Three layers: inset top highlight + close shadow + ambient depth.
+   * Total reach < 32px ambient — substantial but never cartoonish. */
+  box-shadow: var(--df-skeu-shadow-xl);
+
+  display: flex;
+  flex-direction: column;
+  max-height: 380px;
+  overflow: hidden;
+
+  transform-origin: top left;
+  animation: sd-pop-in 160ms var(--df-ease-out, cubic-bezier(0.22, 0.61, 0.36, 1));
+}
+
+.sd-pop--bottom-start { top: calc(100% + 6px); left: 0;  transform-origin: top left; }
+.sd-pop--bottom-end   { top: calc(100% + 6px); right: 0; transform-origin: top right; }
+.sd-pop--top-start    { bottom: calc(100% + 6px); left: 0;  transform-origin: bottom left; }
+.sd-pop--top-end      { bottom: calc(100% + 6px); right: 0; transform-origin: bottom right; }
+
+@keyframes sd-pop-in {
+  from { opacity: 0; transform: scale(0.98) translateY(-4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes sd-pop-in-up {
+  from { opacity: 0; transform: scale(0.98) translateY(4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.sd-pop--top-start, .sd-pop--top-end {
+  animation-name: sd-pop-in-up;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sd-pop { animation: none; }
+}
+
+/* ─── Search input row ──────────────────────────────────────────────── */
+.sd-pop-search {
+  position: sticky;
+  top: 0;
+  padding: 8px;
+  background: var(--df-surface-elevated);
+  border-bottom: 1px solid var(--df-border-subtle);
+  z-index: 1;
+}
+.sd-pop-search-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  /* Cavity contrast — the search input drops to sunken-1 so it reads
+   * as recessed inside the popover plate. The popover itself
+   * (var(--df-surface-elevated-grad)) sits raised; the search bowl
+   * sits sunken below it. Hierarchy: popover plate → search cavity. */
+  background: var(--df-surface-sunken-1);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  /* Slightly deeper inset than v14 to match cavity tier. */
+  box-shadow:
+    inset 0 1px 2px 0 rgba(0, 0, 0, 0.18),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.10);
+
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  color: var(--df-text-primary);
+  outline: none;
+  transition: border-color 120ms var(--df-ease-out),
+              background 120ms var(--df-ease-out),
+              box-shadow 120ms var(--df-ease-out);
+}
+.sd-pop-search-input::placeholder {
+  color: var(--df-text-faint);
+  opacity: 0.7;
+}
+.sd-pop-search-input:focus {
+  border-color: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 60%, transparent);
+  /* v21: stay sunken on focus (cavity isn't ejected when typing). The
+   * accent inner ring signals focus without lifting the surface. */
+  background: var(--df-surface-sunken-1);
+  box-shadow:
+    inset 0 1px 2px 0 rgba(0, 0, 0, 0.18),
+    inset 0 0 0 1px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 36%, transparent);
+}
+
+/* ─── List (scroll area) ────────────────────────────────────────────── */
+.sd-pop-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+/* ─── Option rows ───────────────────────────────────────────────────── */
+.sd-pop-opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  background: none;
+  border: 0;
+  border-radius: var(--df-r-sm);
+  color: var(--df-text-primary);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--df-text-sm, 13px);
+  text-align: left;
+
+  transition: background 100ms var(--df-ease-out, ease-out),
+              color     100ms var(--df-ease-out, ease-out);
+}
+
+.sd-pop-opt.is-highlighted {
+  background: var(--df-interactive-hover);
+}
+.sd-pop-opt.is-selected {
+  background: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 14%, transparent);
+}
+.sd-pop-opt.is-selected.is-highlighted {
+  background: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 22%, transparent);
+}
+
+.sd-pop-opt-leading {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.sd-pop-opt-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.sd-pop-opt-label {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sd-pop-opt-sub {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  color: var(--df-text-faint);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sd-pop-opt-check {
+  color: var(--df-accent-user, var(--df-accent-ok));
+  font-size: 12px;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+.sd-pop-opt-caret {
+  color: var(--df-text-faint);
+  font-size: 14px;
+  margin-left: 4px;
+  flex-shrink: 0;
+}
+
+/* ─── Special variants ──────────────────────────────────────────────── */
+.sd-pop-opt--clear {
+  border-bottom: 1px solid var(--df-border-subtle);
+  border-radius: 0;
+  margin: 0;
+  color: var(--df-text-faint);
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.sd-pop-opt--clear:hover {
+  color: var(--df-text-primary);
+  background: var(--df-interactive-hover);
+}
+
+.sd-pop-opt--footer {
+  margin-top: 2px;
+  border-top: 1px solid var(--df-border-subtle);
+  border-radius: 0;
+  color: var(--df-text-secondary);
+}
+.sd-pop-opt--footer .sd-pop-opt-label {
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ─── Empty state ───────────────────────────────────────────────────── */
+.sd-pop-empty {
+  padding: 18px 12px;
+  text-align: center;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  color: var(--df-text-faint);
+  letter-spacing: 0.04em;
+}
+
+/* ─── Grouped lists ──────────────────────────────────────────────────── */
+/* Renders sticky group headers between buckets when items declare a
+ * `group` field. Keeps the editorial mono caps style of other section
+ * headers in DF (Padrões, Settings) for kinship. */
+.sd-pop-group { display: contents; }
+
+.sd-pop-group-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px 4px;
+  background: var(--df-surface-elevated-grad, var(--df-surface-elevated));
+  border-top: 1px solid var(--df-border-subtle);
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--df-text-secondary);
+}
+/* First group should not show a top border (avoids double-line under
+ * the search input). */
+.sd-pop-group:first-child .sd-pop-group-head { border-top: none; }
+
+.sd-pop-group-label {
+  font-weight: 500;
+  color: var(--df-text-primary);
+}
+
+.sd-pop-group-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 16px;
+  padding: 0 5px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: 999px;
+  font-size: 9px;
+  color: var(--df-text-muted);
+  letter-spacing: 0;
+}

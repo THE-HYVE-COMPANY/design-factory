@@ -1,0 +1,1380 @@
+/* ════════════════════════════════════════════════════════════════════════
+ *  Settings · Padrões — editorial respiro overlay
+ * ════════════════════════════════════════════════════════════════════════
+ *
+ * Scope (CRITICAL):
+ *   Every rule here is scoped under `.padroes-panel` so the NewProject
+ *   modal premium skeu (faceplate hero, picker keys, Aqua tabs) is
+ *   never regressed. The taxonomy manager keeps its base styles in
+ *   settings-taxonomy.css; this overlay reduces skeu density and adds
+ *   editorial breathing room ONLY in the Settings/Padrões scope.
+ *
+ * Editorial deltas vs base settings-taxonomy.css:
+ *   · Larger row height (56px) and gap (10px) — was ~40px, gap 4px
+ *   · Flat row backgrounds with 1px subtle border (no triple bezel)
+ *   · Wider list column (380px) and detail panel padding (32px)
+ *   · Generous section gaps (24px+) between header → directions → tabs → editor
+ *   · Editorial typography: display title 26px, kicker 11px mono uppercase
+ *   · Soft shadows ONLY on detail card (no row bezel)
+ *   · Toggle pills lighter — 1px border swap on active (no bezel pressed)
+ *
+ * NewProject modal is preserved — no .new-project-modal selectors are
+ * touched. The InsumosPanel tab chiclets keep their Aqua DNA (LED +
+ * radial highlight) since those are tabs, not list items.
+ */
+
+/* ─── Container respiro ───────────────────────────────────────────── */
+.padroes-panel {
+  /* bumped from 1180px → 1400px (user: "largura
+   * de todas paginas de settings podia ser maior 1400"). The wider
+   * canvas lets the split layout breathe — list rail 480px + detail
+   * 1fr now have proper editorial proportions. */
+  max-width: 1400px;
+  /* Generous breathing room between sections (header/directions/tabs/editor) */
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding-bottom: 56px;
+}
+
+/* Pre-tab block: kicker + title + description */
+.padroes-panel > .settings-kicker {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+}
+.padroes-panel > .settings-title {
+  font-size: 32px;
+  letter-spacing: -0.02em;
+  margin-top: 4px;
+  margin-bottom: 6px;
+  line-height: 1.1;
+}
+.padroes-panel > .settings-group-sub {
+  font-size: 14.5px;
+  line-height: 1.6;
+  max-width: 64ch;
+  color: var(--df-text-secondary);
+  margin: 0;
+}
+
+/* Tab strip respiro */
+.padroes-panel .insumos-tabs {
+  margin-bottom: 0; /* parent .padroes-panel gap handles it */
+}
+
+/* ─── Directions block (guidance) ─────────────────────────────────── */
+.padroes-directions {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 14px;
+  align-items: start;
+  padding: 18px 22px;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-left: 3px solid var(--df-accent-user, #8ab06b);
+  border-radius: var(--df-r-md);
+  /* No bezel — flat editorial card. */
+  box-shadow: none;
+}
+
+.padroes-directions-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 10%, transparent);
+  color: var(--df-accent-user, #8ab06b);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.padroes-directions-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.padroes-directions-title {
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--df-text-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.padroes-directions-body {
+  font-family: var(--df-font-sans);
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--df-text-secondary);
+  margin: 0;
+  letter-spacing: -0.005em;
+  max-width: 70ch;
+}
+
+.padroes-directions-body strong {
+  font-weight: 600;
+  color: var(--df-text-primary);
+}
+
+.padroes-directions-body em {
+  font-style: italic;
+  color: var(--df-text-primary);
+}
+
+.padroes-directions-code {
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  background: var(--df-bg-base);
+  padding: 1px 6px;
+  border-radius: 3px;
+  color: var(--df-text-primary);
+  border: 1px solid var(--df-border-subtle);
+}
+
+[data-theme="light"] .padroes-directions {
+  background: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 4%, transparent);
+  border-left-color: var(--df-accent-user, #8ab06b);
+}
+
+[data-theme="light"] .padroes-directions-mark {
+  background: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 14%, transparent);
+}
+
+/* ─── EDITORIAL OVERRIDES — skeu reduction inside Padrões scope ─── */
+/* "cards de canvas, formatos e regras tao mal
+ * diagramados, mal pensados, mal feitos" — repensar row anatomy:
+ *   · 480px rail (was 380) — names + meta breathe
+ *   · 64px row height (was 56) — text stack + badge inline
+ *   · Title 15px / subtitle 12.5px line-height 1.5
+ *   · Badge inline RIGHT of title (was below checkbox)
+ *   · Toggle softer (less saturated when on)
+ *   · Drag handle hover-only (cleaner idle)
+ *   · Selected: 3px accent left bar + 1px accent border + faint accent bg
+ */
+
+/* Split — wider list rail (480px) for editorial breathing. */
+.padroes-panel .tx-mgr-split {
+  grid-template-columns: 480px 1fr;
+  gap: 32px;
+  min-height: 580px;
+}
+
+/* List column — flat surface with 1px border, no bezel. */
+.padroes-panel .tx-mgr-left {
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  box-shadow: none;
+  border-radius: var(--df-r-lg);
+  padding: 20px;
+  gap: 16px;
+}
+
+/* Search bowl: lighter recess, taller. */
+.padroes-panel .tx-mgr-search {
+  height: 42px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  box-shadow: none;
+  padding: 0 12px 0 38px;
+  border-radius: var(--df-r-md);
+}
+.padroes-panel .tx-mgr-search:focus-within {
+  border-color: var(--df-accent-user, var(--df-text-primary));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 10%, transparent);
+}
+.padroes-panel .tx-mgr-search-input {
+  font-size: 14px;
+}
+.padroes-panel .tx-mgr-search-icon {
+  left: 14px;
+}
+
+/* Create button — taller, editorial weight. */
+.padroes-panel .tx-mgr-create {
+  height: 42px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+/* List — generous row gap for editorial cadence. */
+.padroes-panel .tx-mgr-list {
+  gap: 10px;
+  max-height: 64vh;
+  padding: 0;
+}
+
+.padroes-panel .tx-mgr-section + .tx-mgr-section {
+  margin-top: 22px;
+}
+
+.padroes-panel .tx-mgr-section-head {
+  padding: 12px 4px 8px;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+}
+
+/* ─── Row anatomy repensar from scratch ─── */
+.padroes-panel .tx-mgr-row {
+  /* Generous padding so title + subtitle stack breathes. */
+  padding: 14px 16px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  /* Kill triple-layer bezel — single border, soft hover. */
+  box-shadow: none;
+  /* Wider gap between control cluster and text body. */
+  gap: 14px;
+  min-height: 64px;
+  /* We: grid was `auto auto 1fr auto` (4 cols) but row JSX renders
+   * up to 5 children (check + grip + toggle + body + badges). When all 5
+   * are present the 5th wraps to a new row, dropping the PADRÃO badge
+   * below the checkbox column. Use 5 explicit cols so the badge sits
+   * right of the body always. The middle 3 collapse to 0 when their
+   * elements aren't rendered (auto-fit). */
+  grid-template-columns: auto auto auto 1fr auto;
+  /* Smooth border + bg shifts on hover/select. */
+  transition:
+    background 140ms var(--df-ease-out),
+    border-color 140ms var(--df-ease-out),
+    box-shadow 140ms var(--df-ease-out);
+}
+/* Editorial flat row state (user still found "feio" — the
+ * accent border + tinted bg felt heavy and competed with the checkbox
+ * accent fill). New direction: clean separation of two cues that don't
+ * overlap visually:
+ *   1. SELECTED → 3px accent left rail (single, sharp, editorial)
+ *   2. CHECKED → checkbox accent fill (owned by the checkbox column)
+ * No bg shifts, no border accent, no shadows. Calmer, more legible.
+ *
+ * Hover is the lightest possible (2-3% text-tint) — just enough to
+ * confirm interactivity. The row idle border remains 1px subtle for
+ * structural separation between rows. */
+.padroes-panel .tx-mgr-row {
+  /* Override base raised shadow — Padrões wants flat editorial feel. */
+  box-shadow: none;
+  background: var(--df-bg-section);
+  /* Track left rail without layout shift — pad-left absorbs the 3px when
+   * a row is selected so neighbors don't reflow. */
+  padding-left: 13px;
+}
+.padroes-panel .tx-mgr-row:hover {
+  background: color-mix(in srgb, var(--df-text-primary) 3%, transparent);
+  border-color: var(--df-border-subtle);
+  transform: none;
+  box-shadow: none;
+}
+.padroes-panel .tx-mgr-row.is-selected {
+  /* Pure rail — no bg shift, no border tint. The 3px accent owns the
+   * "selected" cue. Bg stays at idle to avoid double-cue with hover. */
+  background: var(--df-bg-section);
+  border-color: var(--df-border-subtle);
+  box-shadow: none;
+}
+.padroes-panel .tx-mgr-row.is-selected:hover {
+  background: color-mix(in srgb, var(--df-text-primary) 3%, transparent);
+}
+.padroes-panel .tx-mgr-row.is-selected::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  background: var(--df-accent-user, var(--df-text-primary));
+  border-radius: 0 1.5px 1.5px 0;
+  box-shadow: none; /* no glow — editorial, not premium-skeu */
+}
+
+/* Kill is-multi dashed outline + raised bg. The checkbox accent
+ * fill is the bulk-select cue, full stop. */
+.padroes-panel .tx-mgr-row.is-multi {
+  outline: none;
+  background: var(--df-bg-section);
+}
+.padroes-panel .tx-mgr-row.is-multi:hover {
+  background: color-mix(in srgb, var(--df-text-primary) 3%, transparent);
+}
+.padroes-panel .tx-mgr-row.is-multi.is-selected {
+  background: var(--df-bg-section);
+}
+
+/* Title — bumped to 15px, generous letter-spacing. */
+.padroes-panel .tx-mgr-row-title {
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: -0.005em;
+  /* Inline title + badge: title takes 1fr, badge sits right of it. */
+}
+/* Subtitle — dedicated line, more breath, mono treatment for meta. */
+.padroes-panel .tx-mgr-row-sub {
+  font-size: 12.5px;
+  margin-top: 4px;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: var(--df-text-muted);
+}
+
+/* Drag handle — hover-only (cleaner idle). */
+.padroes-panel .tx-mgr-grip {
+  opacity: 0;
+  transition: opacity 140ms var(--df-ease-out);
+}
+.padroes-panel .tx-mgr-row:hover .tx-mgr-grip,
+.padroes-panel .tx-mgr-row.is-selected .tx-mgr-grip {
+  opacity: 0.6;
+}
+
+/* Toggle — softer when on (lower saturation, no border bleed). */
+.padroes-panel .tx-mgr-toggle {
+  width: 32px;
+  height: 18px;
+  border-radius: 9px;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  box-shadow: none;
+  flex-shrink: 0;
+}
+.padroes-panel .tx-mgr-toggle.is-on {
+  background: var(--df-accent-user, var(--df-text-primary));
+  border-color: var(--df-accent-user, transparent);
+  /* Slightly muted shadow so toggle doesn't dominate the row. */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  opacity: 0.92;
+}
+.padroes-panel .tx-mgr-toggle-thumb {
+  width: 14px;
+  height: 14px;
+  top: 1px;
+  left: 1px;
+  background: var(--df-text-secondary);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.20);
+}
+.padroes-panel .tx-mgr-toggle.is-on .tx-mgr-toggle-thumb {
+  transform: translateX(14px);
+  background: #fff;
+}
+
+/* Checkbox — clean square w/ centered checkmark when checked.
+ * Idle: faint border, transparent bg.
+ * Checked: accent fill + SVG-encoded white checkmark via mask-image. */
+.padroes-panel .tx-mgr-row-check {
+  position: relative;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  border: 1.5px solid var(--df-border-subtle);
+  background: var(--df-bg-section);
+  cursor: pointer;
+  transition: border-color 120ms var(--df-ease-out), background 120ms var(--df-ease-out);
+}
+.padroes-panel .tx-mgr-row:hover .tx-mgr-row-check {
+  border-color: var(--df-border-strong);
+}
+.padroes-panel .tx-mgr-row-check[aria-checked="true"] {
+  background: var(--df-accent-user, var(--df-text-primary));
+  border-color: var(--df-accent-user, transparent);
+}
+.padroes-panel .tx-mgr-row-check[aria-checked="true"]::after {
+  /* Real checkmark: 2 white strokes drawn via border-bottom + border-right
+   * on a rotated pseudo. Cleaner than a gradient stripe hack. */
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border-right: 1.6px solid #fff;
+  border-bottom: 1.6px solid #fff;
+  transform: rotate(45deg);
+}
+
+/* Row body — preserve preview gap (tx-mgr-row-body:has(...) on base
+ * sets grid+gap). When no preview, our flex column has tight stack;
+ * the title→sub margin lives on .tx-mgr-row-sub directly. */
+.padroes-panel .tx-mgr-row-body {
+  gap: 4px;
+}
+/* When preview is present (Canvas tab) — keep base grid layout but
+ * give the preview thumb more presence in the wider row. */
+.padroes-panel .tx-mgr-row-body:has(.tx-mgr-row-preview) {
+  gap: 14px;
+}
+.padroes-panel .tx-mgr-row-preview {
+  width: 32px;
+  height: 32px;
+}
+
+/* Row badges — sit inline right (small, tasteful). */
+.padroes-panel .tx-mgr-row-badges {
+  align-self: center;
+  /* Cap so long custom name still wins space. */
+  max-width: 96px;
+  overflow: hidden;
+}
+.padroes-panel .tx-mgr-badge {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  padding: 2.5px 6px;
+  border-radius: 3px;
+}
+
+/* Detail panel — flat editorial plate, generous padding. */
+.padroes-panel .tx-mgr-detail {
+  position: sticky;
+  top: 18px;
+}
+.padroes-panel .tx-mgr-detail-card {
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-lg);
+  padding: 36px 40px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  min-height: 580px;
+}
+.padroes-panel .tx-mgr-detail-empty {
+  background: var(--df-bg-section);
+  border: 1px dashed var(--df-border-subtle);
+  border-radius: var(--df-r-lg);
+  padding: 96px 36px;
+  box-shadow: none;
+  min-height: 580px;
+}
+.padroes-panel .tx-mgr-detail-empty-mark {
+  background: var(--df-bg-base);
+  box-shadow: none;
+  border: 1px solid var(--df-border-subtle);
+}
+
+/* ImportExport toolbar should sit ABOVE the list rail only (not
+ * stretching across the full 1400px). Match list rail width. */
+.padroes-panel .tx-mgr-toolbar-top {
+  width: 480px;
+  margin-bottom: -8px;
+}
+.padroes-panel .tx-mgr-toolbar-top .ie-controls {
+  margin-bottom: 0;
+}
+@media (max-width: 980px) {
+  .padroes-panel .tx-mgr-toolbar-top {
+    width: 100%;
+  }
+}
+
+/* Detail header — bigger editorial title. */
+.padroes-panel .tx-mgr-detail-head {
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+}
+.padroes-panel .tx-mgr-detail-eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.20em;
+}
+.padroes-panel .tx-mgr-detail-title {
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-top: 4px;
+}
+
+/* Form fields — editorial sizing. */
+.padroes-panel .tx-mgr-form {
+  gap: 18px;
+}
+.padroes-panel .tx-mgr-field-label {
+  font-size: 10.5px;
+  letter-spacing: 0.10em;
+}
+.padroes-panel .tx-mgr-input,
+.padroes-panel .tx-mgr-select,
+.padroes-panel .tx-mgr-textarea {
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  box-shadow: none;
+  padding: 11px 14px;
+  font-size: 14px;
+  border-radius: var(--df-r-md);
+}
+.padroes-panel .tx-mgr-input:focus,
+.padroes-panel .tx-mgr-select:focus,
+.padroes-panel .tx-mgr-textarea:focus {
+  border-color: var(--df-accent-user, var(--df-text-primary));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 10%, transparent);
+}
+.padroes-panel .tx-mgr-textarea {
+  font-size: 13px;
+  min-height: 120px;
+}
+
+/* Field help — slightly bigger for readability. */
+.padroes-panel .tx-mgr-field-help {
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--df-text-muted);
+}
+
+/* Builtin guidance pill above the form — soft tinted card. */
+.padroes-panel .padroes-builtin-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: rgba(216, 168, 107, 0.08);
+  border: 1px solid rgba(216, 168, 107, 0.20);
+  border-left: 3px solid var(--df-accent-warn, #d8a86b);
+  border-radius: var(--df-r-md);
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--df-text-secondary);
+  margin-bottom: 18px;
+}
+[data-theme="light"] .padroes-panel .padroes-builtin-note {
+  background: rgba(216, 168, 107, 0.10);
+}
+
+/* Detail action row — taller buttons, editorial button hierarchy. */
+.padroes-panel .tx-mgr-detail-action {
+  font-size: 11px;
+  padding: 6px 12px;
+  border: 1px solid var(--df-border-subtle);
+}
+.padroes-panel .tx-mgr-detail-action:hover {
+  background: var(--df-interactive-hover);
+  border-color: var(--df-border-strong);
+}
+
+/* Group filter pills — editorial sizing.
+ * v29 fix: scope inactive state so the active pill keeps its tactile-dark
+ * background (the editorial overlay was leaking bg into the active state
+ * and producing warm-light-text-on-warm-light-bg = invisible label).
+ */
+.padroes-panel .tx-mgr-group-pills {
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.padroes-panel .tx-mgr-group-pill:not(.is-active) {
+  height: 32px;
+  padding: 0 14px;
+  font-size: 11px;
+  background: var(--df-bg-base);
+  box-shadow: none;
+}
+.padroes-panel .tx-mgr-group-pill.is-active {
+  height: 32px;
+  padding: 0 14px;
+  font-size: 11px;
+  /* Inherit base.is-active rule: tactile-dark bg + on-tactile text. Just
+   * lock the editorial-sized pill geometry without touching colors. */
+}
+
+/* Manage Categories CTA next to filter pills */
+.padroes-cats-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.padroes-cats-toolbar .tx-mgr-group-pills {
+  margin-bottom: 0;
+  flex: 1;
+}
+.padroes-cats-manage-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 14px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+  color: var(--df-text-secondary);
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 120ms var(--df-ease-out), color 120ms var(--df-ease-out), border-color 120ms var(--df-ease-out);
+  flex-shrink: 0;
+}
+.padroes-cats-manage-btn:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+  border-color: var(--df-border-strong);
+}
+
+/* ─── Description sub above split ─── */
+.padroes-panel .tx-mgr-desc {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--df-text-muted);
+  max-width: 64ch;
+}
+
+/* Count line replacement when SkeuHero is suppressed */
+.padroes-panel .tx-mgr-count-line {
+  font-family: var(--df-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--df-text-muted);
+  padding: 2px 0;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ *  CONFIRM MODAL
+ * ════════════════════════════════════════════════════════════════════════ */
+
+.padroes-confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 18, 16, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: padroes-fade-in 180ms var(--df-ease-out);
+}
+[data-theme="light"] .padroes-confirm-backdrop {
+  background: rgba(40, 30, 20, 0.30);
+}
+
+.padroes-confirm-card {
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-lg);
+  padding: 28px 28px 22px;
+  width: 100%;
+  max-width: 420px;
+  /* User ask 2026-05-21: dark drops puros (rgba(0,0,0,0.40)) viravam
+     "blob preto" sem relief. Stack agora: inset top highlight (gives the
+     edge that catches light) + warm-tinted ambient drops via the skeu
+     tokens. Reads as a raised plate in both themes. */
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    0 2px 6px var(--df-skeu-contact),
+    0 14px 36px -8px var(--df-skeu-deep-near);
+  animation: padroes-rise 200ms var(--df-ease-out);
+}
+
+.padroes-confirm-title {
+  font-family: var(--df-font-sans);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--df-text-primary);
+  margin: 0 0 10px;
+  line-height: 1.25;
+}
+
+.padroes-confirm-body {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--df-text-secondary);
+  margin: 0 0 22px;
+}
+
+.padroes-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.padroes-confirm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: var(--df-r-sm);
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 120ms var(--df-ease-out), color 120ms var(--df-ease-out), border-color 120ms var(--df-ease-out);
+}
+
+.padroes-confirm-btn--cancel {
+  background: transparent;
+  color: var(--df-text-secondary);
+  border-color: var(--df-border-subtle);
+}
+.padroes-confirm-btn--cancel:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+  border-color: var(--df-border-strong);
+}
+
+.padroes-confirm-btn--danger {
+  background: var(--df-accent-danger, #c54c4c);
+  color: #fff;
+  border-color: var(--df-accent-danger, #c54c4c);
+}
+.padroes-confirm-btn--danger:hover {
+  background: #b03d3d;
+  border-color: #b03d3d;
+}
+.padroes-confirm-btn--danger:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(197, 76, 76, 0.30);
+}
+
+.padroes-confirm-btn--neutral {
+  background: var(--df-text-primary);
+  color: var(--df-bg-base);
+  border-color: var(--df-text-primary);
+}
+.padroes-confirm-btn--neutral:hover {
+  background: var(--df-text-secondary);
+}
+
+@keyframes padroes-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes padroes-rise {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .padroes-confirm-backdrop,
+  .padroes-confirm-card {
+    animation: none !important;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ *  CATEGORY MANAGER MODAL
+ * ════════════════════════════════════════════════════════════════════════ */
+
+.padroes-cat-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 18, 16, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 8500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: padroes-fade-in 180ms var(--df-ease-out);
+}
+[data-theme="light"] .padroes-cat-modal-backdrop {
+  background: rgba(40, 30, 20, 0.30);
+}
+
+.padroes-cat-modal {
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-lg);
+  padding: 0;
+  width: 100%;
+  max-width: 560px;
+  max-height: min(80vh, 720px);
+  display: flex;
+  flex-direction: column;
+  /* User ask 2026-05-21: dark drops puros (rgba(0,0,0,0.40)) viravam
+     "blob preto" sem relief. Stack agora: inset top highlight (gives the
+     edge that catches light) + warm-tinted ambient drops via the skeu
+     tokens. Reads as a raised plate in both themes. */
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    0 2px 6px var(--df-skeu-contact),
+    0 14px 36px -8px var(--df-skeu-deep-near);
+  animation: padroes-rise 200ms var(--df-ease-out);
+  overflow: hidden;
+}
+
+.padroes-cat-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 28px 18px;
+  border-bottom: 1px solid var(--df-border-subtle);
+}
+
+.padroes-cat-modal-title {
+  font-family: var(--df-font-sans);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--df-text-primary);
+  margin: 0 0 6px;
+  line-height: 1.2;
+}
+
+.padroes-cat-modal-sub {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--df-text-muted);
+  margin: 0;
+  max-width: 48ch;
+}
+
+.padroes-cat-modal-close {
+  background: transparent;
+  border: 0;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--df-text-muted);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 120ms var(--df-ease-out), color 120ms var(--df-ease-out);
+}
+.padroes-cat-modal-close:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+}
+
+.padroes-cat-create {
+  display: flex;
+  gap: 8px;
+  padding: 18px 28px 6px;
+}
+.padroes-cat-create-input {
+  flex: 1;
+  height: 36px;
+  padding: 0 12px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  color: var(--df-text-primary);
+  font-family: var(--df-font-sans);
+  font-size: 13.5px;
+  outline: 0;
+  transition: border-color 120ms var(--df-ease-out), box-shadow 120ms var(--df-ease-out);
+}
+.padroes-cat-create-input:focus {
+  border-color: var(--df-accent-user, var(--df-text-primary));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 10%, transparent);
+}
+.padroes-cat-create-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.padroes-cat-create-cta {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 14px;
+  background: var(--df-text-primary);
+  color: var(--df-bg-base);
+  border: 0;
+  border-radius: var(--df-r-md);
+  font-family: var(--df-font-sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 120ms var(--df-ease-out);
+}
+.padroes-cat-create-cta:hover {
+  opacity: 0.85;
+}
+.padroes-cat-create-cta:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.padroes-cat-create-error {
+  margin: 4px 28px 0;
+  font-size: 11.5px;
+  color: var(--df-accent-danger, #c54c4c);
+}
+
+.padroes-cat-list {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0 28px 18px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--df-border-subtle) transparent;
+}
+
+.padroes-cat-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  transition: border-color 120ms var(--df-ease-out);
+}
+.padroes-cat-row:hover {
+  border-color: var(--df-border-strong);
+}
+
+.padroes-cat-row-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.padroes-cat-row-label {
+  font-family: var(--df-font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--df-text-primary);
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.padroes-cat-rename-input {
+  width: 100%;
+  height: 28px;
+  padding: 0 8px;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-accent-user, var(--df-text-primary));
+  border-radius: var(--df-r-sm);
+  font-family: var(--df-font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--df-text-primary);
+  outline: 0;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 10%, transparent);
+}
+
+.padroes-cat-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--df-text-muted);
+}
+
+.padroes-cat-badge {
+  font-family: var(--df-font-mono);
+  font-size: 9px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+.padroes-cat-badge--builtin {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--df-border-subtle);
+  color: var(--df-text-faint);
+}
+.padroes-cat-badge--edited {
+  background: rgba(216, 168, 107, 0.14);
+  color: var(--df-accent-warn, #d8a86b);
+  border: 1px solid rgba(216, 168, 107, 0.22);
+  font-size: 11px;
+  padding: 1px 5px;
+}
+[data-theme="light"] .padroes-cat-badge--builtin {
+  background: rgba(60, 50, 40, 0.04);
+}
+
+.padroes-cat-row-count {
+  text-transform: uppercase;
+}
+
+.padroes-cat-row-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.padroes-cat-row-action {
+  background: transparent;
+  border: 1px solid var(--df-border-subtle);
+  color: var(--df-text-secondary);
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: var(--df-r-sm);
+  cursor: pointer;
+  transition: background 120ms var(--df-ease-out), color 120ms var(--df-ease-out), border-color 120ms var(--df-ease-out);
+}
+.padroes-cat-row-action:hover:not(:disabled) {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+  border-color: var(--df-border-strong);
+}
+.padroes-cat-row-action:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.padroes-cat-row-action--danger {
+  color: var(--df-accent-danger, #c54c4c);
+}
+.padroes-cat-row-action--danger:hover:not(:disabled) {
+  background: rgba(197, 76, 76, 0.08);
+  color: var(--df-accent-danger, #c54c4c);
+  border-color: rgba(197, 76, 76, 0.40);
+}
+
+.padroes-cat-modal-foot {
+  display: flex;
+  justify-content: flex-end;
+  padding: 14px 28px 18px;
+  border-top: 1px solid var(--df-border-subtle);
+}
+
+.padroes-cat-modal-foot-btn {
+  background: transparent;
+  border: 1px solid var(--df-border-subtle);
+  color: var(--df-text-secondary);
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: var(--df-r-sm);
+  cursor: pointer;
+  transition: background 120ms var(--df-ease-out), color 120ms var(--df-ease-out);
+}
+.padroes-cat-modal-foot-btn:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ *  BUILTIN ROW ACTIONS (Hide / Show / Reset) — explicit buttons in the
+ *  detail header for clearer affordance.
+ * ════════════════════════════════════════════════════════════════════════ */
+
+.padroes-builtin-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.padroes-builtin-actions .padroes-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+  font-family: var(--df-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--df-text-secondary);
+  cursor: pointer;
+  transition: background 120ms var(--df-ease-out), color 120ms var(--df-ease-out), border-color 120ms var(--df-ease-out);
+}
+.padroes-builtin-actions .padroes-action-btn:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+  border-color: var(--df-border-strong);
+}
+.padroes-builtin-actions .padroes-action-btn--reset {
+  color: var(--df-accent-warn, #d8a86b);
+  border-color: rgba(216, 168, 107, 0.30);
+}
+.padroes-builtin-actions .padroes-action-btn--reset:hover {
+  background: rgba(216, 168, 107, 0.08);
+  color: var(--df-accent-warn, #d8a86b);
+}
+
+/* ─── Narrow viewports ──────────────────────────────────────────── */
+@media (max-width: 980px) {
+  .padroes-panel .tx-mgr-split {
+    grid-template-columns: 1fr;
+  }
+  .padroes-panel .tx-mgr-detail {
+    position: static;
+  }
+  .padroes-panel .tx-mgr-detail-card,
+  .padroes-panel .tx-mgr-detail-empty {
+    min-height: 320px;
+    padding: 24px 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .padroes-cat-modal-backdrop,
+  .padroes-cat-modal,
+  .padroes-cat-row,
+  .padroes-cat-row-action,
+  .padroes-cat-create-cta {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ *  Import / Export / Reset toolbar (top of each editor)
+ *
+ *  An editorial-skin toolbar that lives ABOVE the TaxonomyManager
+ *  search input. Same affordance density as .padroes-cats-toolbar.
+ * ════════════════════════════════════════════════════════════════════════ */
+
+.ie-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0 0;
+  margin-bottom: 4px;
+}
+
+.ie-controls-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+  font-family: var(--df-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--df-text-secondary);
+  cursor: pointer;
+  transition: background 120ms var(--df-ease-out),
+              color 120ms var(--df-ease-out),
+              border-color 120ms var(--df-ease-out);
+}
+.ie-controls-btn:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+  border-color: var(--df-border-strong);
+}
+.ie-controls-btn:focus-visible {
+  outline: 2px solid var(--df-accent-primary);
+  outline-offset: 2px;
+}
+.ie-controls-btn--danger {
+  color: var(--df-text-secondary);
+  border-color: rgba(208, 88, 88, 0.30);
+}
+.ie-controls-btn--danger:hover {
+  color: var(--df-accent-danger, #d05858);
+  background: rgba(208, 88, 88, 0.06);
+  border-color: rgba(208, 88, 88, 0.45);
+}
+.ie-controls-btn svg {
+  flex-shrink: 0;
+}
+
+/* ─── Import preview modal — extra pieces ─────────────────────────── */
+.ie-import-card {
+  /* Slightly wider than the basic confirm, more room for diff lists. */
+  max-width: 540px;
+}
+
+.ie-import-diff {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 16px 0 22px;
+  padding: 16px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+}
+
+.ie-import-diff-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ie-import-diff-label {
+  font-family: var(--df-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--df-text-secondary);
+}
+.ie-import-diff-label--add {
+  color: var(--df-accent-primary, #61b88a);
+}
+.ie-import-diff-label--replace {
+  color: var(--df-accent-warn, #d8a86b);
+}
+.ie-import-diff-label--remove {
+  color: var(--df-accent-danger, #d05858);
+}
+
+.ie-import-diff-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.ie-import-diff-list li {
+  font-size: 12px;
+  color: var(--df-text-primary);
+  padding: 2px 8px;
+  background: var(--df-bg-raised);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-xs, 3px);
+}
+
+.ie-import-diff-more {
+  color: var(--df-text-tertiary, var(--df-text-secondary)) !important;
+  font-style: italic;
+}
+
+.ie-import-diff-note {
+  font-size: 11px;
+  color: var(--df-text-secondary);
+  margin-top: 6px;
+  font-style: italic;
+}
+
+.ie-import-actions {
+  flex-wrap: wrap;
+}
+
+.padroes-confirm-btn--neutral {
+  color: var(--df-text-primary);
+  background: var(--df-bg-raised);
+  border-color: var(--df-border-strong);
+}
+.padroes-confirm-btn--neutral:hover {
+  background: var(--df-interactive-hover);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ *  Detail header delete button (top of detail panel)
+ *
+ *  Surfaces the delete CTA prominently in the detail panel header,
+ *  rather than burying it inside the form footer.
+ * ════════════════════════════════════════════════════════════════════════ */
+
+.padroes-panel .tx-mgr-detail-action--danger,
+.tx-mgr-detail-action--danger-prom {
+  /* Promote danger action visually — slightly more presence than the soft
+   * neutral outline used for "Duplicar" siblings. */
+  color: var(--df-accent-danger, #d05858) !important;
+  border: 1px solid rgba(208, 88, 88, 0.40) !important;
+  background: rgba(208, 88, 88, 0.05) !important;
+}
+.padroes-panel .tx-mgr-detail-action--danger:hover,
+.tx-mgr-detail-action--danger-prom:hover {
+  color: #fff !important;
+  background: var(--df-accent-danger, #d05858) !important;
+  border-color: var(--df-accent-danger, #d05858) !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ *  v20 — Inline form validation (under fields)
+ * ════════════════════════════════════════════════════════════════════════ */
+
+.tx-mgr-field-error {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--df-accent-danger, #d05858);
+  letter-spacing: 0.01em;
+}
+.tx-mgr-field-warn {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--df-accent-warn, #d8a86b);
+  letter-spacing: 0.01em;
+}
+
+.tx-mgr-input.is-invalid,
+.tx-mgr-textarea.is-invalid,
+.tx-mgr-select.is-invalid {
+  border-color: var(--df-accent-danger, #d05858) !important;
+  box-shadow: 0 0 0 1px rgba(208, 88, 88, 0.20) inset !important;
+}
+
+/* Disabled save button (validation gate). */
+.df-btn--primary[disabled],
+.df-btn--primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ *  v20 — Bulk select checkbox (always-visible in Padrões scope)
+ *  visual simplified (user: "quando ta com select box marcada
+ *        tambem ta meio feio, padronize visual mais simples"). Removed
+ *        the duplicate definition that fought the row anatomy block:
+ *        now there is ONE source of truth higher up in the file
+ *        (.padroes-panel .tx-mgr-row-check, ~line 340). This block keeps
+ *        only the layout-affecting rules (gutter, no jitter on hover).
+ *
+ *  Each row gets a left-edge checkbox (16px) for multi-select. Click
+ *  toggles via stopPropagation so the row click still selects-for-edit.
+ * ════════════════════════════════════════════════════════════════════════ */
+
+.padroes-panel .tx-mgr-row {
+  /* Reserve space for the checkbox always (no jitter on hover). */
+  padding-left: 14px;
+}
+
+/* Bulk action bar styling — promote the move-to-cat select in extras slot. */
+.padroes-panel .tx-mgr-bulk-extra-select {
+  height: 28px;
+  padding: 0 28px 0 10px;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+  color: var(--df-text-primary);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none' stroke='%23999' stroke-width='1.6'><polyline points='1 1 5 5 9 1'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 9px 5px;
+}
+
+/* ─── Reduced motion respect for v20 elements ─────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ie-controls-btn,
+  .padroes-panel .tx-mgr-row-check,
+  .ie-import-card {
+    transition: none !important;
+  }
+}

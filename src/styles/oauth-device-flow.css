@@ -1,0 +1,1037 @@
+/* OAuthDeviceFlow + Provider OAuth cards
+ * premium UI for the device-flow ceremony.
+ * Skeu DNA — cavity bg, soft border, no 3D fakery (v27b carry-over);
+ * Geist mono for the user_code (tabular-nums, letter-spaced); flat
+ * df-btn buttons; respects prefers-reduced-motion. */
+
+.oauth-device-flow {
+  margin: 12px 0 0;
+  padding: 18px 16px 16px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md, 8px);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--df-text-primary) 4%, transparent);
+}
+
+.oauth-device-flow__lede {
+  margin: 0 0 14px;
+  font-family: var(--df-font-sans);
+  font-size: var(--df-text-sm);
+  color: var(--df-text-secondary);
+  line-height: 1.45;
+  max-width: 60ch;
+}
+
+.oauth-device-flow__code {
+  display: inline-block;
+  margin: 0 0 6px;
+  padding: 14px 22px;
+  background: var(--df-surface-raised);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: 10px;
+  font-family: var(--df-font-mono);
+  font-size: 32px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.18em;
+  color: var(--df-text-primary);
+  cursor: pointer;
+  user-select: all;
+  outline: none;
+  transition: border-color 140ms var(--df-ease-out), background 140ms var(--df-ease-out);
+}
+
+.oauth-device-flow__code:hover { border-color: var(--df-border-hover); background: var(--df-interactive-hover); }
+.oauth-device-flow__code:focus-visible { border-color: var(--df-border-strong); box-shadow: 0 0 0 2px color-mix(in srgb, var(--df-accent-primary, currentColor) 35%, transparent); }
+
+.oauth-device-flow__copied {
+  margin: 0 0 12px;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  color: var(--df-accent-ok, #5faa54);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.oauth-device-flow__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.oauth-device-flow__waiting {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  color: var(--df-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.oauth-device-flow__dots {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.oauth-device-flow__dots span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--df-text-muted);
+  animation: oauth-dot-pulse 1100ms ease-in-out infinite;
+}
+.oauth-device-flow__dots span:nth-child(2) { animation-delay: 180ms; }
+.oauth-device-flow__dots span:nth-child(3) { animation-delay: 360ms; }
+
+@keyframes oauth-dot-pulse {
+  0%, 80%, 100% { opacity: 0.3; transform: scale(0.85); }
+  40%           { opacity: 1;   transform: scale(1.05); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .oauth-device-flow__dots span { animation: none; opacity: 0.6; }
+}
+
+.oauth-device-flow__success {
+  margin: 0;
+  font-family: var(--df-font-sans);
+  font-size: var(--df-text-sm);
+  color: var(--df-accent-ok, #5faa54);
+  font-weight: 500;
+}
+
+.oauth-device-flow__error {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.oauth-device-flow__error-msg {
+  margin: 0;
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  color: var(--df-accent-warn, #f0a500);
+}
+
+.oauth-device-flow__error-hint {
+  margin: 0;
+  font-family: var(--df-font-sans);
+  font-size: 12px;
+  color: var(--df-text-muted);
+  line-height: 1.45;
+}
+
+/* ─── Provider OAuth card chrome (Vercel + GitHub in Settings) ─────── */
+
+.provider-oauth-card {
+  margin: 8px 0 0;
+  padding: 14px 16px;
+  background: var(--df-surface-raised);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md, 8px);
+}
+
+.provider-oauth-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.provider-oauth-label {
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  color: var(--df-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.provider-oauth-badge {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  border: 1px solid var(--df-border-subtle);
+  padding: 2px 8px;
+  border-radius: 4px;
+  color: var(--df-text-faint);
+}
+
+.provider-oauth-badge.is-on {
+  color: var(--df-accent-ok, #5faa54);
+  background: color-mix(in srgb, var(--df-accent-ok, #5faa54) 12%, transparent);
+}
+
+.provider-oauth-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0 12px;
+  padding: 10px 12px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: 8px;
+}
+
+.provider-oauth-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--df-surface-elevated);
+  border: 1px solid var(--df-border-subtle);
+  overflow: hidden;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--df-font-mono);
+  font-size: 13px;
+  color: var(--df-text-muted);
+}
+
+.provider-oauth-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.provider-oauth-id {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.provider-oauth-name {
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--df-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.provider-oauth-meta {
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  color: var(--df-text-muted);
+  margin-top: 2px;
+}
+
+.provider-oauth-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.provider-oauth-actions .provider-oauth-link {
+  margin-left: auto;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  color: var(--df-text-muted);
+  text-decoration: none;
+}
+.provider-oauth-actions .provider-oauth-link:hover { color: var(--df-text-secondary); }
+
+.provider-oauth-input {
+  display: block;
+  width: 100%;
+  padding: 9px 11px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: 6px;
+  color: var(--df-text-primary);
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  outline: none;
+  box-sizing: border-box;
+}
+.provider-oauth-input:focus-visible {
+  border-color: var(--df-border-strong);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--df-accent-primary, currentColor) 30%, transparent);
+}
+
+.provider-oauth-input + .provider-oauth-input { margin-top: 8px; }
+
+.provider-oauth-error {
+  margin-top: 8px;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  color: var(--df-accent-warn, #f0a500);
+}
+
+.provider-oauth-flash {
+  margin-top: 8px;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  color: var(--df-accent-ok, #5faa54);
+}
+
+/* ─── Publish dialog (Share menu → Publicar no Vercel) ─────────────── */
+
+.publish-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in srgb, var(--df-bg-base) 70%, transparent);
+  backdrop-filter: blur(6px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: publish-dialog-fade 160ms var(--df-ease-out);
+}
+
+@keyframes publish-dialog-fade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .publish-dialog-backdrop { animation: none; }
+}
+
+.publish-dialog {
+  width: min(560px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--df-surface-elevated);
+  border: 1px solid var(--df-border-strong);
+  border-radius: var(--df-r-lg, 12px);
+  box-shadow: var(--df-shadow-card);
+  padding: 24px 24px 20px;
+}
+
+.publish-dialog__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.publish-dialog__title {
+  margin: 0;
+  font-family: var(--df-font-sans);
+  font-size: var(--df-text-lg, 16px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--df-text-primary);
+}
+
+.publish-dialog__close {
+  background: none;
+  border: none;
+  color: var(--df-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+.publish-dialog__close:hover { color: var(--df-text-primary); background: var(--df-interactive-hover); }
+
+.publish-dialog__sub {
+  margin: 0 0 18px;
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  color: var(--df-text-secondary);
+  line-height: 1.45;
+}
+
+.publish-dialog__field {
+  margin-bottom: 14px;
+}
+
+.publish-dialog__label {
+  display: block;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--df-text-secondary);
+  margin-bottom: 6px;
+}
+
+.publish-dialog__hint {
+  margin: 4px 0 0;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  color: var(--df-text-muted);
+}
+
+.publish-dialog__radio-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.publish-dialog__radio {
+  position: relative;
+  padding: 10px 12px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 140ms var(--df-ease-out), background 140ms var(--df-ease-out);
+}
+.publish-dialog__radio:hover { border-color: var(--df-border-hover); }
+.publish-dialog__radio.is-active { border-color: var(--df-border-strong); background: var(--df-surface-raised); }
+
+.publish-dialog__radio-title {
+  display: block;
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--df-text-primary);
+}
+
+.publish-dialog__radio-sub {
+  display: block;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  color: var(--df-text-muted);
+  margin-top: 2px;
+}
+
+.publish-dialog__profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  border: 1px solid var(--df-border-subtle);
+  border-radius: 8px;
+  background: var(--df-bg-base);
+}
+
+.publish-dialog__profile .provider-oauth-avatar { width: 28px; height: 28px; }
+
+.publish-dialog__footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--df-border-subtle);
+}
+
+.publish-dialog__footer .df-btn--primary { margin-left: auto; min-width: 120px; }
+
+.publish-dialog__error {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--df-accent-warn, #f0a500) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--df-accent-warn, #f0a500) 35%, transparent);
+  border-radius: 6px;
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  color: var(--df-accent-warn, #f0a500);
+}
+
+.publish-dialog__byok-cta {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  background: var(--df-bg-base);
+  border: 1px dashed var(--df-border-subtle);
+  border-radius: 8px;
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  color: var(--df-text-secondary);
+  line-height: 1.45;
+}
+
+.publish-dialog__byok-cta strong { color: var(--df-text-primary); font-weight: 500; }
+
+/* ─── hero account label + mode toggle + picker + preview ─── */
+
+/* Account hero — replaces the muted sub when connected. */
+.publish-dialog__account {
+  margin: 0 0 18px;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--df-text-secondary);
+  line-height: 1.4;
+}
+
+/* Mode radio — "Criar novo" / "Usar existente". Two equal pills. */
+.publish-dialog__mode-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.publish-dialog__mode {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 140ms var(--df-ease-out), background 140ms var(--df-ease-out);
+  text-align: left;
+}
+.publish-dialog__mode:hover { border-color: var(--df-border-hover); }
+.publish-dialog__mode.is-active {
+  border-color: var(--df-border-strong);
+  background: var(--df-surface-raised);
+}
+.publish-dialog__mode-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid var(--df-border-subtle);
+  background: transparent;
+  flex-shrink: 0;
+  transition: background 120ms var(--df-ease-out), border-color 120ms var(--df-ease-out);
+}
+.publish-dialog__mode.is-active .publish-dialog__mode-dot {
+  border-color: var(--df-text-primary);
+  /* Inner dot via inset shadow — keeps a single element. */
+  box-shadow: inset 0 0 0 3px var(--df-text-primary);
+}
+.publish-dialog__mode-label {
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  color: var(--df-text-primary);
+  font-weight: 400;
+}
+
+/* Project picker trigger — same shape as provider-oauth-input but with
+ * caret + sub-label. Anchors the SearchableDropdown. */
+.publish-dialog__picker-wrap {
+  position: relative;
+}
+.publish-dialog__picker-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  color: var(--df-text-primary);
+  text-align: left;
+  transition: border-color 140ms var(--df-ease-out);
+}
+.publish-dialog__picker-trigger:hover { border-color: var(--df-border-hover); }
+.publish-dialog__picker-trigger:disabled,
+.publish-dialog__picker-trigger.is-loading {
+  cursor: not-allowed;
+  color: var(--df-text-muted);
+}
+.publish-dialog__picker-trigger-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.publish-dialog__picker-trigger-label {
+  font-size: 13px;
+  color: var(--df-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.publish-dialog__picker-trigger-sub {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--df-text-muted);
+  text-transform: uppercase;
+}
+.publish-dialog__picker-trigger-caret {
+  font-family: var(--df-font-mono);
+  color: var(--df-text-muted);
+  transform: rotate(90deg);
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* Project preview chip — confirms which project is selected. */
+.publish-dialog__project-preview {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: var(--df-surface-raised);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.publish-dialog__project-preview-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.publish-dialog__project-preview-name {
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--df-text-primary);
+}
+.publish-dialog__project-preview-scope {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--df-text-muted);
+  text-transform: uppercase;
+}
+.publish-dialog__project-preview-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  color: var(--df-text-muted);
+}
+
+/* Name validation status line — replaces the generic hint when in
+ * "Criar novo" mode. Subtle color shifts only (no banners). */
+.publish-dialog__name-status {
+  margin: 6px 0 0;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  color: var(--df-text-muted);
+  letter-spacing: 0;
+  min-height: 1.4em;
+}
+.publish-dialog__name-status.is-checking { color: var(--df-text-secondary); }
+.publish-dialog__name-status.is-ok { color: var(--df-accent-success, #16a34a); }
+.publish-dialog__name-status.is-error { color: var(--df-accent-warn, #f0a500); }
+
+/* CLI-first hint shown above BYOK paste flow when disconnected.
+ * Mirrors the gh CLI affordance — user runs `vercel login` once and
+ * DF picks it up automatically (no copy-paste of a token). */
+.provider-oauth-cli-hint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm, 6px);
+  font-family: var(--df-font-sans);
+  font-size: 12.5px;
+  color: var(--df-text-secondary);
+  line-height: 1.5;
+}
+
+.provider-oauth-cli-hint code {
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  background: var(--df-surface-elevated);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: 4px;
+  padding: 2px 8px;
+  color: var(--df-text-primary);
+  white-space: nowrap;
+}
+
+/* CliInstallHint disclosure (Vercel + GitHub install commands).
+ * Sits below the single-line cli-hint, expandable on click. Mirrors the
+ * editorial flat aesthetic — no shadows, soft borders, copy buttons that
+ * flash a brief "Copiado" confirmation. */
+.cli-install-hint {
+  margin: 0 0 12px;
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm, 6px);
+  background: var(--df-bg-section);
+  font-family: var(--df-font-sans);
+}
+
+.cli-install-hint-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 12px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-size: 12.5px;
+  color: var(--df-text-secondary);
+  text-align: left;
+  font-family: inherit;
+}
+
+.cli-install-hint-trigger:hover {
+  background: color-mix(in srgb, var(--df-text-primary) 3%, transparent);
+}
+
+.cli-install-hint-icon {
+  font-size: 14px;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.cli-install-hint-prompt {
+  flex: 1;
+  font-weight: 400;
+}
+
+.cli-install-hint-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  color: var(--df-text-primary);
+  letter-spacing: 0.02em;
+}
+
+.cli-install-hint-chev {
+  font-size: 9px;
+  opacity: 0.7;
+}
+
+.cli-install-hint-body {
+  border-top: 1px solid var(--df-border-subtle);
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cli-install-hint-cmd {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cli-install-hint-caption {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--df-text-faint);
+}
+
+.cli-install-hint-cmd-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.cli-install-hint-cmd-row code {
+  flex: 1;
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: 4px;
+  padding: 7px 10px;
+  color: var(--df-text-primary);
+  overflow-x: auto;
+  white-space: nowrap;
+  /* Treat the code as a row, not block — so copy button aligns. */
+  display: flex;
+  align-items: center;
+}
+
+.cli-install-hint-copy {
+  flex-shrink: 0;
+  padding: 0 12px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: 4px;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  color: var(--df-text-secondary);
+  cursor: pointer;
+  transition: background 120ms var(--df-ease-out), color 120ms var(--df-ease-out);
+}
+
+.cli-install-hint-copy:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+}
+
+/* ─── publish lifecycle (publishing / success / error) ────────── */
+/* User ask 2026-05-06: "tinha que ter alguma sinalização de q a
+ * pagina ta sendo publicada e exibir link quando eh deployado". The
+ * dialog now owns the full lifecycle. The overlays sit inside the
+ * dialog body; the head/title swap, but everything else is replaced.
+ *
+ * Aesthetic sits with the editorial system already on the dialog:
+ * sunken surface for the panel, soft borders, mono captions, no
+ * shadows. Step rows carry their own status icons. Reduced motion is
+ * respected — no rotating spinners; we use a subtle opacity pulse. */
+
+.publish-dialog__progress-panel {
+  margin: 14px 0 6px;
+  padding: 16px 16px 14px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm, 6px);
+}
+
+.publish-dialog__step-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.publish-dialog__step {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  color: var(--df-text-secondary);
+  min-height: 22px;
+  /* Subtle left-edge weight via the icon column — no full row borders. */
+}
+
+.publish-dialog__step-icon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1.5px solid var(--df-border-subtle);
+  background: var(--df-surface-raised);
+  font-family: var(--df-font-sans);
+  font-size: 11px;
+  line-height: 1;
+  color: var(--df-text-faint);
+  transition: background 160ms var(--df-ease-out), border-color 160ms var(--df-ease-out), color 160ms var(--df-ease-out);
+}
+
+.publish-dialog__step.is-done .publish-dialog__step-icon {
+  background: var(--df-accent-success, #16a34a);
+  border-color: var(--df-accent-success, #16a34a);
+  color: #fff;
+}
+
+.publish-dialog__step.is-current .publish-dialog__step-icon {
+  background: transparent;
+  border-color: var(--df-text-primary);
+  color: var(--df-text-primary);
+  /* Pulse — opacity-only, friendly to prefers-reduced-motion. */
+  animation: publish-step-pulse 1400ms ease-in-out infinite;
+}
+
+@keyframes publish-step-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.92); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .publish-dialog__step.is-current .publish-dialog__step-icon {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+.publish-dialog__step-label {
+  flex: 1;
+  font-size: 13px;
+  color: var(--df-text-secondary);
+  letter-spacing: 0;
+}
+
+.publish-dialog__step.is-current .publish-dialog__step-label,
+.publish-dialog__step.is-done .publish-dialog__step-label {
+  color: var(--df-text-primary);
+}
+
+.publish-dialog__step.is-pending .publish-dialog__step-label {
+  color: var(--df-text-muted);
+}
+
+.publish-dialog__step-elapsed {
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  color: var(--df-text-faint);
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  min-width: 32px;
+  text-align: right;
+}
+
+.publish-dialog__progress-bar {
+  margin-top: 14px;
+  height: 3px;
+  background: var(--df-border-subtle);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.publish-dialog__progress-bar-fill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--df-text-primary) 50%,
+    transparent 100%
+  );
+  animation: publish-progress-sweep 1800ms linear infinite;
+}
+
+@keyframes publish-progress-sweep {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .publish-dialog__progress-bar-fill {
+    animation: none;
+    background: var(--df-text-primary);
+    opacity: 0.35;
+  }
+}
+
+.publish-dialog__progress-elapsed {
+  margin: 10px 0 0;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  color: var(--df-text-faint);
+  letter-spacing: 0.02em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Success card ────────────────────────────────────────────────── */
+
+.publish-dialog__success-card {
+  margin: 14px 0 6px;
+  padding: 18px 16px 16px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-accent-success, #16a34a);
+  border-radius: var(--df-r-sm, 6px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  /* Subtle accent — never a full success-bg fill (anti-slop). */
+}
+
+.publish-dialog__success-icon {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--df-accent-success, #16a34a);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.publish-dialog__success-url-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.publish-dialog__success-url {
+  font-family: var(--df-font-mono);
+  font-size: 13px;
+  color: var(--df-text-primary);
+  text-decoration: underline;
+  text-decoration-color: var(--df-border-subtle);
+  text-underline-offset: 3px;
+  word-break: break-all;
+  flex: 1;
+  letter-spacing: 0;
+}
+
+.publish-dialog__success-url:hover {
+  text-decoration-color: var(--df-text-primary);
+}
+
+.publish-dialog__success-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.publish-dialog__success-meta {
+  margin: 8px 0 0;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  color: var(--df-text-faint);
+  letter-spacing: 0.02em;
+}
+
+/* ─── Error card ──────────────────────────────────────────────────── */
+
+.publish-dialog__error-card {
+  margin: 14px 0 6px;
+  padding: 14px 16px;
+  background: var(--df-bg-base);
+  border: 1px solid var(--df-accent-warn, #f0a500);
+  border-radius: var(--df-r-sm, 6px);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.publish-dialog__error-icon {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--df-accent-warn, #f0a500);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.publish-dialog__error-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.publish-dialog__error-body strong {
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--df-text-primary);
+  letter-spacing: 0;
+}
+
+.publish-dialog__error-message {
+  margin: 0;
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  color: var(--df-text-secondary);
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: transparent;
+  padding: 0;
+  letter-spacing: 0;
+  line-height: 1.5;
+  max-height: 140px;
+  overflow-y: auto;
+}

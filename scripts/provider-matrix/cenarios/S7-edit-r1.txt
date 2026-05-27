@@ -1,0 +1,8 @@
+The file already exists. EDIT it (do not rewrite from scratch) to:
+
+1. Change the orb count from whatever it is now to exactly 14 orbs.
+2. Add a single slider in the top-right corner (range 0-100, default 60, label "viscosity") that adjusts the goo blur strength in real-time.
+
+Keep all existing behavior — cursor follower, click ignition, color palette, vignette. Only touch what's needed for those 2 changes.
+
+Reply with 1 short sentence describing what you changed.

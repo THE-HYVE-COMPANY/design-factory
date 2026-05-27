@@ -1,0 +1,8 @@
+The file already exists. EDIT it (do not rewrite from scratch) to:
+
+1. Add a thin 1px HYVE dot grid (~24px spacing, low opacity) as a background layer behind the goo. Must not interfere with the goo filter.
+2. Add a secondary slider next to "viscosity" called "density" (range 4-24, default 14) that dynamically adjusts the orb count.
+
+Keep the viscosity slider and all existing behavior intact.
+
+Reply with 1 short sentence describing what you changed.

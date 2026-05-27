@@ -1,0 +1,9 @@
+The file already exists. EDIT it (do not rewrite from scratch) to:
+
+1. Add a vignette overlay: radial-gradient from transparent center to ~50% black at edges, pointer-events none, on top of everything.
+2. Change the orbs' fill colors so 60% are HYVE orange (#FF5524) and 40% are sage (#A8C09A). Random assignment OK.
+3. Increase the click "ignite" effect: now click expands a transient ring (300ms duration) that fades out as it grows.
+
+Keep all sliders (viscosity, density), the dot grid, the cursor follower. Only touch what's needed.
+
+Reply with 1 short sentence describing what you changed.

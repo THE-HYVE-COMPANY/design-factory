@@ -1,0 +1,5 @@
+The file already exists. EDIT it (do not rewrite from scratch) to:
+1. Darken the background by ~30% (use --bg-darker or replace existing bg color).
+2. Add a single horizontal slider in the top-right (0-100, default 50) that controls one observable parameter of your existing visual (intensity / density / speed — your call).
+
+Keep all existing functionality. Reply with 1 short sentence describing the change you made.

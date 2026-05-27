@@ -1,0 +1,20 @@
+Build an editorial-style operational dashboard as a single self-contained HTML file.
+
+Layout (CSS Grid, 12 columns):
+- Top row: 6 KPI cards in a 6-column grid. Each card: large numeric value (tabular-nums), a small delta indicator (+/- %), a 1-line label, a 60×24px inline SVG sparkline.
+- Middle row split 8/4: left = a Canvas-based bar chart (8 bars, 320×180px, animated reveal on load). Right = a sortable activity log (4 rows, monospace timestamps).
+- Bottom row: a filterable table with 6 rows × 5 cols. Header row sticky. One column has status pills (success/warning/danger), color-coded.
+
+Style:
+- Dark mode default. Background #14110F, surface #1F1B17, text #F5EFE8.
+- Accent orange #FF5524 ONLY for status pills, deltas, and the bar chart hover state.
+- Typography: monospace for numerics, sans-serif for prose. tabular-nums enabled.
+- 8px baseline grid. Cards have 1px solid border at 8% alpha, no shadow, no rounded corners > 4px.
+- All numbers fake but plausible (latency, throughput, errors, etc.).
+
+Interactivity:
+- Bar chart bars highlight on hover with a tooltip.
+- Table search input filters rows in real-time.
+- Sortable columns toggle ASC/DESC on click.
+
+Output: single HTML file via Write/artifact. Inline CSS+JS only. Start with <!DOCTYPE html>. Reply with 2-3 sentences describing the design choices.

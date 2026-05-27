@@ -1,0 +1,473 @@
+/* np-modal.css — full-screen skeu modal that hosts NewProjectFormSkeu.
+ *
+ * hyve-taste preset = premium_ui_surface with dials POLISH=10,
+ * TACTILITY=9, BRAND_FIDELITY=8.
+ *
+ * Surface vocabulary:
+ *   - Faceplate: 3-layer bezel (outer dark ring / middle bright bevel /
+ *     inner deep shadow) so the chrome reads like a milled aluminum
+ *     plate pinned under glass, not a flat border.
+ *   - Drop shadow: longer + softer halo (60px reach) with a tight
+ *     contact tier for crisp lift.
+ *   - Sheen sweep: 2-stop linear-gradient with a brighter peak at 12%,
+ *     bottom drop-off at 30%, so the highlight reads as a rolling
+ *     reflection rather than a flat ribbon.
+ *   - Rivets: inner well via radial gradient (concave) + outer 0.5px
+ *     highlight (raised lip), in both the faceplate and stage corners.
+ *   - Stage: inset bowl deeper (12px shadow) + subtle micro-noise grain
+ *     so the paper feel under the bezel reads physical.
+ *   - Width: max-width 1100px to give the 4-zone layout room.
+ *   - Stage reveal stagger: each .cnp-zone fades in 50ms apart after
+ *     the faceplate lands, so the panel "powers on" zone by zone.
+ *   - Mobile: full viewport (no backdrop padding), sticky footer in
+ *     safe-area-inset, no card shadow (would clip).
+ *
+ * Tokens only — no hardcoded hex (dark + light parity via skeu-* and
+ * surface-* tokens that already exist).
+ */
+
+/* ─── Backdrop ──────────────────────────────────────────────────────── */
+.np-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60; /* above DfModal (50) so a nested DfModal overlays cleanly */
+  background: var(--df-surface-overlay);
+  backdrop-filter: blur(24px) saturate(0.88) brightness(0.9);
+  -webkit-backdrop-filter: blur(24px) saturate(0.88) brightness(0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  animation: np-modal-backdrop-in 240ms var(--df-ease-out);
+}
+@keyframes np-modal-backdrop-in {
+  from { opacity: 0; backdrop-filter: blur(0) saturate(1) brightness(1); }
+  to   { opacity: 1; }
+}
+
+/* ─── Card ──────────────────────────────────────────────────────────── */
+.np-modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  /* Fixed height adapts to the viewport — the modal NEVER scrolls.
+   * The internal grid grows and shrinks to fit; content compacts inside.
+   * The 820px ceiling reflects the layout after the DS row moved out of
+   * the PROJETO column into the composer toolbar dropdown — the footer
+   * pulls up because the split row no longer absorbs that ~120px. */
+  height: min(820px, calc(100vh - 56px));
+  max-height: calc(100vh - 56px);
+  background: var(--df-bg-section);
+  /* v14: biggest surface = biggest radius (--df-r-3xl 18px) per scale spec.
+   * Was --df-r-2xl (14px) — bumped for the luxe feel users asked for
+   * ("realismo de luxo, mas nunca nada flat"). */
+  border-radius: var(--df-r-3xl);
+  /* v2 — forged-plate look (3-layer bezel):
+   *   layer 1 (outer ring 2px deep): 0 0 0 2px rgba(0,0,0,0.55)
+   *   layer 2 (middle bevel highlight): inset 0 1px 0 top-light
+   *   layer 3 (inner deep recess): inset 0 0 0 1px border-subtle
+   *   then the lift stack:
+   *     1px contact + 24px tight halo + 60px ambient halo
+   * The two-tier halo sells "panel is hovering over the room". Tighter
+   * than v1 in the contact zone (more crispness on the edge), longer in
+   * ambient (heavier feel below the panel).
+   */
+  box-shadow:
+    0 0 0 2px rgba(0, 0, 0, 0.55),
+    inset 0 1.5px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    0 1px 0 rgba(255, 255, 255, 0.04),
+    0 24px 48px -12px rgba(0, 0, 0, 0.6),
+    0 8px 16px -4px rgba(0, 0, 0, 0.4),
+    0 60px 120px -20px rgba(0, 0, 0, 0.72);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: np-modal-card-in 360ms cubic-bezier(0.18, 0.82, 0.32, 1.18);
+}
+@keyframes np-modal-card-in {
+  0%   { opacity: 0; transform: translateY(18px) scale(0.96); }
+  60%  { opacity: 1; transform: translateY(-2px) scale(1.005); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+[data-theme="light"] .np-modal-card {
+  /* Paper-bezel light mode: bezel is a lighter milled aluminum on cream
+   * paper. Halo is much shorter (light backdrops eat shadow). */
+  background: var(--df-surface-elevated);
+  box-shadow:
+    0 0 0 1px var(--df-border-strong, rgba(0, 0, 0, 0.22)),
+    inset 0 1.5px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.6),
+    0 18px 38px -10px rgba(0, 0, 0, 0.2),
+    0 6px 14px -4px rgba(0, 0, 0, 0.14),
+    0 48px 96px -16px rgba(0, 0, 0, 0.22);
+}
+
+/* ─── Faceplate (header) ────────────────────────────────────────────── */
+.np-modal-face {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 22px;
+  /* Brushed-metal look: subtle linear gradient + bottom border + top
+     sheen via ::before pseudo (handled by .np-modal-face-sheen span so
+     we can animate it without thrashing the whole header). */
+  background:
+    linear-gradient(180deg,
+      var(--df-surface-elevated) 0%,
+      var(--df-bg-section) 100%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+}
+[data-theme="light"] .np-modal-face {
+  background:
+    linear-gradient(180deg,
+      var(--df-surface-raised) 0%,
+      var(--df-bg-section) 100%);
+  border-bottom-color: var(--df-border-subtle);
+}
+
+/* Top sheen — v2 — 2 stops, brighter peak at 12%, fades by 30%. Reads
+ * as a rolling reflection on a milled metal surface, not a flat ribbon.
+ * Animation: width sweep left→right, then settles at 0.6 opacity static. */
+.np-modal-face-sheen {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 6px;
+  background:
+    linear-gradient(180deg,
+      var(--df-skeu-top-light) 0%,
+      rgba(255, 255, 255, 0.22) 12%,
+      rgba(255, 255, 255, 0.04) 30%,
+      transparent 100%);
+  pointer-events: none;
+  opacity: 0;
+  transform-origin: left;
+  animation: np-modal-sheen-sweep 700ms ease-out 240ms forwards;
+}
+@keyframes np-modal-sheen-sweep {
+  0%   { opacity: 0; transform: scaleX(0.2); }
+  60%  { opacity: 1; transform: scaleX(1); }
+  100% { opacity: 0.6; transform: scaleX(1); }
+}
+
+/* Rivets — v2 — true concave/raised affordance:
+ *   - Outer 0.5px highlight above the rivet (raised lip)
+ *   - Inner radial gradient (light at 30/30, dark at 70%) = recessed well
+ *   - Inset 0.5px highlight on the inner edge (sheen on the well wall)
+ * Bigger than v1 (6px vs 5px) so they read as actual fasteners.
+ */
+.np-modal-face-rivet {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 32%,
+      rgba(255, 255, 255, 0.28),
+      rgba(0, 0, 0, 0.62) 75%);
+  box-shadow:
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -0.5px 0 rgba(0, 0, 0, 0.4),
+    0 0.5px 0 rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+.np-modal-face-rivet--tl { top: 10px;    left: 12px;  }
+.np-modal-face-rivet--tr { top: 10px;    right: 12px; }
+.np-modal-face-rivet--bl { bottom: 10px; left: 12px;  }
+.np-modal-face-rivet--br { bottom: 10px; right: 12px; }
+
+[data-theme="light"] .np-modal-face-rivet {
+  background:
+    radial-gradient(circle at 32% 32%,
+      rgba(255, 255, 255, 0.95),
+      rgba(40, 30, 22, 0.28) 75%);
+  box-shadow:
+    inset 0 0.5px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -0.5px 0 rgba(40, 30, 22, 0.18),
+    0 0.5px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* Mark slot — logo on the left edge of the faceplate. */
+.np-modal-face-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--df-r-md);
+  background: var(--df-bg-base);
+  color: var(--df-text-primary);
+  box-shadow: var(--df-skeu-recess);
+  opacity: 0.85;
+}
+
+/* Titles — kicker (mono micro) above big engraved title. */
+.np-modal-face-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  text-align: center;
+  min-width: 0;
+}
+.np-modal-face-kicker {
+  font-family: var(--df-font-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--df-text-faint);
+}
+.np-modal-face-title {
+  font-family: var(--df-font-display, var(--df-font-sans));
+  font-size: 16px;
+  font-weight: var(--df-fw-bold, 700);
+  letter-spacing: 0.14em;
+  color: var(--df-text-primary);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.55),
+    0 -1px 0 var(--df-skeu-top-light);
+  text-transform: uppercase;
+}
+[data-theme="light"] .np-modal-face-title {
+  text-shadow:
+    0 1px 0 var(--df-skeu-top-light),
+    0 -1px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Close — skeu key style, tactile. */
+.np-modal-close {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-on-tactile);
+  border: 0;
+  border-radius: var(--df-r-md);
+  cursor: pointer;
+  box-shadow: var(--df-shadow-button-tactile);
+  padding: 0;
+  flex-shrink: 0;
+}
+.np-modal-close:hover { box-shadow: var(--df-shadow-button-tactile-hover); }
+.np-modal-close:active {
+  box-shadow: var(--df-shadow-button-tactile-pressed);
+  transform: translateY(1px);
+}
+.np-modal-close-glyph {
+  font-size: 22px;
+  line-height: 1;
+  font-family: var(--df-font-sans);
+  font-weight: 300;
+  margin-top: -2px; /* optical center */
+}
+
+/* ─── Stage (body — recessed inner well) ────────────────────────────── */
+/* v2 — deeper recess (12px shadow) + subtle paper grain via radial micro
+ * dots so the surface inside reads as physical paper under the bezel,
+ * not just a solid panel. Background a touch darker than the faceplate
+ * so the bowl is visually "lower". */
+.np-modal-stage {
+  flex: 1;
+  /* v4: NÃO SCROLLA. Conteúdo compacta-se via grid abaixo. Se ainda
+   * estourar (viewport extremo), o cnp-split-cell scrolla internamente
+   * — nunca o modal inteiro. */
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(rgba(255,255,255,0.012) 1px, transparent 1px) 0 0 / 14px 14px,
+    linear-gradient(180deg,
+      var(--df-bg-base) 0%,
+      var(--df-bg-section) 100%);
+  padding: 22px 28px 18px;
+  /* Top recess shadow (deeper) + side bevel highlights so the bowl walls
+   * read continuous with the bezel. Bottom is soft so the footer reads
+   * separated by its own engrave divider (added in foot styles below). */
+  box-shadow:
+    inset 0 12px 16px -10px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(0, 0, 0, 0.38),
+    inset 1px 0 0 rgba(0, 0, 0, 0.18),
+    inset -1px 0 0 rgba(0, 0, 0, 0.18),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+}
+[data-theme="light"] .np-modal-stage {
+  /* Paper feel: warm cream gradient + faint grain (darker dots on light
+   * paper). Recess shadow much softer (light backdrops eat shadow). */
+  background:
+    radial-gradient(rgba(40,30,22,0.025) 1px, transparent 1px) 0 0 / 14px 14px,
+    linear-gradient(180deg,
+      var(--df-bg-section) 0%,
+      var(--df-bg-base) 100%);
+  box-shadow:
+    inset 0 12px 16px -10px rgba(40, 30, 22, 0.16),
+    inset 0 1px 0 var(--df-border-subtle),
+    inset 1px 0 0 rgba(40, 30, 22, 0.06),
+    inset -1px 0 0 rgba(40, 30, 22, 0.06),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* ─── Form variant inside the modal ─────────────────────────────────── */
+/* The form already provides .cnp-card; we strip its own outer chrome so
+   it sits flush inside our stage (the bezel + face are our chrome).
+   v4: card vira CSS Grid com 3 rows (prompt | split | footer). Split é
+   a única zona com `1fr` — cresce/encolhe para preencher o viewport. */
+.np-modal-stage .cnp-card {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+  max-width: none;
+  flex: 1;
+  min-height: 0;
+}
+.np-modal-stage .cnp-card.cnp-card--v4 {
+  display: grid;
+  /* v4: 3 rows (prompt | split | foot).
+   * v5: 4 rows (name | prompt | split | foot). The 1fr lives on the split
+   * row so it absorbs viewport flex. Name + prompt stay auto so the typing
+   * surface keeps a comfy fixed height. */
+  grid-template-rows: auto auto 1fr auto;
+  gap: 14px;
+}
+/* Within the modal, zones lose the standalone-card padding but keep
+   their inner gap. Each zone defers to its own min-height: 0 so the
+   `1fr` row can shrink. */
+.np-modal-stage .cnp-card--v4 .cnp-zone {
+  min-height: 0;
+}
+.np-modal-stage .cnp-card--v4 .cnp-zone--split {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.np-modal-stage .cnp-card--v4 .cnp-zone--split > .cnp-split {
+  flex: 1;
+  min-height: 0;
+}
+/* If split children push past available height (extremely tight viewports),
+   each cell scrolls internally instead of bleeding the modal. */
+.np-modal-stage .cnp-card--v4 .cnp-split-cell {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.np-modal-stage .cnp-card--v4 .cnp-split-cell > .cnp-zone-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* ─── Stage reveal stagger ──────────────────────────────────────────── */
+/* Each .cnp-zone fades in 50ms after the previous, starting after the
+ * faceplate has landed (~360ms card-in animation). Subtle — 8px lift +
+ * opacity 0→1 in 280ms. The card-in animation drives the timing.
+ *
+ * Index 1..4 with nth-of-type so the form can reorder zones without
+ * losing the stagger.
+ */
+.np-modal-stage .cnp-zone {
+  opacity: 0;
+  transform: translateY(6px);
+  animation: np-modal-zone-in 320ms var(--df-ease-out) forwards;
+}
+/* v5: 3 zones (name | prompt | split). Each fades in 60ms apart starting
+ * after the faceplate has landed (~360ms card-in). Footer trails. */
+.np-modal-stage .cnp-zone:nth-of-type(1) { animation-delay: 380ms; }
+.np-modal-stage .cnp-zone:nth-of-type(2) { animation-delay: 440ms; }
+.np-modal-stage .cnp-zone:nth-of-type(3) { animation-delay: 500ms; }
+.np-modal-stage .cnp-foot-row {
+  opacity: 0;
+  transform: translateY(6px);
+  animation: np-modal-zone-in 320ms var(--df-ease-out) 560ms forwards;
+}
+@keyframes np-modal-zone-in {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Responsive ────────────────────────────────────────────────────── */
+/* Tight viewports (≤ 768 height). Compact face + tighter stage padding
+ * + smaller zone gaps so the split zone has room to breathe without
+ * forcing the modal to scroll. */
+@media (max-height: 800px) {
+  .np-modal-backdrop { padding: 16px; }
+  .np-modal-card { height: calc(100vh - 32px); max-height: calc(100vh - 32px); }
+  .np-modal-stage { padding: 16px 24px 14px; }
+  .np-modal-stage .cnp-card.cnp-card--v4 { gap: 12px; }
+}
+
+/* 1280×720 / sub-720 height — ultra compact. Hero zone padding tightens,
+ * dial heights shrink (handled in canonical-plus.css), composer textarea
+ * uses fewer rows (handled by NewProjectChatComposer rows prop). */
+@media (max-height: 720px) {
+  .np-modal-card { height: calc(100vh - 24px); max-height: calc(100vh - 24px); }
+  .np-modal-face { padding: 10px 18px; }
+  .np-modal-stage { padding: 14px 20px 12px; }
+  .np-modal-stage .cnp-card.cnp-card--v4 { gap: 10px; }
+}
+
+/* Tablet width — modal narrows, padding shrinks. */
+@media (max-width: 1023px) {
+  .np-modal-backdrop { padding: 16px; }
+  .np-modal-card { max-width: 800px; }
+  .np-modal-stage { padding: 18px 22px 14px; }
+}
+
+/* Mobile — full viewport. Stage scrolls internally because the 1fr split
+ * row is now stacked (single column). Modal still owns full screen. */
+@media (max-width: 767px) {
+  .np-modal-backdrop {
+    padding: 0;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .np-modal-card {
+    max-width: 100%;
+    max-height: 100vh;
+    height: 100vh;
+    border-radius: 0;
+    box-shadow:
+      inset 0 1.5px 0 var(--df-skeu-top-light),
+      inset 0 0 0 1px var(--df-border-subtle);
+  }
+  .np-modal-face { padding: 12px 16px; }
+  .np-modal-face-mark { width: 32px; height: 32px; }
+  .np-modal-face-title { font-size: 14px; letter-spacing: 0.12em; }
+  .np-modal-stage { padding: 14px 16px 14px; }
+  /* On mobile, the stage itself scrolls because the 1fr split becomes
+   * tall when collapsed to one column. Internal scroll, NOT the
+   * outer modal frame. */
+  .np-modal-stage .cnp-card.cnp-card--v4 {
+    /* v5 mobile: 4 rows all auto (name | prompt | split | foot). Stage
+     * scrolls because the split is no longer a viewport-bound 1fr. */
+    grid-template-rows: auto auto auto auto;
+    overflow-y: auto;
+    min-height: 0;
+  }
+  .np-modal-stage .cnp-card--v4 .cnp-split-cell > .cnp-zone-body {
+    overflow: visible;
+  }
+}
+
+/* ─── Reduced motion ────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .np-modal-backdrop,
+  .np-modal-card,
+  .np-modal-face-sheen,
+  .np-modal-stage .cnp-zone,
+  .np-modal-stage .cnp-foot-row {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

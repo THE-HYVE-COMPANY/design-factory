@@ -1,0 +1,374 @@
+/* np-c.css — Mood Board lab (Lab C).
+ *
+ * 12 cards in a 4×3 grid (collapses to 3×4 / 2×6 on smaller widths).
+ * Each card has a gradient swatch (top), check overlay when picked, and
+ * label+descriptor underneath. Selecting cards reveals the prompt area.
+ *
+ * Tokens only — gradients are composed from token-based colors.
+ */
+
+.np-mood-root {
+  min-height: 100vh;
+  background: var(--df-bg-base);
+  color: var(--df-text-primary);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== Topbar ===== */
+.np-mood-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--df-sp-3) var(--df-sp-5);
+  border-bottom: 1px solid var(--df-border-subtle);
+  background: var(--df-bg-section);
+}
+
+.np-mood-back {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--df-text-secondary);
+  font: inherit;
+  font-size: var(--df-text-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: var(--df-r-md);
+  cursor: pointer;
+  transition: background var(--df-motion-quick) var(--df-ease-standard),
+              color var(--df-motion-quick) var(--df-ease-standard);
+}
+.np-mood-back:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+}
+.np-mood-back-arrow {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.np-mood-topbar-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--df-text-muted);
+  font-size: var(--df-text-xs);
+  letter-spacing: var(--df-tracking-loose);
+  text-transform: uppercase;
+}
+.np-mood-topbar-label {
+  font-family: var(--df-font-mono);
+}
+
+.np-mood-theme-toggle {
+  appearance: none;
+  background: var(--df-surface-raised);
+  color: var(--df-text-secondary);
+  border: 1px solid var(--df-border-subtle);
+  font: inherit;
+  font-size: var(--df-text-xs);
+  letter-spacing: var(--df-tracking-loose);
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: var(--df-r-full);
+  cursor: pointer;
+  transition: background var(--df-motion-quick) var(--df-ease-standard),
+              border-color var(--df-motion-quick) var(--df-ease-standard);
+}
+.np-mood-theme-toggle:hover {
+  background: var(--df-surface-elevated);
+  border-color: var(--df-border-strong);
+  color: var(--df-text-primary);
+}
+
+/* ===== Main ===== */
+.np-mood-main {
+  flex: 1;
+  width: min(960px, calc(100% - 2 * var(--df-sp-5)));
+  margin: 0 auto;
+  padding: var(--df-sp-7) 0 var(--df-sp-10);
+  display: flex;
+  flex-direction: column;
+  gap: var(--df-sp-5);
+}
+
+.np-mood-section-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--df-sp-1);
+}
+.np-mood-h1 {
+  margin: 0;
+  font-size: var(--df-text-xl);
+  font-weight: var(--df-fw-medium);
+  letter-spacing: var(--df-tracking-tight);
+  color: var(--df-text-primary);
+  line-height: 1.2;
+}
+.np-mood-h1-sub {
+  margin: 0;
+  font-size: var(--df-text-sm);
+  color: var(--df-text-muted);
+}
+
+/* ===== Grid ===== */
+.np-mood-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--df-sp-3);
+}
+@media (max-width: 880px) {
+  .np-mood-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .np-mood-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.np-mood-card {
+  appearance: none;
+  background: var(--df-surface-raised);
+  border: 1px solid var(--df-border-subtle);
+  color: var(--df-text-primary);
+  font: inherit;
+  text-align: left;
+  padding: 0;
+  border-radius: var(--df-r-xl);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  transition: border-color var(--df-motion-quick) var(--df-ease-standard),
+              transform var(--df-motion-quick) var(--df-ease-standard),
+              box-shadow var(--df-motion-quick) var(--df-ease-standard);
+}
+.np-mood-card:hover {
+  border-color: var(--df-border-strong);
+  box-shadow: var(--df-shadow-card-hover);
+  transform: translateY(1px);
+}
+.np-mood-card--active {
+  border-color: var(--df-text-primary);
+  box-shadow: 0 0 0 1px var(--df-text-primary);
+}
+.np-mood-card--active:hover {
+  border-color: var(--df-text-primary);
+}
+
+.np-mood-card-thumb {
+  width: 100%;
+  aspect-ratio: 5 / 3;
+  display: block;
+  background-size: cover;
+  background-position: center;
+  border-bottom: 1px solid var(--df-border-subtle);
+}
+
+.np-mood-card-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  background: var(--df-text-primary);
+  color: var(--df-text-inverse);
+  border-radius: var(--df-r-full);
+  font-size: 12px;
+  font-weight: var(--df-fw-semibold);
+}
+
+.np-mood-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px 12px;
+}
+.np-mood-card-label {
+  font-size: var(--df-text-sm);
+  font-weight: var(--df-fw-medium);
+  color: var(--df-text-primary);
+}
+.np-mood-card-descriptor {
+  font-size: var(--df-text-2xs);
+  color: var(--df-text-muted);
+  line-height: 1.4;
+}
+
+/* ===== Prompt area ===== */
+.np-mood-prompt {
+  display: flex;
+  flex-direction: column;
+  gap: var(--df-sp-3);
+  animation: npMoodPromptIn 220ms var(--df-ease-out);
+}
+@keyframes npMoodPromptIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.np-mood-pickedrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.np-mood-chip {
+  display: inline-flex;
+  align-items: center;
+  background: var(--df-surface-raised);
+  border: 1px solid var(--df-border-strong);
+  color: var(--df-text-primary);
+  font-size: var(--df-text-xs);
+  padding: 4px 4px 4px 12px;
+  border-radius: var(--df-r-full);
+  gap: 4px;
+}
+.np-mood-chip-label {
+  font-weight: var(--df-fw-medium);
+}
+.np-mood-chip-x {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--df-text-muted);
+  font: inherit;
+  font-size: var(--df-text-md);
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--df-r-full);
+  cursor: pointer;
+  transition: background var(--df-motion-quick) var(--df-ease-standard),
+              color var(--df-motion-quick) var(--df-ease-standard);
+}
+.np-mood-chip-x:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+}
+
+.np-mood-prompt-card {
+  background: var(--df-surface-raised);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-2xl);
+  box-shadow: var(--df-shadow-card);
+  padding: var(--df-sp-4) var(--df-sp-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--df-sp-3);
+}
+
+.np-mood-textarea {
+  appearance: none;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: var(--df-text-primary);
+  font: inherit;
+  font-size: var(--df-text-md);
+  line-height: 1.5;
+  resize: vertical;
+  min-height: 110px;
+  padding: 0;
+}
+.np-mood-textarea::placeholder {
+  color: var(--df-text-faint);
+}
+
+.np-mood-prompt-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--df-sp-2);
+  flex-wrap: wrap;
+}
+
+.np-mood-hint {
+  font-size: var(--df-text-xs);
+  color: var(--df-text-muted);
+  font-family: var(--df-font-mono);
+}
+
+.np-mood-begin {
+  appearance: none;
+  background: var(--df-text-primary);
+  color: var(--df-text-inverse);
+  border: 0;
+  font: inherit;
+  font-size: var(--df-text-sm);
+  font-weight: var(--df-fw-medium);
+  padding: 10px 22px;
+  border-radius: var(--df-r-full);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity var(--df-motion-quick) var(--df-ease-standard),
+              transform var(--df-motion-quick) var(--df-ease-standard);
+}
+.np-mood-begin:hover:not(:disabled) {
+  opacity: 0.9;
+}
+.np-mood-begin:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.np-mood-begin:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.np-mood-begin-arrow {
+  font-size: 14px;
+}
+
+.np-mood-empty {
+  text-align: center;
+  font-size: var(--df-text-sm);
+  color: var(--df-text-muted);
+  padding: var(--df-sp-4) 0;
+  margin: 0;
+  font-style: italic;
+}
+
+/* ===== Toast ===== */
+.np-mood-toast {
+  position: fixed;
+  left: 50%;
+  bottom: var(--df-sp-5);
+  transform: translateX(-50%);
+  background: var(--df-surface-elevated);
+  border: 1px solid var(--df-border-strong);
+  color: var(--df-text-primary);
+  font-size: var(--df-text-sm);
+  padding: 10px 18px;
+  border-radius: var(--df-r-full);
+  box-shadow: var(--df-shadow-lg);
+  z-index: 50;
+  max-width: 90vw;
+  text-align: center;
+  animation: npMoodToastIn 220ms var(--df-ease-out);
+}
+@keyframes npMoodToastIn {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ===== Accessibility ===== */
+.np-mood-back:focus-visible,
+.np-mood-card:focus-visible,
+.np-mood-chip-x:focus-visible,
+.np-mood-textarea:focus-visible,
+.np-mood-begin:focus-visible,
+.np-mood-theme-toggle:focus-visible {
+  outline: 0;
+  box-shadow: var(--df-focus-ring);
+}

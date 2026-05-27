@@ -1,0 +1,39 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+      day: monday
+      time: "09:00"
+      timezone: UTC
+    open-pull-requests-limit: 5
+    groups:
+      types:
+        patterns:
+          - "@types/*"
+      vite-stack:
+        patterns:
+          - "vite"
+          - "vitest"
+          - "@vitest/*"
+          - "@vitejs/*"
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "react-router-dom"
+
+  - package-ecosystem: npm
+    directory: /apps/daemon
+    schedule:
+      interval: monthly
+      day: monday
+      time: "09:00"
+      timezone: UTC
+    open-pull-requests-limit: 3
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
