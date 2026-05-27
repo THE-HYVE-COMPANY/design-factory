@@ -104,10 +104,10 @@ export function AskUserQuestion({ question, onPick, answered }: AskUserQuestionP
               onMouseEnter={() => setHovered(opt.label)}
               onMouseLeave={() => setHovered(null)}
               style={{
-                display: "grid",
-                gridTemplateColumns: "auto 1fr",
-                alignItems: "baseline",
-                gap: 10,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                gap: 4,
                 padding: "10px 12px",
                 background: isPicked
                   ? "var(--df-interactive-selected)"
