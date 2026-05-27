@@ -7677,7 +7677,7 @@ export function EditorScreen({ projectId, projectName, projectPath, mode, startM
                     </span>
                     <span>
                       {canvasMode === "comment" && "click anywhere on the preview to leave a note"}
-                      {canvasMode === "edit" && "describe the edit in the chat — Claude applies to current HTML"}
+                      {canvasMode === "edit" && "click an element in the preview to edit it inline"}
                     </span>
                   </div>
                 )}
@@ -7874,7 +7874,7 @@ export function EditorScreen({ projectId, projectName, projectPath, mode, startM
             }}
           >
             <iframe
-              srcDoc={iframeHtml}
+              srcDoc={iframeSrcDocFinal ?? undefined}
               style={{ width: "100%", height: "100%", border: "none", background: "white" }}
               title="present"
               sandbox={PREVIEW_SANDBOX}
