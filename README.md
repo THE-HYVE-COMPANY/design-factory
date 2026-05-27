@@ -53,6 +53,12 @@ Sem terminal: depois de clonar, dê dois cliques em `start.command` (macOS) ou
 `start.bat` (Windows). A primeira execução instala as dependências e abre o app.
 Para atualizar, use `update.command` / `update.bat`.
 
+> **macOS na primeira vez:** se aparecer "não é possível abrir porque a Apple não
+> pode verificar", é só porque o app é open-source e não é assinado. **Clique com
+> o botão direito** (ou Control+clique) em `start.command` → **Abrir** → **Abrir**
+> de novo no aviso. Depois disso o duplo-clique funciona normal. (Clonar com `git`
+> evita esse aviso; baixar o `.zip` é que dispara o bloqueio do macOS.)
+
 Depois de abrir, vá em Configurações → Providers. As CLIs que você já tem
 logadas aparecem conectadas; chaves BYOK entram só se você quiser. Crie um
 projeto, dê contexto, gere, e refine com tweaks, comentários e edits. Passo a

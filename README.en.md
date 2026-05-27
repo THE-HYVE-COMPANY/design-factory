@@ -53,6 +53,12 @@ No terminal needed: after cloning, double-click `start.command` (macOS) or
 `start.bat` (Windows). The first run installs dependencies and opens the app. To
 update, use `update.command` / `update.bat`.
 
+> **First time on macOS:** if you see "cannot be opened because Apple cannot
+> check it", that's just because the app is open-source and unsigned.
+> **Right-click** (or Control-click) `start.command` → **Open** → **Open** again
+> in the prompt. Double-click works normally after that. (Cloning with `git`
+> avoids the warning; downloading the `.zip` is what triggers macOS's block.)
+
 Once it opens, go to Settings → Providers. CLIs you already have logged in show
 as connected; BYOK keys are optional. Create a project, give it context,
 generate, then refine with tweaks, comments, and edits. Walkthrough in
