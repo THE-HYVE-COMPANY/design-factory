@@ -4493,6 +4493,82 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // ─── Skills: list extra files (multifile display) ───────────────
+  // Returns file metadata for everything in the skill folder except
+  // SKILL.md (already exposed via skill.body). Read-only — UI fetches
+  // content lazily via /fs/read on click.
+  if (req.method === "GET") {
+    const m = req.url.match(/^\/skills\/([^/]+)\/files(?:\?|$)/);
+    if (m) {
+      try {
+        const id = decodeURIComponent(m[1]);
+        if (!id.startsWith("df:")) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "only df-source skills" }));
+          return;
+        }
+        const skillFile = resolveSkillPath(id.slice(3));
+        if (!skillFile) {
+          res.writeHead(404, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "skill not found" }));
+          return;
+        }
+        const skillDir = dirname(skillFile);
+        // Defense: only walk inside canonical or legacy skills dirs.
+        const canonicalDir = getSkillsDir();
+        const legacyDir = getLegacySkillsDir();
+        if (!isPathInside(canonicalDir, skillDir) && !isPathInside(legacyDir, skillDir)) {
+          res.writeHead(403, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: "refused: skill outside known dirs" }));
+          return;
+        }
+        const out = [];
+        const TEXT_EXT_RX = /\.(html?|svg|xml|css|scss|sass|less|js|jsx|mjs|cjs|ts|tsx|json|jsonc|md|markdown|mdx|txt|csv|tsv|yaml|yml|toml|ini|conf|sh|bash|zsh|py|rb|go|rs|java|kt|c|cc|cpp|h|hpp|sql|graphql|gql)$/i;
+        const walk = async (p, depth, relPrefix) => {
+          if (depth > 3 || out.length >= 200) return;
+          let entries;
+          try { entries = await readdir(p, { withFileTypes: true }); } catch { return; }
+          for (const e of entries) {
+            if (out.length >= 200) break;
+            if (/^\.(git|DS_Store)/.test(e.name)) continue;
+            const childPath = join(p, e.name);
+            const childRel = relPrefix ? `${relPrefix}/${e.name}` : e.name;
+            if (e.isDirectory()) {
+              await walk(childPath, depth + 1, childRel);
+              continue;
+            }
+            if (!e.isFile()) continue;
+            let st;
+            try { st = await stat(childPath); } catch { continue; }
+            // Skip the manifest itself — already in skill.body.
+            if (childRel === basename(skillFile) && p === skillDir) continue;
+            out.push({
+              rel: childRel,
+              name: e.name,
+              path: childPath,
+              size: st.size,
+              isText: TEXT_EXT_RX.test(e.name),
+            });
+          }
+        };
+        await walk(skillDir, 0, "");
+        // Sort: text files first (more useful for inspection), then by path.
+        out.sort((a, b) => {
+          if (a.isText !== b.isText) return a.isText ? -1 : 1;
+          return a.rel.localeCompare(b.rel);
+        });
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ skillDir, files: out }));
+      } catch (e) {
+        if (!res.headersSent) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: String(e?.message || e) }));
+        }
+      }
+      return;
+    }
+  }
+
   // ─── Skills registry ─────────────────────────────────────────
   // Multi-source classification: df (user-managed) · project (cwd/.claude)
   // · global (~/.claude/skills) · builtin (hardcoded).
