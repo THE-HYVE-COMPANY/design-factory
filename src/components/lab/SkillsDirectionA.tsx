@@ -4,6 +4,7 @@
 // (logs intent); real installSkill / import re-wires when this is chosen.
 
 import { useState } from "react";
+import { ArrowRight, Folder, Link, Sparkles, Upload, type LucideIcon } from "lucide-react";
 
 type Mode = "create" | "import";
 type ImportSource = "upload" | "url" | "folder";
@@ -12,10 +13,10 @@ function slugify(name: string): string {
   return "/" + name.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }
 
-const IMPORT_SOURCES: Array<{ id: ImportSource; glyph: string; name: string; hint: string; placeholder?: string }> = [
-  { id: "upload", glyph: "↥", name: "Upload", hint: "Suba um arquivo .md ou um bundle .zip de skill.", placeholder: undefined },
-  { id: "url", glyph: "◌", name: "URL", hint: "Cole a URL de um SKILL.md ou bundle publicado.", placeholder: "https://…/SKILL.md" },
-  { id: "folder", glyph: "▣", name: "Pasta", hint: "Escolha skills de uma pasta skills/ (ou .claude/skills/ legado).", placeholder: "~/projeto/skills" },
+const IMPORT_SOURCES: Array<{ id: ImportSource; Icon: LucideIcon; name: string; hint: string; placeholder?: string }> = [
+  { id: "upload", Icon: Upload, name: "Upload", hint: "Suba um arquivo .md ou um bundle .zip de skill.", placeholder: undefined },
+  { id: "url",    Icon: Link,   name: "URL",    hint: "Cole a URL de um SKILL.md ou bundle publicado.", placeholder: "https://…/SKILL.md" },
+  { id: "folder", Icon: Folder, name: "Pasta",  hint: "Escolha skills de uma pasta skills/ (ou .claude/skills/ legado).", placeholder: "~/projeto/skills" },
 ];
 
 export function SkillsDirectionA({ initialMode, onClose }: { initialMode: Mode; onClose: () => void }) {
@@ -55,14 +56,14 @@ export function SkillsDirectionA({ initialMode, onClose }: { initialMode: Mode; 
         <div className="dsl-keys dsl-keys--2">
           <button type="button" className="dsl-key" data-active={mode === "create"} onClick={() => setMode("create")}>
             <div className="dsl-key-head">
-              <span className="dsl-key-glyph" aria-hidden="true">✶</span>
+              <span className="dsl-key-glyph" aria-hidden="true"><Sparkles size={20} strokeWidth={2} /></span>
               <span className="dsl-key-led" aria-hidden="true" />
             </div>
             <span className="dsl-key-name">Criar do zero</span>
           </button>
           <button type="button" className="dsl-key" data-active={mode === "import"} onClick={() => setMode("import")}>
             <div className="dsl-key-head">
-              <span className="dsl-key-glyph" aria-hidden="true">↥</span>
+              <span className="dsl-key-glyph" aria-hidden="true"><Upload size={20} strokeWidth={2} /></span>
               <span className="dsl-key-led" aria-hidden="true" />
             </div>
             <span className="dsl-key-name">Importar</span>
@@ -97,7 +98,7 @@ export function SkillsDirectionA({ initialMode, onClose }: { initialMode: Mode; 
               {IMPORT_SOURCES.map((s) => (
                 <button key={s.id} type="button" className="dsl-key" data-active={source === s.id} onClick={() => setSource(s.id)}>
                   <div className="dsl-key-head">
-                    <span className="dsl-key-glyph" aria-hidden="true">{s.glyph}</span>
+                    <span className="dsl-key-glyph" aria-hidden="true"><s.Icon size={20} strokeWidth={2} /></span>
                     <span className="dsl-key-led" aria-hidden="true" />
                   </div>
                   <span className="dsl-key-name">{s.name}</span>
@@ -112,7 +113,9 @@ export function SkillsDirectionA({ initialMode, onClose }: { initialMode: Mode; 
                 <div className="dsl-bowl-hint">
                   {activeSource.hint}
                   <div style={{ marginTop: 10 }}>
-                    <button className="dsl-engine-chip" type="button">↥ Escolher .md ou .zip…</button>
+                    <button className="dsl-engine-chip" type="button">
+                      <Upload size={14} strokeWidth={2} aria-hidden="true" /> Escolher .md ou .zip…
+                    </button>
                   </div>
                 </div>
               ) : (
@@ -131,7 +134,7 @@ export function SkillsDirectionA({ initialMode, onClose }: { initialMode: Mode; 
         <button type="button" className="cnp-begin cnp-begin--v8" onClick={submit}>
           <span className="cnp-begin-led" aria-hidden="true" />
           <span className="cnp-begin-label">{mode === "create" ? "Criar skill" : "Importar skill"}</span>
-          <span className="cnp-begin-arrow" aria-hidden="true">→</span>
+          <span className="cnp-begin-arrow" aria-hidden="true"><ArrowRight size={16} strokeWidth={2} /></span>
         </button>
       </div>
     </div>

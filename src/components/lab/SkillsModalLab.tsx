@@ -5,6 +5,7 @@
 // install/import logic re-wires onto this once the design is approved.
 
 import { createPortal } from "react-dom";
+import { X } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { SkillsDirectionA } from "@/components/lab/SkillsDirectionA";
 import "@/styles/np-modal.css";
@@ -38,7 +39,7 @@ export function SkillsModalLab({ open, initialMode = "create", onClose }: Skills
             </div>
           </div>
           <button type="button" className="np-modal-close" onClick={onClose} aria-label="Fechar">
-            <span className="np-modal-close-glyph" aria-hidden="true">×</span>
+            <span className="np-modal-close-glyph" aria-hidden="true"><X size={16} strokeWidth={2} /></span>
           </button>
         </header>
 
