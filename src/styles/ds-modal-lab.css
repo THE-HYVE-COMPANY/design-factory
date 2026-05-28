@@ -58,18 +58,18 @@
     box-shadow var(--df-motion-quick) var(--df-ease-out);
 }
 .dsl-key:hover {
-  border-color: color-mix(in srgb, var(--df-accent) 40%, var(--df-border-subtle));
+  border-color: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 40%, var(--df-border-subtle));
 }
 .dsl-key:active {
   transform: translateY(1px);
 }
 .dsl-key[data-active="true"] {
-  border-color: var(--df-accent);
+  border-color: var(--df-accent-user, var(--df-accent-ok));
   /* pressed-in + lit: inner shadow instead of outer, accent glow */
   box-shadow:
     inset 0 2px 4px color-mix(in srgb, black 28%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--df-accent) 35%, transparent);
-  background: color-mix(in srgb, var(--df-accent) 8%, var(--df-surface-raised));
+    0 0 0 1px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 35%, transparent);
+  background: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 8%, var(--df-surface-raised));
 }
 .dsl-key-glyph {
   font-size: 19px;
@@ -78,10 +78,10 @@
   transition: opacity var(--df-motion-quick) var(--df-ease-out);
 }
 .dsl-key[data-active="true"] .dsl-key-glyph { opacity: 1; }
-.dsl-key[data-active="true"] .dsl-key-name { color: var(--df-accent); }
+.dsl-key[data-active="true"] .dsl-key-name { color: var(--df-accent-user, var(--df-accent-ok)); }
 .dsl-key[data-active="true"] .dsl-key-led {
-  background: var(--df-accent);
-  box-shadow: 0 0 6px var(--df-accent);
+  background: var(--df-accent-user, var(--df-accent-ok));
+  box-shadow: 0 0 6px var(--df-accent-user, var(--df-accent-ok));
 }
 .dsl-key-led {
   width: 5px;
@@ -222,13 +222,15 @@
     border-color var(--df-motion-quick) var(--df-ease-out);
 }
 .dsl-switch[data-on="true"] .dsl-switch-track {
-  background: var(--df-accent);
-  border-color: color-mix(in srgb, var(--df-accent) 70%, black);
+  background: var(--df-accent-user, var(--df-accent-ok));
+  border-color: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 70%, black);
+  /* Clean accent fill — no white inner glow (it was washing the green to
+   * gray, making the toggle "disappear" when active). Subtle top inset for
+   * the skeu lip + a strong outer accent glow so it reads as lit. */
   box-shadow:
-    inset 0 1px 2px color-mix(in srgb, black 30%, transparent),
-    inset 0 0 8px color-mix(in srgb, white 30%, transparent),
-    0 0 14px color-mix(in srgb, var(--df-accent) 70%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--df-accent) 55%, transparent);
+    inset 0 1px 2px color-mix(in srgb, black 25%, transparent),
+    0 0 12px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 75%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 55%, transparent);
 }
 .dsl-switch-knob {
   position: absolute;
@@ -245,7 +247,7 @@
 }
 .dsl-switch[data-on="true"] .dsl-switch-knob {
   transform: translateX(22px);
-  background: linear-gradient(180deg, #fff, color-mix(in srgb, white 80%, var(--df-accent)));
+  background: linear-gradient(180deg, #fff, color-mix(in srgb, white 80%, var(--df-accent-user, var(--df-accent-ok))));
 }
 .dsl-switch-state {
   font-family: var(--df-font-mono);
@@ -258,8 +260,8 @@
   transition: color var(--df-motion-quick) var(--df-ease-out);
 }
 .dsl-switch[data-on="true"] .dsl-switch-state {
-  color: var(--df-accent);
-  text-shadow: 0 0 8px color-mix(in srgb, var(--df-accent) 55%, transparent);
+  color: var(--df-accent-user, var(--df-accent-ok));
+  text-shadow: 0 0 8px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 55%, transparent);
 }
 
 /* ── Footer / begin ──────────────────────────────────────────────── */
