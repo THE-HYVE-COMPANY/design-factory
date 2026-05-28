@@ -6,6 +6,7 @@ import type { DsEntry } from "@/components/DsSetupModal";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { GeneratePreviewModal } from "@/components/GeneratePreviewModal";
 import { TabCornerLeft, TabCornerRight } from "@/components/TabCorner";
+import { Settings } from "lucide-react";
 
 interface GenerationState {
   provider: string;
@@ -366,20 +367,7 @@ export function DsPreviewScreen({ entry, onBack, onOpenSettings, theme, onThemeC
               aria-label="Settings"
               onClick={onOpenSettings}
             >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <circle cx="12" cy="8" r="4" />
-                <path d="M4 21v-1a7 7 0 0 1 14 0v1" />
-              </svg>
+              <Settings size={16} strokeWidth={2} aria-hidden="true" />
             </button>
           )}
         </div>

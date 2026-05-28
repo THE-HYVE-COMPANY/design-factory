@@ -1,6 +1,6 @@
 # i18n-audit baseline — entries here are accepted as known offenders.
 # Format: <relative-path>\t<exact text>  (line-independent — survives edits)
-# Generated: 2026-05-27T23:23:08.082Z
+# Generated: 2026-05-28T12:09:20.206Z
 
 src/App.tsx	No DS matches
 src/App.tsx	. It may have been renamed or removed.
@@ -250,6 +250,8 @@ src/components/InlineEditPanel.tsx	Border Radius
 src/components/InlineEditPanel.tsx	Cancel
 src/components/NewProjectFormSkeu.tsx	See the compiled direction before starting
 src/components/NewProjectFormSkeu.tsx	Preview prompt
+src/components/NewProjectFormSkeu.tsx	Abre o projeto em branco — sem prompt, sem direção pré-definida.
+src/components/NewProjectFormSkeu.tsx	Começar em branco
 src/components/NewProjectFormSkeu.tsx	Model
 src/components/NewProjectFormSkeu.tsx	Provider
 src/components/OriginGuardBanner.tsx	Origem não permitida
