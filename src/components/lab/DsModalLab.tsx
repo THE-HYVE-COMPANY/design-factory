@@ -7,6 +7,7 @@
 // direction wins.
 
 import { createPortal } from "react-dom";
+import { X } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { DsDirectionA } from "@/components/lab/DsDirectionA";
 import "@/styles/np-modal.css";
@@ -39,7 +40,7 @@ export function DsModalLab({ open, onClose }: DsModalLabProps) {
             </div>
           </div>
           <button type="button" className="np-modal-close" onClick={onClose} aria-label="Fechar">
-            <span className="np-modal-close-glyph" aria-hidden="true">×</span>
+            <span className="np-modal-close-glyph" aria-hidden="true"><X size={16} strokeWidth={2} /></span>
           </button>
         </header>
 

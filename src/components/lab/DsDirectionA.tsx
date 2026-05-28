@@ -6,14 +6,15 @@
 // gets re-wired when this direction is chosen.
 
 import { useState } from "react";
+import { ArrowRight, FileText, Folder, GitBranch, Link, Upload, type LucideIcon } from "lucide-react";
 
 type Source = "folder" | "github" | "upload" | "url";
 
-const SOURCES: Array<{ id: Source; glyph: string; name: string; hint: string; placeholder?: string }> = [
-  { id: "folder", glyph: "▣", name: "Pasta", hint: "Aponte uma pasta com tokens, globals.css, tailwind.config — a IA extrai o design.md.", placeholder: "~/meu-projeto/src/styles" },
-  { id: "github", glyph: "◐", name: "GitHub", hint: "Cole a URL de um repositório público. A IA lê os arquivos de estilo e destila o design.md.", placeholder: "https://github.com/org/repo" },
-  { id: "upload", glyph: "↥", name: "design.md", hint: "Já tem um design.md canônico? Ele entra como está, sem reprocessar.", placeholder: undefined },
-  { id: "url", glyph: "◌", name: "URL", hint: "Cole a URL de um site. A IA captura o fingerprint visual (cores, tipografia, espaçamento).", placeholder: "https://site.com" },
+const SOURCES: Array<{ id: Source; Icon: LucideIcon; name: string; hint: string; placeholder?: string }> = [
+  { id: "folder", Icon: Folder,     name: "Pasta",     hint: "Aponte uma pasta com tokens, globals.css, tailwind.config — a IA extrai o design.md.", placeholder: "~/meu-projeto/src/styles" },
+  { id: "github", Icon: GitBranch,  name: "GitHub",    hint: "Cole a URL de um repositório público. A IA lê os arquivos de estilo e destila o design.md.", placeholder: "https://github.com/org/repo" },
+  { id: "upload", Icon: FileText,   name: "design.md", hint: "Já tem um design.md canônico? Ele entra como está, sem reprocessar.", placeholder: undefined },
+  { id: "url",    Icon: Link,       name: "URL",       hint: "Cole a URL de um site. A IA captura o fingerprint visual (cores, tipografia, espaçamento).", placeholder: "https://site.com" },
 ];
 
 export function DsDirectionA({ onClose }: { onClose: () => void }) {
@@ -46,7 +47,7 @@ export function DsDirectionA({ onClose }: { onClose: () => void }) {
               onClick={() => setSource(s.id)}
             >
               <div className="dsl-key-head">
-                <span className="dsl-key-glyph" aria-hidden="true">{s.glyph}</span>
+                <span className="dsl-key-glyph" aria-hidden="true"><s.Icon size={20} strokeWidth={2} /></span>
                 <span className="dsl-key-led" aria-hidden="true" />
               </div>
               <span className="dsl-key-name">{s.name}</span>
@@ -65,7 +66,9 @@ export function DsDirectionA({ onClose }: { onClose: () => void }) {
             <div className="dsl-bowl-hint">
               {active.hint}
               <div style={{ marginTop: 10 }}>
-                <button className="dsl-engine-chip" type="button">↥ Escolher design.md…</button>
+                <button className="dsl-engine-chip" type="button">
+                  <Upload size={14} strokeWidth={2} aria-hidden="true" /> Escolher design.md…
+                </button>
               </div>
             </div>
           ) : (
@@ -141,7 +144,7 @@ export function DsDirectionA({ onClose }: { onClose: () => void }) {
         <button type="button" className="cnp-begin cnp-begin--v8" onClick={forge}>
           <span className="cnp-begin-led" aria-hidden="true" />
           <span className="cnp-begin-label">Forjar design.md</span>
-          <span className="cnp-begin-arrow" aria-hidden="true">→</span>
+          <span className="cnp-begin-arrow" aria-hidden="true"><ArrowRight size={16} strokeWidth={2} /></span>
         </button>
       </div>
     </div>
