@@ -1,0 +1,1 @@
+Write a self-contained hello world HTML file. The HTML must start with <!DOCTYPE html>, render a centered "Hello, World!" heading, and include a small body of accent CSS. Reply with a single short sentence describing what you built.

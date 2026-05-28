@@ -1,0 +1,13 @@
+Create a single self-contained HTML file with a WebGL fragment shader that renders a living, organic flow field.
+
+Requirements:
+- Full viewport canvas. WebGL or WebGL2 (your call).
+- Fragment shader does the heavy lifting: simplex/perlin noise distortion + radial gradient + soft additive blending.
+- Color palette is restricted to HYVE: deep warm orange (#FF5524), sage green (#A8C09A), warm olive grey background (#2A2826).
+- Mouse position drives one shader uniform (e.g., distortion amplitude, flow direction, or color intensity).
+- Click adds a transient pulse that ripples across the field over ~600ms.
+- Animation loop via requestAnimationFrame. Cap to 60fps; pause when tab hidden.
+- HTML must start with <!DOCTYPE html>. No external assets. Inline everything (vertex shader as template string).
+- Include error handling: if WebGL context fails, show a brief fallback message.
+
+Output: the HTML file via Write tool (or <artifact> block). Then reply with 1-3 sentences describing what you built and which shader technique you chose.

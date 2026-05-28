@@ -1,0 +1,7 @@
+node_modules/
+dist/
+artifacts/
+docs/archive/
+package-lock.json
+*.html
+src/styles/

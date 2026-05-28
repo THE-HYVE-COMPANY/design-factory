@@ -1,0 +1,123 @@
+/* np-hub.css — top-tab switcher for the 5 New Project labs.
+ *
+ * Sticky strip above the active lab. Stays minimal so each lab still
+ * dominates visually; the hub is just navigation.
+ *
+ * Layout: full-width strip with a centered cluster of tabs. Each tab is
+ * a 3-line pill (code · label · hint) so the user can identify the
+ * paradigm without hovering. Active tab gets the inverted color treatment
+ * matching the existing pill convention used in np-prompt-first.css.
+ *
+ * Light mode: paper-feel — same tokens, different palette.
+ */
+
+.np-hub-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--df-bg-base);
+}
+
+.np-hub-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--df-bg-section);
+  border-bottom: 1px solid var(--df-border-subtle);
+  padding: var(--df-sp-2) var(--df-sp-5);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.np-hub-tabs-inner {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: var(--df-sp-2);
+  flex-wrap: wrap;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.np-hub-tab {
+  appearance: none;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--df-text-muted);
+  font: inherit;
+  cursor: pointer;
+  padding: 6px 14px;
+  border-radius: var(--df-r-md);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  transition: background var(--df-motion-quick) var(--df-ease-standard),
+              color var(--df-motion-quick) var(--df-ease-standard),
+              border-color var(--df-motion-quick) var(--df-ease-standard);
+  text-align: left;
+}
+
+.np-hub-tab:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+  border-color: var(--df-border-subtle);
+}
+
+.np-hub-tab--active {
+  background: var(--df-text-primary);
+  color: var(--df-text-inverse);
+  border-color: var(--df-text-primary);
+}
+.np-hub-tab--active:hover {
+  background: var(--df-text-primary);
+  color: var(--df-text-inverse);
+  border-color: var(--df-text-primary);
+}
+
+.np-hub-tab-code {
+  font-family: var(--df-font-mono);
+  font-size: var(--df-text-2xs);
+  letter-spacing: var(--df-tracking-loose);
+  opacity: 0.72;
+}
+
+.np-hub-tab-label {
+  font-size: var(--df-text-sm);
+  font-weight: var(--df-fw-medium);
+}
+
+.np-hub-tab-hint {
+  font-size: var(--df-text-2xs);
+  color: inherit;
+  opacity: 0.6;
+}
+
+/* On smaller widths drop the hint so the bar fits in one row. */
+@media (max-width: 760px) {
+  .np-hub-tab-hint {
+    display: none;
+  }
+  .np-hub-tab {
+    padding: 6px 10px;
+  }
+}
+
+.np-hub-tab:focus-visible {
+  outline: 0;
+  box-shadow: var(--df-focus-ring);
+}
+
+.np-hub-stage {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Each lab's root sets its own min-height: 100vh. With the sticky tabs
+ * above, the second viewport feels balanced because the tabs only take
+ * ~64px and the labs render their full layout below. */
+.np-hub-stage > * {
+  min-height: calc(100vh - 68px);
+}

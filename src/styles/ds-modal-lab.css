@@ -1,0 +1,292 @@
+/* ds-modal-lab.css — design-lab styling for the Design System modal
+ * redesign directions. Loaded only when ?modalLab=1. Reuses the New
+ * Project faceplate shell (np-modal.css) + cnp-begin button; this file
+ * adds the DS-specific tactile parts: source keys, the morphing input
+ * stage, the engraved engine picker, and the physical preview switch.
+ *
+ * Vocabulary mirrors the skeu language: engraved mono-uppercase labels,
+ * recessed bowls (inset shadow), embossed keys (outset), accent on the
+ * live/active member.
+ */
+
+/* ── Zone scaffold ───────────────────────────────────────────────── */
+.dsl-zone {
+  margin-bottom: 18px;
+}
+.dsl-engrave {
+  display: block;
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--df-text-faint);
+  margin-bottom: 9px;
+  /* engraved: faint dark inset + light bottom highlight */
+  text-shadow: 0 1px 0 color-mix(in srgb, var(--df-bg-base) 70%, transparent);
+}
+
+/* ── Source keys — tactile physical buttons, one lit ─────────────── */
+.dsl-keys {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.dsl-keys--3 { grid-template-columns: repeat(3, 1fr); }
+.dsl-keys--2 { grid-template-columns: repeat(2, 1fr); }
+.dsl-key {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 11px 12px 10px;
+  border-radius: var(--df-r-sm);
+  border: 1px solid var(--df-border-subtle);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--df-surface-raised) 100%, white 3%),
+    var(--df-surface-raised)
+  );
+  /* embossed key: soft top light + bottom shadow */
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 6%, transparent),
+    0 1px 2px color-mix(in srgb, black 18%, transparent);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    transform var(--df-motion-quick) var(--df-ease-out),
+    border-color var(--df-motion-quick) var(--df-ease-out),
+    box-shadow var(--df-motion-quick) var(--df-ease-out);
+}
+.dsl-key:hover {
+  border-color: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 40%, var(--df-border-subtle));
+}
+.dsl-key:active {
+  transform: translateY(1px);
+}
+.dsl-key[data-active="true"] {
+  border-color: var(--df-accent-user, var(--df-accent-ok));
+  /* pressed-in + lit: inner shadow instead of outer, accent glow */
+  box-shadow:
+    inset 0 2px 4px color-mix(in srgb, black 28%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 35%, transparent);
+  background: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 8%, var(--df-surface-raised));
+}
+.dsl-key-glyph {
+  font-size: 19px;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity var(--df-motion-quick) var(--df-ease-out);
+}
+.dsl-key[data-active="true"] .dsl-key-glyph { opacity: 1; }
+.dsl-key[data-active="true"] .dsl-key-name { color: var(--df-accent-user, var(--df-accent-ok)); }
+.dsl-key[data-active="true"] .dsl-key-led {
+  background: var(--df-accent-user, var(--df-accent-ok));
+  box-shadow: 0 0 6px var(--df-accent-user, var(--df-accent-ok));
+}
+.dsl-key-led {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--df-text-faint) 50%, transparent);
+  transition: all var(--df-motion-quick) var(--df-ease-out);
+}
+.dsl-key-name {
+  font-size: var(--df-text-xs);
+  font-weight: 500;
+  color: var(--df-text-primary);
+}
+.dsl-key-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* ── Input bowl — recessed, morphs per source ────────────────────── */
+.dsl-bowl {
+  padding: 14px;
+  border-radius: var(--df-r-sm);
+  background: var(--df-bg-section);
+  /* recessed: inner shadow */
+  box-shadow:
+    inset 0 2px 6px color-mix(in srgb, black 22%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, white 4%, transparent);
+  border: 1px solid color-mix(in srgb, black 14%, var(--df-border-subtle));
+}
+.dsl-bowl-hint {
+  font-size: var(--df-text-xs);
+  color: var(--df-text-muted);
+  line-height: 1.5;
+}
+.dsl-input {
+  width: 100%;
+  background: var(--df-surface-raised);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+  padding: 9px 11px;
+  color: var(--df-text-primary);
+  font-size: var(--df-text-sm);
+  font-family: var(--df-font-mono);
+}
+.dsl-input:focus {
+  outline: none;
+  border-color: var(--df-border-focus);
+}
+.dsl-textarea {
+  width: 100%;
+  min-height: 90px;
+  resize: vertical;
+  background: var(--df-surface-raised);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+  padding: 10px 12px;
+  color: var(--df-text-primary);
+  font-size: var(--df-text-sm);
+  font-family: var(--df-font-mono);
+  line-height: 1.55;
+}
+.dsl-textarea:focus { outline: none; border-color: var(--df-border-focus); }
+/* compact field stack for the create form */
+.dsl-field { margin-bottom: 14px; }
+.dsl-field:last-child { margin-bottom: 0; }
+
+/* ── Engine row — engraved provider + model ──────────────────────── */
+.dsl-engine {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.dsl-engine-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 11px;
+  border-radius: var(--df-r-sm);
+  border: 1px solid var(--df-border-subtle);
+  background: var(--df-surface-raised);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 5%, transparent);
+  font-size: var(--df-text-xs);
+  color: var(--df-text-primary);
+  cursor: pointer;
+}
+.dsl-engine-chip .dsl-engine-k {
+  font-family: var(--df-font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--df-text-faint);
+}
+
+/* ── Physical toggle switch (generate preview) ───────────────────── */
+.dsl-switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 13px;
+  border-radius: var(--df-r-sm);
+  background: var(--df-surface-raised);
+  border: 1px solid var(--df-border-subtle);
+}
+.dsl-switch-copy { display: flex; flex-direction: column; gap: 2px; }
+.dsl-switch-title { font-size: var(--df-text-sm); color: var(--df-text-primary); }
+.dsl-switch-sub { font-size: var(--df-text-xs); color: var(--df-text-muted); }
+/* Physical skeu switch: recessed track + sliding knob + ON/OFF readout.
+   OFF reads as a dark recessed slot; ON fills bright accent with a glow
+   ring and the readout turns accent — unmistakably lit. */
+.dsl-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.dsl-switch-track {
+  position: relative;
+  width: 50px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--df-bg-base);
+  border: 1px solid color-mix(in srgb, black 18%, var(--df-border-subtle));
+  /* recessed slot */
+  box-shadow:
+    inset 0 2px 5px color-mix(in srgb, black 38%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, white 4%, transparent);
+  transition:
+    background var(--df-motion-quick) var(--df-ease-out),
+    box-shadow var(--df-motion-quick) var(--df-ease-out),
+    border-color var(--df-motion-quick) var(--df-ease-out);
+}
+.dsl-switch[data-on="true"] .dsl-switch-track {
+  background: var(--df-accent-user, var(--df-accent-ok));
+  border-color: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 70%, black);
+  /* Clean accent fill — no white inner glow (it was washing the green to
+   * gray, making the toggle "disappear" when active). Subtle top inset for
+   * the skeu lip + a strong outer accent glow so it reads as lit. */
+  box-shadow:
+    inset 0 1px 2px color-mix(in srgb, black 25%, transparent),
+    0 0 12px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 75%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 55%, transparent);
+}
+.dsl-switch-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, color-mix(in srgb, white 18%, var(--df-surface-raised)), var(--df-surface-raised));
+  box-shadow:
+    0 1px 3px color-mix(in srgb, black 45%, transparent),
+    inset 0 1px 0 color-mix(in srgb, white 14%, transparent);
+  transition: transform var(--df-motion-quick) var(--df-ease-out);
+}
+.dsl-switch[data-on="true"] .dsl-switch-knob {
+  transform: translateX(22px);
+  background: linear-gradient(180deg, #fff, color-mix(in srgb, white 80%, var(--df-accent-user, var(--df-accent-ok))));
+}
+.dsl-switch-state {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--df-text-faint);
+  width: 24px;
+  text-align: left;
+  transition: color var(--df-motion-quick) var(--df-ease-out);
+}
+.dsl-switch[data-on="true"] .dsl-switch-state {
+  color: var(--df-accent-user, var(--df-accent-ok));
+  text-shadow: 0 0 8px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 55%, transparent);
+}
+
+/* ── Footer / begin ──────────────────────────────────────────────── */
+.dsl-foot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+.dsl-name-field {
+  flex: 1;
+}
+
+/* ── Card sizing — FIXED height so it doesn't jump as the source/engine
+ * morphs. Narrower than the 1100px New Project. Stage scrolls if needed. ── */
+.np-modal-card.dsl-card {
+  height: min(680px, calc(100vh - 56px));
+  max-height: calc(100vh - 56px);
+  max-width: 720px;
+}
+.np-modal-card.dsl-card .np-modal-stage {
+  overflow-y: auto;
+}
+
+/* Begin button reuses the New Project's .cnp-begin.cnp-begin--v8 (the real
+ * skeu CTA) so the two surfaces read as the same instrument. The foot keeps
+ * it from stretching full-width via justify. */
+.dsl-foot .cnp-begin.cnp-begin--v8 { margin-top: 22px; }

@@ -1,0 +1,325 @@
+/* ════════════════════════════════════════════════════════════════════════
+ *  SkeuHero — canonical skeumorphic hero pattern
+ * ════════════════════════════════════════════════════════════════════════
+ *
+ * The DNA of HYVE skeumorphism, distilled. Originally HeroV1 in the
+ * lab (NewProjectRegionsLabScreen, untouched), cloned as `cnp-hero` in
+ * NewProjectFormSkeu. This file is the canonical source for all
+ * premium skeu surfaces.
+ *
+ * Anatomy invariants (don't break):
+ *   1. Surface = flat raised material + bezel inset highlight + 1px ring
+ *   2. Background grain = literal ASCII dots (mono pre), opacity 0.32-0.38
+ *   3. Brand mark = absolute top-right Logo at opacity 0.55
+ *   4. Copy = bottom-left, kicker mono uppercase + display title
+ *   5. Radius = --df-r-xl (12px) to align with Aqua tab radius
+ *   6. No animation by default — wrappers like .home-hero add LED/sheen
+ *
+ * Sizes:
+ *   sm → 80px / title 16px / padding 12px 14px / logo 20px
+ *   md → 118px / title 22px / padding 14px 16px / logo 26px
+ *   lg → 200px+/ title clamp(34, 5vw, 48) / padding 32px 40px / logo 32px
+ */
+
+/* ─── Bezel depth tokens — reusable inset combos ────────────────────── */
+/* These tokens capture the 3-state depth language for ALL interactive
+ * skeu elements (picker keys, buttons, dropdowns, hero plates). Use as:
+ *   box-shadow: var(--df-bezel-raised), var(--df-skeu-shadow-md);
+ * Combine bezel (inset depth) with shadow scale (ambient drop). */
+:root {
+  /* Raised — neutral idle state. Inset top-light + 1px ring. */
+  --df-bezel-raised:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle);
+
+  /* Recessed — sunken/recess state. For input bowls, recessed wells. */
+  --df-bezel-recessed:
+    inset 0 1px 2px 0 rgba(0, 0, 0, 0.18),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+
+  /* Pressed — active state. Deeper inset, subtle dark top edge. */
+  --df-bezel-pressed:
+    inset 0 2px 4px 0 rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 0 rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] {
+  --df-bezel-raised:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle);
+  --df-bezel-recessed:
+    inset 0 1px 2px 0 rgba(60, 50, 40, 0.10),
+    inset 0 0 0 1px rgba(60, 50, 40, 0.06);
+  --df-bezel-pressed:
+    inset 0 2px 4px 0 rgba(60, 50, 40, 0.14),
+    inset 0 1px 0 0 rgba(60, 50, 40, 0.04);
+}
+
+/* ─── Surface ────────────────────────────────────────────────────────── */
+.skeu-hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  background: var(--df-bg-section);
+  border-radius: var(--df-r-xl);
+  /* Bezel + subtle ambient drop. Composes the canonical raised feel. */
+  box-shadow:
+    var(--df-bezel-raised),
+    var(--df-skeu-shadow-md);
+}
+
+/* ─── Size variants ──────────────────────────────────────────────────── */
+.skeu-hero--sm {
+  min-height: 80px;
+  padding: 12px 14px;
+}
+.skeu-hero--md {
+  min-height: 118px;
+  padding: 14px 16px;
+}
+.skeu-hero--lg {
+  min-height: 200px;
+  padding: 32px 40px 28px;
+  /* Larger plates breathe more; lg gets stronger shadow + extra ring. */
+  box-shadow:
+    var(--df-bezel-raised),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.20),
+    var(--df-skeu-shadow-lg);
+}
+[data-theme="light"] .skeu-hero--lg {
+  box-shadow:
+    var(--df-bezel-raised),
+    inset 0 -1px 0 rgba(60, 50, 40, 0.06),
+    var(--df-skeu-shadow-lg);
+}
+
+/* ─── ASCII dot grain — DNA texture ──────────────────────────────────── */
+.skeu-hero-ascii {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  color: var(--df-text-faint);
+  opacity: 0.32;
+  white-space: pre;
+  line-height: 1.06;
+  padding: 10px 14px;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+  user-select: none;
+  /* Soft fade toward bottom so copy reads cleaner. */
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.55) 100%);
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.55) 100%);
+}
+.skeu-hero--lg .skeu-hero-ascii {
+  font-size: 11px;
+  opacity: 0.28;
+  padding: 18px 24px;
+}
+[data-theme="light"] .skeu-hero-ascii {
+  opacity: 0.42;
+}
+[data-theme="light"] .skeu-hero--lg .skeu-hero-ascii {
+  opacity: 0.36;
+}
+
+/* ─── Brand mark — corner decal ──────────────────────────────────────── */
+.skeu-hero-mark {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  color: var(--df-text-primary);
+  opacity: 0.55;
+  pointer-events: none;
+  z-index: 1;
+}
+.skeu-hero--lg .skeu-hero-mark {
+  top: 20px;
+  right: 22px;
+  opacity: 0.48;
+}
+
+/* ─── Copy block ─────────────────────────────────────────────────────── */
+.skeu-hero-copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.skeu-hero-kicker {
+  font-family: var(--df-font-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--df-text-muted);
+  margin: 0;
+}
+.skeu-hero--lg .skeu-hero-kicker {
+  font-size: 10px;
+  letter-spacing: 0.20em;
+}
+
+.skeu-hero-title {
+  margin: 0;
+  font-family: var(--df-font-display, var(--df-font-sans));
+  font-weight: var(--df-fw-bold, 700);
+  letter-spacing: var(--df-tracking-display, -0.01em);
+  color: var(--df-text-primary);
+  line-height: 1.1;
+}
+.skeu-hero--sm .skeu-hero-title { font-size: 16px; }
+.skeu-hero--md .skeu-hero-title { font-size: 22px; }
+.skeu-hero--lg .skeu-hero-title {
+  font-size: clamp(34px, 5vw, 48px);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  /* Engraved feel — soft top shadow + bright underline. */
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.30),
+    0 -1px 0 var(--df-skeu-top-light);
+}
+[data-theme="light"] .skeu-hero--lg .skeu-hero-title {
+  text-shadow:
+    0 1px 0 var(--df-skeu-top-light),
+    0 -1px 0 rgba(60, 50, 40, 0.04);
+}
+
+/* ─── CTA slot ───────────────────────────────────────────────────────── */
+.skeu-hero-cta-slot {
+  position: relative;
+  z-index: 1;
+}
+.skeu-hero--cta-stacked {
+  /* Stacked center layout for marquee usage (lg). */
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+.skeu-hero--cta-stacked .skeu-hero-copy {
+  align-items: center;
+  text-align: center;
+}
+.skeu-hero--cta-inline {
+  /* Inline layout — copy left, CTA right. Use grid for clean alignment. */
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 14px;
+}
+.skeu-hero--cta-inline .skeu-hero-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ─── left-right layout (v16) ────────────────────────────────────────────
+ * Wide horizontal hero: [optional decoration · copy · CTA].
+ * Used by the Projects feed-aligned hero. Vertical-center alignment so
+ * the engraved title and the tactile CTA sit on the same baseline plane. */
+.skeu-hero--cta-left-right {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 24px;
+  text-align: left;
+}
+.skeu-hero--cta-left-right .skeu-hero-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+  align-items: flex-start;
+  text-align: left;
+}
+.skeu-hero--cta-left-right .skeu-hero-cta-slot {
+  flex-shrink: 0;
+  margin-left: auto;  /* push CTA flush right */
+}
+.skeu-hero-decoration {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--df-text-primary);
+  /* Default: subdued like a corner stamp, but presence-forward enough
+   * to anchor the left side of the wide hero. User Opção A craft. */
+  opacity: 0.55;
+  pointer-events: none;
+}
+[data-theme="light"] .skeu-hero-decoration {
+  opacity: 0.42;
+}
+
+/* ─── Reduced motion (no animations declared, but be explicit) ───────── */
+@media (prefers-reduced-motion: reduce) {
+  .skeu-hero-ascii { transition: none; }
+}
+
+/* ─── Mobile ─────────────────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  .skeu-hero--lg {
+    padding: 24px 22px 22px;
+  }
+  .skeu-hero--lg .skeu-hero-title {
+    font-size: 30px;
+  }
+  .skeu-hero--cta-inline,
+  .skeu-hero--cta-left-right {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .skeu-hero--cta-left-right .skeu-hero-cta-slot {
+    margin-left: 0;
+    align-self: stretch;
+  }
+  .skeu-hero--cta-left-right .skeu-hero-decoration {
+    align-self: flex-start;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ *  Modal stage DNA — apply hero grain inside NewProjectModal stage
+ *  User ask v15: "esse hero eh a ref principal" — apply DNA pattern
+ *  to the modal stage so the body reads as living inside the hero,
+ *  rather than nesting a redundant hero block under the faceplate title.
+ * ════════════════════════════════════════════════════════════════════════ */
+.np-modal-stage {
+  position: relative;
+}
+.np-modal-stage::before {
+  /* ASCII dot grain — same DNA as .skeu-hero-ascii, applied as the
+   * stage backdrop. Sits behind form content but above stage bg.
+   * Generated via radial-gradient (faster than literal pre, fine here
+   * because the modal stage is purely structural; the literal pre
+   * usage in SkeuHero is the canonical reference, this is the echo). */
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    circle at center,
+    var(--df-text-faint) 0.7px,
+    transparent 0.8px
+  );
+  background-size: 14px 14px;
+  background-position: 0 0;
+  opacity: 0.18;
+  /* Fade harder at the bottom so form fields stay legible. */
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.25) 60%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.25) 60%, transparent 100%);
+  z-index: 0;
+}
+[data-theme="light"] .np-modal-stage::before {
+  opacity: 0.28;
+}
+.np-modal-stage > * {
+  position: relative;
+  z-index: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .np-modal-stage::before { animation: none; }
+}

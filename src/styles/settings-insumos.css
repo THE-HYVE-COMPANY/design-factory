@@ -1,0 +1,197 @@
+/* ════════════════════════════════════════════════════════════════════════
+ *  Settings · Insumos — Aqua sub-tabs surface
+ * ════════════════════════════════════════════════════════════════════════
+ *
+ * Sub-tabs are skeu chiclets — same Aqua DNA as the home topbar
+ * (radial-gradient highlight, accent LED dot, tactile lift) but
+ * smaller (28px) since they live inside Settings.
+ *
+ * DNA invariants:
+ *   · Tab bar = 1px subtle border bottom, no full bezel (chiclets float)
+ *   · Idle tab = bezel-raised, mono uppercase, faint label
+ *   · Hover = translateY(-0.5px), label brightens
+ *   · Active = bezel-pressed, LED dot lit, label primary, accent ring
+ *   · Click = LED pulse (200ms), no surface bounce (these are tabs,
+ *     not push-buttons)
+ */
+
+/* Layout (display flex, column, gap, padding-bottom) now provided by
+ * global `.settings-page` so all Settings pages share the same outer
+ * envelope. `.insumos-panel` retains only the inner-specific tab strip
+ * + body rules below. */
+
+/* Tabs strip */
+.insumos-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  margin-bottom: 16px;
+  background: var(--df-bg-section);
+  border-radius: var(--df-r-md);
+  box-shadow:
+    var(--df-bezel-recessed),
+    inset 0 1px 0 var(--df-skeu-top-light, rgba(255, 255, 255, 0.04));
+  width: fit-content;
+}
+
+.insumos-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 14px;
+  background: var(--df-bg-base);
+  border: 0;
+  border-radius: var(--df-r-sm);
+  color: var(--df-text-muted);
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  user-select: none;
+  /* Idle: subtle raised bezel */
+  box-shadow:
+    var(--df-bezel-raised),
+    inset 0 1px 0 var(--df-skeu-top-light, rgba(255, 255, 255, 0.06));
+  transition:
+    background 140ms var(--df-ease-out),
+    color 140ms var(--df-ease-out),
+    box-shadow 140ms var(--df-ease-out),
+    transform 80ms var(--df-ease-out);
+}
+
+.insumos-tab:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-secondary);
+  transform: translateY(0.5px);
+  box-shadow:
+    var(--df-bezel-raised),
+    inset 0 1px 0 var(--df-skeu-top-light, rgba(255, 255, 255, 0.10)),
+    0 1px 3px rgba(0, 0, 0, 0.10);
+}
+
+.insumos-tab:focus-visible {
+  outline: 0;
+  box-shadow:
+    var(--df-bezel-raised),
+    inset 0 0 0 1.5px var(--df-accent-user, var(--df-text-primary));
+}
+
+.insumos-tab.is-active {
+  /* Aqua-ish radial highlight + bezel pressed for depth. We layer:
+   *   1. radial gradient brightening from the accent LED area
+   *   2. base bg-button-tactile (always dark per token decision so the
+   *      key-press socket feel reads in both themes)
+   *   3. bezel-pressed inset for the click-down sensation
+   * NOTE: text color must use --df-text-on-tactile (warm light, theme-
+   * agnostic) since the bg is intentionally dark in light mode too.
+   */
+  background:
+    radial-gradient(circle at 12px 50%,
+      var(--df-accent-user-soft, color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 18%, transparent)) 0%,
+      transparent 60%),
+    var(--df-bg-button-tactile, var(--df-surface-raised));
+  color: var(--df-text-on-tactile, var(--df-text-primary));
+  box-shadow:
+    var(--df-bezel-pressed),
+    inset 0 0 0 1px var(--df-accent-user, var(--df-text-primary)),
+    0 0 8px var(--df-accent-user-soft, color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 20%, transparent));
+  cursor: default;
+}
+
+.insumos-tab.is-active:hover {
+  transform: none;
+  background:
+    radial-gradient(circle at 12px 50%,
+      var(--df-accent-user-soft, color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 22%, transparent)) 0%,
+      transparent 62%),
+    var(--df-bg-button-tactile, var(--df-surface-raised));
+}
+
+/* LED dot — sits left of the label */
+.insumos-tab-led {
+  position: relative;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--df-text-faint);
+  flex-shrink: 0;
+  box-shadow:
+    inset 0 0 0 0.5px rgba(0, 0, 0, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+  transition: background 200ms var(--df-ease-out), box-shadow 200ms var(--df-ease-out);
+}
+
+.insumos-tab.is-active .insumos-tab-led {
+  background: var(--df-accent-user, #8ab06b);
+  box-shadow:
+    inset 0 0 0 0.5px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.30),
+    0 0 5px var(--df-accent-user, #8ab06b),
+    0 0 10px var(--df-accent-user-soft, color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 40%, transparent));
+}
+
+.insumos-tab-label {
+  white-space: nowrap;
+}
+
+/* Body: editors render directly without their own padding */
+.insumos-body {
+  display: block;
+}
+
+/* The editors used to render their own h1 + kicker. They still do, and
+ * that's intentional: each editor remains self-contained so direct
+ * /settings/insumos/canvas linking still feels like a full page. The
+ * top-level kicker ("DESIGN FACTORY · INSUMOS") sits ABOVE the tabs
+ * and acts as the unified scope header. */
+
+/* ─── Reduced motion ────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .insumos-tab,
+  .insumos-tab-led {
+    transition: none !important;
+  }
+  .insumos-tab:hover {
+    transform: none;
+  }
+}
+
+/* ─── Light-theme adjustments ───────────────────────────────────── */
+[data-theme="light"] .insumos-tabs {
+  box-shadow:
+    var(--df-bezel-recessed),
+    inset 0 1px 0 rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="light"] .insumos-tab {
+  background: var(--df-surface-raised);
+  box-shadow:
+    var(--df-bezel-raised),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+[data-theme="light"] .insumos-tab.is-active {
+  background:
+    radial-gradient(circle at 12px 50%,
+      var(--df-accent-user-soft, color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 22%, transparent)) 0%,
+      transparent 60%),
+    var(--df-bg-button-tactile, var(--df-surface-raised));
+  /* Tactile bg is intentionally dark in light mode too — keep warm-light
+   * text from the dark-theme rule, do NOT flip to text-primary. */
+  color: var(--df-text-on-tactile, var(--df-text-primary));
+}
+
+/* ─── Narrow viewports ──────────────────────────────────────────── */
+@media (max-width: 760px) {
+  .insumos-tabs {
+    width: 100%;
+    overflow-x: auto;
+  }
+  .insumos-tab {
+    flex-shrink: 0;
+  }
+}

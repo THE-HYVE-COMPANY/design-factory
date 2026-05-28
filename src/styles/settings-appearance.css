@@ -1,0 +1,387 @@
+/* ════════════════════════════════════════════════════════════════════════
+ *  Settings · Aparência — editorial layout
+ * ════════════════════════════════════════════════════════════════════════
+ *
+ * Layout rules (matches the Padrões editorial respiro pattern):
+ *   · Generous 32px section gaps between header → directions → groups
+ *   · Reduced skeu (no triple bezel — single 1px border + soft shadow)
+ *   · Tema / Cores / Idioma / Editor-theme as 4 distinct subgroups,
+ *     each with its own section header
+ *   · The advanced theme editor lives behind a disclosure (closed by
+ *     default)
+ *
+ * Scope: every rule below is scoped under `.appearance-panel` so the
+ * NewProject modal's heavier skeu vocabulary is preserved.
+ */
+
+/* ─── Container ─────────────────────────────────────────────────────
+ * Layout rules (max-width, display, gap, padding-bottom) and hero
+ * rhythm (kicker + title) moved to global `.settings-page` so every
+ * Settings page shares the same envelope. `.appearance-panel` is now
+ * just a scope selector for the inner accent/lang/theme group rules
+ * below. */
+
+/* ─── Directions block (guidance for whole panel) ────────────────── */
+.appearance-directions {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 14px;
+  align-items: start;
+  padding: 18px 22px;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-left: 3px solid var(--df-accent-user, #8ab06b);
+  border-radius: var(--df-r-md);
+  box-shadow: none;
+}
+.appearance-directions-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 10%, transparent);
+  color: var(--df-accent-user, #8ab06b);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.appearance-directions-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.appearance-directions-title {
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  color: var(--df-text-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+.appearance-directions-body {
+  font-family: var(--df-font-sans);
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--df-text-secondary);
+  margin: 0;
+  letter-spacing: -0.005em;
+  max-width: 70ch;
+}
+[data-theme="light"] .appearance-directions {
+  background: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 4%, transparent);
+  border-left-color: var(--df-accent-user, #8ab06b);
+}
+[data-theme="light"] .appearance-directions-mark {
+  background: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 14%, transparent);
+}
+
+/* ─── Subgroups — 4 distinct sections with editorial breathing ──── */
+.appearance-panel .appearance-group {
+  padding: 24px 0 0;
+  border-top: 1px solid var(--df-border-subtle);
+  margin-top: 0;
+}
+.appearance-panel .appearance-group:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+.appearance-panel .appearance-group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.appearance-panel .appearance-group-title {
+  font-family: var(--df-font-sans);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--df-text-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+.appearance-panel .appearance-group-sub {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--df-text-muted);
+  margin: 0 0 18px;
+  max-width: 64ch;
+}
+
+/* ─── Tema chip toggle (skeu reduced) ───────────────────────────── */
+.appearance-theme-toggle {
+  display: inline-flex;
+  gap: 0;
+  border-radius: var(--df-r-md);
+  overflow: hidden;
+  border: 1px solid var(--df-border-subtle);
+  background: var(--df-bg-section);
+}
+.appearance-theme-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: transparent;
+  border: 0;
+  color: var(--df-text-secondary);
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  transition: background 120ms var(--df-ease-out), color 120ms var(--df-ease-out);
+}
+.appearance-theme-chip + .appearance-theme-chip {
+  border-left: 1px solid var(--df-border-subtle);
+}
+/* User QA 2026-05-16: inset shadow of the pressed chip was painting
+ * over square corners while the toggle group rounded them via overflow.
+ * Match the chip's own radius to the group radius on the outer edges so
+ * the pressed inset reads as a cleanly rounded recess. */
+.appearance-theme-toggle .appearance-theme-chip:first-child {
+  border-top-left-radius: var(--df-r-md);
+  border-bottom-left-radius: var(--df-r-md);
+}
+.appearance-theme-toggle .appearance-theme-chip:last-child {
+  border-top-right-radius: var(--df-r-md);
+  border-bottom-right-radius: var(--df-r-md);
+}
+.appearance-theme-chip:hover:not([aria-pressed="true"]) {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+}
+.appearance-theme-chip[aria-pressed="true"] {
+  /* User QA 2026-05-15: pressed state was "meio quebrado" — fixed
+   * by anchoring the chip with a visible accent ring + softer inset
+   * shadow so the active state reads clearly in both themes. */
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-on-tactile);
+  font-weight: 600;
+  box-shadow:
+    var(--df-shadow-button-tactile-pressed),
+    inset 0 0 0 1px color-mix(in srgb, var(--df-accent-user, var(--df-text-primary)) 28%, transparent);
+  cursor: default;
+}
+.appearance-theme-chip svg {
+  flex-shrink: 0;
+}
+
+/* ─── Cores: accent swatches (cleaner grid) ─────────────────────── */
+.appearance-accent-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.appearance-accent-swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  color: var(--df-text-secondary);
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  transition: background 120ms var(--df-ease-out), border-color 120ms var(--df-ease-out), color 120ms var(--df-ease-out);
+}
+.appearance-accent-swatch:hover {
+  background: var(--df-interactive-hover);
+  border-color: var(--df-border-strong);
+  color: var(--df-text-primary);
+}
+.appearance-accent-swatch[aria-pressed="true"] {
+  background: var(--df-bg-section);
+  border-color: var(--df-accent-user, var(--df-text-primary));
+  box-shadow: 0 0 0 1px var(--df-accent-user, transparent);
+  color: var(--df-text-primary);
+}
+.appearance-accent-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  /* User ask 2026-05-21: top-light 0.18 vs drop 0.40 desbalanceava
+     o dot em dark — drop dominava o highlight. Aumentado top-light
+     pra ler como esfera, drop reduzido pro --df-skeu-contact warm. */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 1px 2px var(--df-skeu-contact);
+}
+[data-theme="light"] .appearance-accent-dot {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.40),
+    0 1px 2px rgba(40, 30, 22, 0.16);
+}
+
+.appearance-accent-custom {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 14px 16px;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+}
+.appearance-accent-custom-label {
+  font-size: 11px;
+  font-family: var(--df-font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--df-text-faint);
+  margin-right: 4px;
+}
+
+.appearance-accent-note {
+  margin-top: 16px;
+  font-size: 12.5px;
+  color: var(--df-text-muted);
+  line-height: 1.55;
+  max-width: 64ch;
+}
+
+/* ─── Idioma — radio group (cleaner) ────────────────────────────── */
+.appearance-lang-group {
+  display: inline-flex;
+  gap: 0;
+  border-radius: var(--df-r-md);
+  overflow: hidden;
+  border: 1px solid var(--df-border-subtle);
+  background: var(--df-bg-section);
+}
+.appearance-lang-chip {
+  padding: 9px 18px;
+  background: transparent;
+  color: var(--df-text-secondary);
+  font-family: var(--df-font-sans);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  border: 0;
+  cursor: pointer;
+  transition: background 120ms var(--df-ease-out), color 120ms var(--df-ease-out);
+}
+.appearance-lang-chip + .appearance-lang-chip {
+  border-left: 1px solid var(--df-border-subtle);
+}
+/* See .appearance-theme-chip note above — same fix for the lang group. */
+.appearance-lang-group .appearance-lang-chip:first-child {
+  border-top-left-radius: var(--df-r-md);
+  border-bottom-left-radius: var(--df-r-md);
+}
+.appearance-lang-group .appearance-lang-chip:last-child {
+  border-top-right-radius: var(--df-r-md);
+  border-bottom-right-radius: var(--df-r-md);
+}
+.appearance-lang-chip:hover:not([aria-checked="true"]) {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+}
+.appearance-lang-chip[aria-checked="true"] {
+  /* User QA 2026-05-15: see .appearance-theme-chip note. */
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-on-tactile);
+  font-weight: 600;
+  box-shadow:
+    var(--df-shadow-button-tactile-pressed),
+    inset 0 0 0 1px color-mix(in srgb, var(--df-accent-user, var(--df-text-primary)) 28%, transparent);
+  cursor: default;
+}
+
+/* ─── Tema editor avançado — disclosure ─────────────────────────── */
+.appearance-disclosure {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  color: var(--df-text-primary);
+  font-family: var(--df-font-sans);
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  text-align: left;
+  transition: background 120ms var(--df-ease-out), border-color 120ms var(--df-ease-out);
+}
+.appearance-disclosure:hover {
+  background: var(--df-interactive-hover);
+  border-color: var(--df-border-strong);
+}
+.appearance-disclosure-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+.appearance-disclosure-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--df-text-primary);
+}
+.appearance-disclosure-sub {
+  font-size: 12px;
+  color: var(--df-text-muted);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.appearance-disclosure-chev {
+  flex-shrink: 0;
+  color: var(--df-text-muted);
+  transition: transform 160ms var(--df-ease-out);
+}
+.appearance-disclosure[aria-expanded="true"] .appearance-disclosure-chev {
+  transform: rotate(180deg);
+}
+
+.appearance-disclosure-body {
+  margin-top: 14px;
+  padding: 24px;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  animation: appearance-disclosure-in 200ms var(--df-ease-out);
+}
+
+@keyframes appearance-disclosure-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .appearance-disclosure-body,
+  .appearance-disclosure-chev,
+  .appearance-theme-chip,
+  .appearance-lang-chip,
+  .appearance-accent-swatch {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ─── Narrow viewports ──────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .appearance-panel {
+    gap: 24px;
+  }
+  .appearance-accent-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

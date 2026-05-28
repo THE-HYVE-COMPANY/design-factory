@@ -1,0 +1,249 @@
+# i18n-audit baseline — entries here are accepted as known offenders.
+# Format: <relative-path>\t<exact text>  (line-independent — survives edits)
+# Generated: 2026-05-28T15:09:24.051Z
+
+src/App.tsx	No DS matches
+src/App.tsx	. It may have been renamed or removed.
+src/App.tsx	Back to design systems
+src/components/AgentPicker.tsx	Switch CLI agent
+src/components/AgentPicker.tsx	Reescanear PATH
+src/components/AgentPicker.tsx	Reescanear PATH
+src/components/AskUserQuestion.tsx	Answered ·
+src/components/AttachDsModal.tsx	Close
+src/components/ChatMessage.tsx	salvando…
+src/components/ChatMessage.tsx	A escrita no daemon falhou ou demorou demais. Mensagem salva localmente; será sincronizada quando possível.
+src/components/ChatMessage.tsx	salvo localmente
+src/components/ChatMessage.tsx	Não foi possível salvar este turno em disco nem no recovery local.
+src/components/ChatMessage.tsx	falha ao salvar
+src/components/ChatMessage.tsx	Tempo decorrido desde o início do turno
+src/components/ChatMessage.tsx	remove attachment
+src/components/DfModal.tsx	Close dialog
+src/components/EditDrawer.tsx	Edit · global
+src/components/EditDrawer.tsx	Close
+src/components/EditDrawer.tsx	Presets
+src/components/EditDrawer.tsx	Background
+src/components/EditDrawer.tsx	Text color
+src/components/EditDrawer.tsx	Page padding
+src/components/EditDrawer.tsx	Max content width
+src/components/EditDrawer.tsx	Base font size
+src/components/EditDrawer.tsx	Font family
+src/components/EditDrawer.tsx	Border radius
+src/components/EditDrawer.tsx	Shadow
+src/components/EditDrawer.tsx	Reset all
+src/components/EditDrawer.tsx	Clear
+src/components/ElementInspectorPanel.tsx	Element · selected
+src/components/ElementInspectorPanel.tsx	Close element inspector
+src/components/ElementInspectorPanel.tsx	Close (Esc)
+src/components/ElementInspectorPanel.tsx	Tag
+src/components/ElementInspectorPanel.tsx	Selector
+src/components/ElementInspectorPanel.tsx	Copy selector
+src/components/ElementInspectorPanel.tsx	Copy
+src/components/ElementInspectorPanel.tsx	Box
+src/components/ElementInspectorPanel.tsx	Text
+src/components/ElementInspectorPanel.tsx	Edit this element
+src/components/ElementInspectorPanel.tsx	Describe the change. E.g. 'make this orange and bold'.
+src/components/ElementInspectorPanel.tsx	Send to agent ·
+src/components/ErrorBoundary.tsx	render error
+src/components/ErrorBoundary.tsx	Something broke while rendering
+src/components/ErrorBoundary.tsx	Reload app
+src/components/ErrorBoundary.tsx	Back to home
+src/components/ErrorBoundary.tsx	Copy diagnostics
+src/components/ErrorToastDock.tsx	Dismiss
+src/components/FileManager.tsx	Close panel
+src/components/FileManager.tsx	File
+src/components/FileManager.tsx	Folder
+src/components/FileManager.tsx	Refresh
+src/components/FileManager.tsx	Loading…
+src/components/FileManager.tsx	Create folder
+src/components/FileManager.tsx	Create first file
+src/components/FileManager.tsx	Uploads & assets
+src/components/FileManager.tsx	Folders
+src/components/FileManager.tsx	Create (Enter)
+src/components/FileManager.tsx	Cancel (Esc)
+src/components/FileView.tsx	Binary file — preview unavailable
+src/components/FormatTaxonomyEditor.tsx	Prompt
+src/components/FormatTaxonomyEditor.tsx	Long-form instruction text that gets concatenated into the system prompt when this format is selected. Empty = use descriptor.
+src/components/FormatTaxonomyEditor.tsx	Editable for builtins too. Saved as user override, original ships in code.
+src/components/GeneratePreviewModal.tsx	Gerar preview do design system
+src/components/GeneratePreviewModal.tsx	Cancelar
+src/components/GeneratePreviewModal.tsx	vai ser enviado ao provider escolhido com um prompt fixo que pede uma página HTML completa aplicando todos os tokens, componentes e regras descritas. O resultado é salvo em
+src/components/GeneratePreviewModal.tsx	Provider
+src/components/GeneratePreviewModal.tsx	Carregando…
+src/components/GeneratePreviewModal.tsx	Claude Code (default)
+src/components/GeneratePreviewModal.tsx	Modelo
+src/components/GeneratePreviewModal.tsx	(sem modelos)
+src/components/GeneratePreviewModal.tsx	custom model id
+src/components/GeneratePreviewModal.tsx	Modelo customizado
+src/components/GeneratePreviewModal.tsx	ex: claude-sonnet-4-6
+src/components/InlineEditPanel.tsx	Inline edit ·
+src/components/InlineEditPanel.tsx	Text
+src/components/InlineEditPanel.tsx	Typography
+src/components/InlineEditPanel.tsx	Font
+src/components/InlineEditPanel.tsx	Weight
+src/components/InlineEditPanel.tsx	Size
+src/components/InlineEditPanel.tsx	Color
+src/components/InlineEditPanel.tsx	Align
+src/components/InlineEditPanel.tsx	Line Height
+src/components/InlineEditPanel.tsx	Tracking
+src/components/InlineEditPanel.tsx	Size
+src/components/InlineEditPanel.tsx	Width
+src/components/InlineEditPanel.tsx	Height
+src/components/InlineEditPanel.tsx	Box
+src/components/InlineEditPanel.tsx	Opacity
+src/components/InlineEditPanel.tsx	Padding
+src/components/InlineEditPanel.tsx	Margin
+src/components/InlineEditPanel.tsx	Border
+src/components/InlineEditPanel.tsx	Border Radius
+src/components/InlineEditPanel.tsx	Cancel
+src/components/NewProjectFormSkeu.tsx	See the compiled direction before starting
+src/components/NewProjectFormSkeu.tsx	Preview prompt
+src/components/NewProjectFormSkeu.tsx	Abre o projeto em branco — sem prompt, sem direção pré-definida.
+src/components/NewProjectFormSkeu.tsx	Começar em branco
+src/components/NewProjectFormSkeu.tsx	Model
+src/components/NewProjectFormSkeu.tsx	Provider
+src/components/OriginGuardBanner.tsx	Origem não permitida
+src/components/OriginGuardBanner.tsx	Esta página está em
+src/components/OriginGuardBanner.tsx	, mas o daemon do Design Factory só aceita conexões de
+src/components/OriginGuardBanner.tsx	(ou pela app Tauri). Chamadas para o bridge vão falhar — chat, salvamento e geração ficam quebrados.
+src/components/OriginGuardBanner.tsx	Abrir em
+src/components/ProviderBanner.tsx	Apontar minha CLI
+src/components/ProviderBanner.tsx	Abrir Ajustes
+src/components/ProviderBanner.tsx	caminho do executável (ex: C:\\Users\\voce\\.local\\bin\\claude.exe)
+src/components/ProviderBanner.tsx	Dica: no terminal,
+src/components/ProviderBanner.tsx	where claude
+src/components/ProviderBanner.tsx	(Windows) ou
+src/components/ProviderBanner.tsx	which claude
+src/components/ProviderBanner.tsx	(Mac/Linux) mostra o caminho.
+src/components/ProviderTokenInline.tsx	vercel login
+src/components/ProviderTokenInline.tsx	gh auth login
+src/components/RatioChangeConfirmModal.tsx	Cancelar
+src/components/RatioChangeConfirmModal.tsx	Adaptar conteúdo
+src/components/RatioChangeConfirmModal.tsx	O conteúdo atual foi gerado para
+src/components/RatioChangeConfirmModal.tsx	). Para adaptar ao novo formato
+src/components/RatioChangeConfirmModal.tsx	), o Design Factory vai regenerar o HTML preservando texto, animações, cores e timing das scenes — apenas redimensionando o layout.
+src/components/RatioChangeConfirmModal.tsx	Esse processo demora 30s-2min e usa o provider/modelo selecionado. Você pode cancelar a qualquer momento.
+src/components/RatioRegenOverlay.tsx	Adaptando layout para
+src/components/RatioRegenOverlay.tsx	tokens gerados
+src/components/RatioRegenOverlay.tsx	Cancelar
+src/components/ShortcutsOverlay.tsx	Keyboard shortcuts
+src/components/ShortcutsOverlay.tsx	Press
+src/components/ShortcutsOverlay.tsx	anytime to toggle this list.
+src/components/SlashMenu.tsx	No matches
+src/components/TasteDialEditor.tsx	50 · neutral (no prompt)
+src/components/TasteDialEditor.tsx	● override
+src/components/TasteDialEditor.tsx	Restore default phrase
+src/components/TasteDialEditor.tsx	Reset
+src/components/TerminalDrawer.tsx	Terminal
+src/components/TerminalDrawer.tsx	Clear scrollback (process keeps running)
+src/components/TerminalDrawer.tsx	Clear
+src/components/TerminalDrawer.tsx	Copy selection (or full buffer if nothing selected)
+src/components/TerminalDrawer.tsx	Copy
+src/components/TerminalDrawer.tsx	Close terminal
+src/components/ThemeToggle.tsx	Toggle theme
+src/components/ToolEventBubble.tsx	Input
+src/components/ToolEventBubble.tsx	Reason
+src/components/dfds/ColorPickerPopover.tsx	#rrggbb
+src/components/dfds/ColorPickerPopover.tsx	Apply
+src/components/dfds/ColorPickerPopover.tsx	Reset to default
+src/screens/DsPreviewScreen.tsx	Back to home
+src/screens/DsPreviewScreen.tsx	Back to home
+src/screens/DsPreviewScreen.tsx	Settings
+src/screens/DsPreviewScreen.tsx	Settings
+src/screens/DsPreviewScreen.tsx	Loading design.md…
+src/screens/DsPreviewScreen.tsx	Can't reach this design system
+src/screens/DsPreviewScreen.tsx	GitHub-sourced DSes keep their
+src/screens/DsPreviewScreen.tsx	in an ephemeral cache that gets wiped between runs. Remove this entry and re-add the repo to regenerate.
+src/screens/DsPreviewScreen.tsx	Remove from list
+src/screens/DsPreviewScreen.tsx	Back to workspace
+src/screens/DsPreviewScreen.tsx	This DS has no content
+src/screens/DsPreviewScreen.tsx	The
+src/screens/DsPreviewScreen.tsx	exists but is empty — likely the original generation failed silently. Edit the file directly below, or remove this DS and create a new one.
+src/screens/DsPreviewScreen.tsx	Edit design.md
+src/screens/DsPreviewScreen.tsx	Remove from list
+src/screens/DsPreviewScreen.tsx	Back to workspace
+src/screens/DsPreviewScreen.tsx	Cancel
+src/screens/DsPreviewScreen.tsx	Save
+src/screens/DsPreviewScreen.tsx	Edit markdown
+src/screens/DsPreviewScreen.tsx	Edit markdown
+src/screens/DsPreviewScreen.tsx	Edit
+src/screens/DsPreviewScreen.tsx	Gerando preview com
+src/screens/DsPreviewScreen.tsx	s decorridos · roda em background, pode fechar tabs
+src/screens/DsPreviewScreen.tsx	Cancelar
+src/screens/DsPreviewScreen.tsx	Design system preview (stale while regenerating)
+src/screens/DsPreviewScreen.tsx	Carregando preview…
+src/screens/DsPreviewScreen.tsx	Falha ao gerar preview:
+src/screens/DsPreviewScreen.tsx	Tentar de novo
+src/screens/DsPreviewScreen.tsx	Design system preview
+src/screens/DsPreviewScreen.tsx	Ainda sem preview
+src/screens/DsPreviewScreen.tsx	O preview é um
+src/screens/DsPreviewScreen.tsx	gerado por um modelo de IA aplicando o seu
+src/screens/DsPreviewScreen.tsx	. Escolha o provider e o modelo no próximo passo.
+src/screens/DsPreviewScreen.tsx	Gerar Preview
+src/screens/DsPreviewScreen.tsx	Design system preview
+src/screens/EditorScreen.tsx	Claude CLI not authenticated.
+src/screens/EditorScreen.tsx	Dismiss auth banner
+src/screens/EditorScreen.tsx	Project path not found:
+src/screens/EditorScreen.tsx	Browse…
+src/screens/EditorScreen.tsx	Dismiss missing path banner
+src/screens/EditorScreen.tsx	Close
+src/screens/EditorScreen.tsx	Resize chat column
+src/screens/EditorScreen.tsx	No comments yet
+src/screens/EditorScreen.tsx	Switch to Comment mode in the canvas toolbar, then click any element in the preview to pin a note.
+src/screens/EditorScreen.tsx	Jump to element in preview
+src/screens/EditorScreen.tsx	· sent
+src/screens/EditorScreen.tsx	Click to edit
+src/screens/EditorScreen.tsx	Delete comment
+src/screens/EditorScreen.tsx	Send this comment to Claude
+src/screens/EditorScreen.tsx	Send
+src/screens/EditorScreen.tsx	Send
+src/screens/EditorScreen.tsx	to Claude
+src/screens/EditorScreen.tsx	Clear sent comments
+src/screens/EditorScreen.tsx	Clear sent
+src/screens/EditorScreen.tsx	in /
+src/screens/EditorScreen.tsx	Elapsed time
+src/screens/EditorScreen.tsx	Estimated output tokens
+src/screens/EditorScreen.tsx	Tool calls (completed / total)
+src/screens/EditorScreen.tsx	Provider · model
+src/screens/EditorScreen.tsx	Cancel turn (Esc)
+src/screens/EditorScreen.tsx	Detach design system
+src/screens/EditorScreen.tsx	probe failed
+src/screens/EditorScreen.tsx	No models configured.
+src/screens/EditorScreen.tsx	Terminal
+src/screens/EditorScreen.tsx	Files
+src/screens/EditorScreen.tsx	Tweaks
+src/screens/EditorScreen.tsx	Leave blank for a comprehensive set.
+src/screens/EditorScreen.tsx	Cancel
+src/screens/EditorScreen.tsx	Comment
+src/screens/EditorScreen.tsx	Edit
+src/screens/EditorScreen.tsx	Prompt
+src/screens/EditorScreen.tsx	Present fullscreen (Esc to exit)
+src/screens/EditorScreen.tsx	Present
+src/screens/EditorScreen.tsx	Video editing is deferred to a later wave.
+src/screens/EditorScreen.tsx	Close this tab to remove it from the project.
+src/screens/EditorScreen.tsx	Describe what to create in the chat. Claude will generate your design.
+src/screens/EditorScreen.tsx	Esc
+src/screens/EditorScreen.tsx	Actions
+src/screens/EditorScreen.tsx	Esc
+src/screens/EditorScreen.tsx	Version history
+src/screens/EditorScreen.tsx	named ·
+src/screens/EditorScreen.tsx	Save current as...
+src/screens/EditorScreen.tsx	No versions yet. Saves happen automatically on every generation.
+src/screens/EditorScreen.tsx	· current
+src/screens/EditorScreen.tsx	Restore
+src/screens/EditorScreen.tsx	Delete version
+src/screens/EditorScreen.tsx	Save version
+src/screens/EditorScreen.tsx	Name this save so you can restore it later. Named versions are kept indefinitely; auto-saves are capped at 20.
+src/screens/EditorScreen.tsx	e.g. before color rework
+src/screens/EditorScreen.tsx	Cancel
+src/screens/EditorScreen.tsx	Save
+src/screens/EditorScreen.tsx	Pin a comment
+src/screens/EditorScreen.tsx	What to note about this element...
+src/screens/EditorScreen.tsx	⌘↵ to save · comments batch in the Comments tab
+src/screens/EditorScreen.tsx	Cancel
+src/screens/EditorScreen.tsx	Pin
+src/screens/HomeScreen.tsx	Carregar mais (
+src/screens/HomeScreen.tsx	restantes)
+src/screens/SkillCoverPreviewScreen.tsx	Preview · Skill covers
+src/screens/SkillCoverPreviewScreen.tsx	6 direções, 4 skills mockadas cada
+src/screens/SkillCoverPreviewScreen.tsx	Cada coluna é uma direção visual. Cada linha é a mesma skill renderizada em todas. Olha o conjunto e me diz qual letra (A-F).
+src/screens/SkillCoverPreviewScreen.tsx	Manda a letra (A, B, C, D, E ou F) — se quiser combinar (e.g. "C com cor de B"), descreve que aplico.

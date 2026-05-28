@@ -1,0 +1,821 @@
+/* ════════════════════════════════════════════════════════════════════════
+ *  Settings · Taxonomy Manager — premium split-panel surface
+ *  v18 * ════════════════════════════════════════════════════════════════════════
+ *
+ * Skeu DNA invariants:
+ *   · Surface = bezel-raised plates (var(--df-bezel-raised))
+ *   · Hover = lift +0.5px, brighter shadow
+ *   · Selected row = bezel-pressed inset + accent left-edge bar
+ *   · Inputs = bezel-recessed bowl, focus accent inner glow
+ *   · Buttons = df-tactile (LED dot pulses on primary)
+ *   · Drag handle = 3-dot vertical grip pattern
+ *
+ * Composes with skeu-hero.css (sm hero) and components.css (df-tactile).
+ *
+ * Layout:
+ *   · Hero (sm) at top
+ *   · Optional description prose
+ *   · Optional group filter pills (horizontal)
+ *   · Split: 320px left list + 1fr right detail
+ *   · Bulk action bar slides in at bottom of list when items multi-selected
+ */
+
+/* ─── Container ──────────────────────────────────────────────────────── */
+.tx-mgr {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 40px;
+}
+
+.tx-mgr-desc {
+  font-size: var(--df-text-sm);
+  color: var(--df-text-secondary);
+  line-height: 1.55;
+  max-width: 60ch;
+}
+
+/* ─── Group filter pills ─────────────────────────────────────────────── */
+.tx-mgr-group-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+.tx-mgr-group-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 11px;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+  color: var(--df-text-secondary);
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 var(--df-skeu-top-light);
+  transition: background 140ms var(--df-ease-out), color 140ms var(--df-ease-out), transform 80ms var(--df-ease-out);
+}
+.tx-mgr-group-pill:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+}
+.tx-mgr-group-pill.is-active {
+  background: var(--df-bg-button-tactile, var(--df-surface-raised));
+  color: var(--df-text-on-tactile, var(--df-text-primary));
+  border-color: var(--df-border-strong);
+  box-shadow: var(--df-bezel-pressed);
+}
+.tx-mgr-group-pill-count {
+  font-size: 9px;
+  color: var(--df-text-muted);
+  font-weight: 400;
+}
+.tx-mgr-group-pill.is-active .tx-mgr-group-pill-count {
+  color: var(--df-text-on-tactile, var(--df-text-secondary));
+  opacity: 0.7;
+}
+
+/* ─── Split layout ───────────────────────────────────────────────────── */
+.tx-mgr-split {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 16px;
+  align-items: start;
+  /* Min height so the empty-detail state has presence. */
+  min-height: 480px;
+}
+
+/* ─── LEFT — list column ─────────────────────────────────────────────── */
+.tx-mgr-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--df-bg-section);
+  border-radius: var(--df-r-lg);
+  padding: 12px;
+  box-shadow: var(--df-bezel-raised), var(--df-skeu-shadow-sm);
+}
+
+/* ─── Search input — bezel recessed bowl ─────────────────────────────── */
+.tx-mgr-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 34px;
+  background: var(--df-bg-base);
+  border-radius: var(--df-r-md);
+  box-shadow: var(--df-bezel-recessed);
+  padding: 0 10px 0 32px;
+  transition: box-shadow 140ms var(--df-ease-out);
+}
+.tx-mgr-search:focus-within {
+  box-shadow:
+    var(--df-bezel-recessed),
+    inset 0 0 0 1.5px var(--df-accent-user, var(--df-text-primary));
+}
+.tx-mgr-search-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--df-text-muted);
+  display: flex;
+  align-items: center;
+}
+.tx-mgr-search-input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  height: 100%;
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  color: var(--df-text-primary);
+  letter-spacing: -0.005em;
+}
+.tx-mgr-search-input::placeholder { color: var(--df-text-faint); }
+.tx-mgr-search-input::-webkit-search-cancel-button { display: none; }
+.tx-mgr-search-clear {
+  background: transparent;
+  border: 0;
+  color: var(--df-text-muted);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.tx-mgr-search-clear:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+}
+
+/* ─── Create button (full-width tactile) ─────────────────────────────── */
+.tx-mgr-create {
+  width: 100%;
+  height: 34px;
+  justify-content: center;
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+.tx-mgr-create-icon {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+/* ─── List ───────────────────────────────────────────────────────────── */
+.tx-mgr-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  max-height: 60vh;
+  padding: 2px;
+  outline: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--df-border-subtle) transparent;
+}
+.tx-mgr-list:focus-visible {
+  box-shadow: 0 0 0 1.5px var(--df-accent-user, var(--df-text-primary));
+  border-radius: var(--df-r-sm);
+}
+
+/* ─── Section (group) ────────────────────────────────────────────────── */
+.tx-mgr-section { display: flex; flex-direction: column; gap: 4px; }
+.tx-mgr-section + .tx-mgr-section { margin-top: 10px; }
+.tx-mgr-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px 2px;
+  font-family: var(--df-font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--df-text-muted);
+}
+.tx-mgr-section-count {
+  font-family: var(--df-font-mono);
+  font-size: 9px;
+  color: var(--df-text-faint);
+}
+
+/* ─── Row — the heart of the list ────────────────────────────────────── */
+.tx-mgr-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: var(--df-bg-section);
+  border-radius: var(--df-r-sm);
+  cursor: pointer;
+  user-select: none;
+  /* Idle: bezel raised, no shadow ambient (kept tight). */
+  box-shadow: var(--df-bezel-raised);
+  transition:
+    background 140ms var(--df-ease-out),
+    box-shadow 140ms var(--df-ease-out),
+    transform 80ms var(--df-ease-out);
+}
+.tx-mgr-row:hover {
+  background: var(--df-interactive-hover);
+  transform: translateY(0.5px);
+  box-shadow: var(--df-bezel-raised), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+.tx-mgr-row.is-selected {
+  background: var(--df-surface-raised);
+  box-shadow: var(--df-bezel-pressed);
+}
+.tx-mgr-row.is-selected::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 2.5px;
+  background: var(--df-accent-user, var(--df-text-primary));
+  border-radius: 0 2px 2px 0;
+  box-shadow: 0 0 6px var(--df-accent-user, var(--df-text-primary));
+}
+.tx-mgr-row.is-multi {
+  background: var(--df-surface-raised);
+  outline: 1.5px dashed var(--df-accent-user, var(--df-text-primary));
+  outline-offset: -2px;
+}
+.tx-mgr-row.is-drag-over {
+  background: var(--df-interactive-hover);
+  box-shadow: var(--df-bezel-pressed), inset 0 2px 0 var(--df-accent-user, var(--df-text-primary));
+}
+.tx-mgr-row.is-disabled .tx-mgr-row-title,
+.tx-mgr-row.is-disabled .tx-mgr-row-sub {
+  opacity: 0.5;
+  text-decoration: line-through;
+  text-decoration-thickness: 0.5px;
+  text-decoration-color: var(--df-text-faint);
+}
+
+/* Drag grip — 3 dots × 2 cols */
+.tx-mgr-grip {
+  display: grid;
+  grid-template-columns: 2px 2px;
+  grid-template-rows: 2px 2px 2px;
+  gap: 2px;
+  width: 6px;
+  height: 10px;
+  cursor: grab;
+  opacity: 0.4;
+  transition: opacity 120ms var(--df-ease-out);
+}
+.tx-mgr-row:hover .tx-mgr-grip { opacity: 0.8; }
+.tx-mgr-grip > span {
+  background: var(--df-text-muted);
+  border-radius: 1px;
+}
+
+/* Toggle (compact, lighter than the full skeu-toggle) */
+.tx-mgr-toggle {
+  position: relative;
+  width: 26px;
+  height: 14px;
+  background: var(--df-bg-base);
+  border-radius: var(--df-r-sm);
+  border: 1px solid var(--df-border-subtle);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background 200ms var(--df-ease-out);
+}
+.tx-mgr-toggle.is-on {
+  background: var(--df-accent-user, var(--df-text-primary));
+  border-color: transparent;
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.20),
+    0 0 5px rgba(255, 255, 255, 0.06);
+}
+.tx-mgr-toggle-thumb {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 10px;
+  height: 10px;
+  background: var(--df-text-secondary);
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.30);
+  transition: transform 200ms var(--df-ease-out), background 200ms var(--df-ease-out);
+}
+.tx-mgr-toggle.is-on .tx-mgr-toggle-thumb {
+  transform: translateX(12px);
+  background: #fff;
+}
+
+/* Row body — title + subtitle + optional preview.
+ *
+ * When a renderRowPreview is supplied (Canvas) the body becomes a 2-col
+ * grid so the preview sits INLINE LEFT of the title stack (flex column).
+ * When no preview, body collapses to a single flex column. */
+.tx-mgr-row-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.tx-mgr-row-body:has(.tx-mgr-row-preview) {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 10px;
+}
+.tx-mgr-row-preview {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+}
+.tx-mgr-row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.tx-mgr-row-title {
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--df-text-primary);
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.25;
+}
+.tx-mgr-row-sub {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  color: var(--df-text-muted);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
+}
+
+/* Row badges (right cluster) */
+.tx-mgr-row-badges {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.tx-mgr-badge {
+  font-family: var(--df-font-mono);
+  font-size: 8px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  padding: 2px 5px;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--df-text-muted);
+}
+.tx-mgr-badge--builtin {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--df-text-faint);
+  border: 1px solid var(--df-border-subtle);
+}
+[data-theme="light"] .tx-mgr-badge--builtin {
+  background: rgba(60, 50, 40, 0.04);
+}
+.tx-mgr-badge--custom {
+  background: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 10%, transparent);
+  color: var(--df-accent-ok, #8ab06b);
+  border: 1px solid color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 20%, transparent);
+}
+.tx-mgr-badge--edited {
+  background: rgba(216, 168, 107, 0.12);
+  color: var(--df-accent-warn, #d8a86b);
+  border: 1px solid rgba(216, 168, 107, 0.22);
+}
+
+/* ─── Empty states ───────────────────────────────────────────────────── */
+.tx-mgr-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px 20px;
+  text-align: center;
+  background: var(--df-bg-base);
+  border-radius: var(--df-r-md);
+  box-shadow: var(--df-bezel-recessed);
+  margin: 8px 0;
+}
+.tx-mgr-empty-title {
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--df-text-primary);
+}
+.tx-mgr-empty-body {
+  font-size: 12px;
+  color: var(--df-text-muted);
+  line-height: 1.5;
+  max-width: 32ch;
+}
+.tx-mgr-empty-cta {
+  margin-top: 6px;
+}
+
+/* ─── Bulk action bar ────────────────────────────────────────────────── */
+/* With up to 7 buttons (Duplicar, Habilitar, Desativar, Ocultar,
+ * Selecionar tudo, Limpar + optional category select) and the list
+ * rail at ~480px wide, the bar overflows without wrapping. Strategy:
+ *   1. flex-wrap on the outer container so the count stays on its own
+ *      line when actions need to wrap.
+ *   2. flex-wrap on the actions container so buttons reflow into a
+ *      second/third row instead of clipping.
+ *   3. min-width: 0 and max-width: 100% on the bar so it never escapes
+ *      the rail.
+ *   4. Slightly smaller padding/letter-spacing to buy a few chars of
+ *      horizontal room before wrapping kicks in.
+ */
+.tx-mgr-bulk {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 10px;
+  padding: 8px 10px;
+  background: var(--df-bg-base);
+  border-radius: var(--df-r-md);
+  box-shadow: var(--df-bezel-pressed);
+  border: 1px solid var(--df-accent-user, var(--df-border-strong));
+  animation: tx-bulk-slide 200ms var(--df-ease-out);
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+@keyframes tx-bulk-slide {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.tx-mgr-bulk-count {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--df-text-secondary);
+  flex-shrink: 0;
+}
+.tx-mgr-bulk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  /* When the actions row wraps to its own line (count is on a separate
+   * line), align the buttons to the start of the rail rather than
+   * stretching across — keeps the visual rhythm tight. */
+  justify-content: flex-end;
+  min-width: 0;
+}
+.tx-mgr-bulk-btn {
+  background: transparent;
+  border: 1px solid var(--df-border-subtle);
+  color: var(--df-text-secondary);
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: var(--df-r-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 120ms var(--df-ease-out), color 120ms var(--df-ease-out);
+}
+.tx-mgr-bulk-btn:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+}
+.tx-mgr-bulk-btn--danger {
+  color: var(--df-accent-danger, #d96d6d);
+}
+.tx-mgr-bulk-btn--danger:hover {
+  background: rgba(217, 109, 109, 0.10);
+  color: var(--df-accent-danger, #d96d6d);
+}
+
+/* ─── RIGHT — detail panel ───────────────────────────────────────────── */
+.tx-mgr-detail {
+  position: sticky;
+  top: 16px;
+}
+.tx-mgr-detail-card {
+  background: var(--df-bg-section);
+  border-radius: var(--df-r-lg);
+  padding: 22px 24px;
+  box-shadow: var(--df-bezel-raised), var(--df-skeu-shadow-md);
+  min-height: 480px;
+}
+.tx-mgr-detail-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 60px 24px;
+  background: var(--df-bg-section);
+  border-radius: var(--df-r-lg);
+  box-shadow: var(--df-bezel-raised), var(--df-skeu-shadow-sm);
+  min-height: 480px;
+  text-align: center;
+}
+.tx-mgr-detail-empty-mark {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--df-r-md);
+  background: var(--df-bg-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--df-text-faint);
+  box-shadow: var(--df-bezel-recessed);
+}
+.tx-mgr-detail-empty-title {
+  font-family: var(--df-font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--df-text-primary);
+  letter-spacing: -0.01em;
+}
+.tx-mgr-detail-empty-body {
+  font-size: 12px;
+  color: var(--df-text-muted);
+  line-height: 1.55;
+  max-width: 36ch;
+}
+
+/* ─── Detail form anatomy (used by editors) ─────────────────────────── */
+.tx-mgr-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--df-border-subtle);
+}
+.tx-mgr-detail-head-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.tx-mgr-detail-eyebrow {
+  font-family: var(--df-font-mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--df-text-muted);
+}
+.tx-mgr-detail-title {
+  font-family: var(--df-font-sans);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--df-text-primary);
+  line-height: 1.2;
+  margin: 0;
+}
+.tx-mgr-detail-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.tx-mgr-detail-action {
+  background: transparent;
+  border: 1px solid var(--df-border-subtle);
+  color: var(--df-text-secondary);
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 9px;
+  border-radius: var(--df-r-sm);
+  cursor: pointer;
+  transition: background 120ms var(--df-ease-out), color 120ms var(--df-ease-out);
+}
+.tx-mgr-detail-action:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+}
+.tx-mgr-detail-action--danger {
+  color: var(--df-accent-danger, #d96d6d);
+}
+.tx-mgr-detail-action--danger:hover {
+  background: rgba(217, 109, 109, 0.10);
+}
+.tx-mgr-detail-action[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Form fields */
+.tx-mgr-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.tx-mgr-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.tx-mgr-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.tx-mgr-field-label {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--df-text-muted);
+}
+.tx-mgr-field-help {
+  font-size: 11px;
+  color: var(--df-text-faint);
+  line-height: 1.45;
+  margin-top: 2px;
+}
+.tx-mgr-input,
+.tx-mgr-select,
+.tx-mgr-textarea {
+  width: 100%;
+  background: var(--df-bg-base);
+  border: 0;
+  border-radius: var(--df-r-md);
+  padding: 9px 11px;
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  color: var(--df-text-primary);
+  box-shadow: var(--df-bezel-recessed);
+  transition: box-shadow 140ms var(--df-ease-out);
+  outline: 0;
+}
+.tx-mgr-input:focus,
+.tx-mgr-select:focus,
+.tx-mgr-textarea:focus {
+  box-shadow:
+    var(--df-bezel-recessed),
+    inset 0 0 0 1.5px var(--df-accent-user, var(--df-text-primary));
+}
+.tx-mgr-textarea {
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  line-height: 1.55;
+  resize: vertical;
+  min-height: 100px;
+}
+.tx-mgr-input--mono {
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+.tx-mgr-select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--df-text-muted) 50%),
+    linear-gradient(135deg, var(--df-text-muted) 50%, transparent 50%);
+  background-position: calc(100% - 16px) 50%, calc(100% - 11px) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 28px;
+  cursor: pointer;
+}
+
+/* Preview thumb — aspect-ratio rectangle for canvas presets */
+.tx-mgr-preview-thumb {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--df-bg-base);
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px var(--df-border-subtle);
+  flex-shrink: 0;
+}
+.tx-mgr-preview-thumb-fill {
+  background: var(--df-text-faint);
+  border-radius: 2px;
+  opacity: 0.55;
+  width: 100%;
+  height: 100%;
+}
+.tx-mgr-preview-thumb--free {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--df-border-subtle);
+  /* Dashed proxy reads as "any size, no fixed canvas". */
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--df-border-subtle) 0,
+    var(--df-border-subtle) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  opacity: 0.6;
+}
+
+/* Detail-side preview (larger) */
+.tx-mgr-preview-large {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--df-bg-base);
+  border-radius: var(--df-r-md);
+  box-shadow: var(--df-bezel-recessed);
+  padding: 26px;
+  min-height: 200px;
+  margin-bottom: 14px;
+}
+.tx-mgr-preview-large .tx-mgr-preview-thumb {
+  background: var(--df-surface-raised);
+  box-shadow:
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.tx-mgr-preview-large .tx-mgr-preview-thumb-fill {
+  background: linear-gradient(135deg, var(--df-text-faint) 0%, transparent 100%);
+  opacity: 0.20;
+}
+.tx-mgr-preview-meta {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--df-text-muted);
+  text-align: center;
+  margin-top: -6px;
+  margin-bottom: 14px;
+}
+
+/* Inline status (Saved indicator) */
+.tx-mgr-status {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--df-accent-ok, #8ab06b);
+  opacity: 0;
+  transition: opacity 200ms var(--df-ease-out);
+}
+.tx-mgr-status.is-shown { opacity: 1; }
+
+/* ─── Reduced motion ────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .tx-mgr-row,
+  .tx-mgr-toggle,
+  .tx-mgr-toggle-thumb,
+  .tx-mgr-input,
+  .tx-mgr-select,
+  .tx-mgr-textarea,
+  .tx-mgr-search,
+  .tx-mgr-bulk,
+  .tx-mgr-group-pill {
+    transition: none !important;
+    animation: none !important;
+  }
+  .tx-mgr-row:hover { transform: none; }
+}
+
+/* ─── Mobile / narrow ───────────────────────────────────────────────── */
+@media (max-width: 980px) {
+  .tx-mgr-split {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  .tx-mgr-detail {
+    position: static;
+  }
+  .tx-mgr-detail-card,
+  .tx-mgr-detail-empty {
+    min-height: 280px;
+  }
+}

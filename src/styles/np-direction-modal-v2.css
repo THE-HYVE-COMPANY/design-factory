@@ -1,0 +1,829 @@
+/* np-direction-modal-v2.css — Unified modal styles (Canvas / Format / Direction).
+ *
+ * ONE row pattern across all three pickers. The same engrave / recess /
+ * bowl / accent vocabulary used in np-canonical-plus.css, narrowed to a
+ * single consistent shape so the three modals don't drift apart.
+ *
+ * Every interactive choice (preset, format item, direction item,
+ * anti-slop item) is a `.dmv2-row`. Categories are `.dmv2-cat` with
+ * `.dmv2-cat-head`. No cards, pills, badges or buttons mixing freely.
+ *
+ * Tokens-only — all colors via var(--df-*).
+ */
+
+/* ─── Modal shell overrides ─────────────────────────────────────────── */
+
+.dmv2-modal,
+.cnv-modal,
+.fmt-modal {
+  /* DfModal already gives us the surface, padding and border. We just
+   * tighten the inner padding because we render our own header section
+   * with a search bar that wants to sit flush with the divider. */
+}
+
+/* Header — editorial title block. The title uses Geist sans 22px
+ * semibold sentence-case (flat labels in Geist, per the broader button
+ * refactor). The earlier 18px mono uppercase nameplate was redundant
+ * with the eyebrow above it (both said "CANVAS"), so the eyebrow now
+ * stays as a small mono origin marker and a subtitle slot carries
+ * pt-BR/EN prose explaining the modal's purpose. */
+.dmv2-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 20px 20px 14px;
+}
+.dmv2-head-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.dmv2-eyebrow {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--df-text-faint);
+}
+.dmv2-title {
+  margin: 0;
+  font-family: var(--df-font-sans);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  color: var(--df-text-primary);
+  /* No text-shadow — flat editorial. */
+}
+.dmv2-subtitle {
+  margin: 4px 0 0;
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  line-height: 1.45;
+  letter-spacing: -0.005em;
+  color: var(--df-text-muted);
+  max-width: 56ch;
+}
+.dmv2-close {
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-on-tactile);
+  border: 0;
+  border-radius: var(--df-r-sm);
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--df-shadow-button-tactile);
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.dmv2-close:hover { box-shadow: var(--df-shadow-button-tactile-hover); }
+.dmv2-close:active {
+  box-shadow: var(--df-shadow-button-tactile-pressed);
+  transform: translateY(1px);
+}
+
+/* ─── Search bar (DirectionModalV2 only) ────────────────────────────── */
+
+.dmv2-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 20px 14px;
+  padding: 8px 12px;
+  /* Cavity contrast — the search bowl drops to sunken-1 (-4% L vs the
+   * faceplate) so it reads as engraved into the modal. */
+  background: var(--df-surface-sunken-1);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.18),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.025);
+}
+.dmv2-search-glyph {
+  font-family: var(--df-font-mono);
+  font-size: 13px;
+  color: var(--df-text-faint);
+  flex-shrink: 0;
+}
+.dmv2-search-input {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--df-text-primary);
+  min-width: 0;
+}
+.dmv2-search-input::placeholder { color: var(--df-text-faint); }
+.dmv2-search-input::-webkit-search-cancel-button { display: none; }
+.dmv2-search-clear {
+  background: transparent;
+  border: 0;
+  color: var(--df-text-faint);
+  font-size: 14px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.dmv2-search-clear:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+}
+
+/* ─── Category list ─────────────────────────────────────────────────── */
+
+.dmv2-cats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 20px 16px;
+  max-height: min(70vh, 720px);
+  overflow-y: auto;
+}
+
+.dmv2-cat {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.dmv2-cat-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px 10px 14px;
+  background: var(--df-bg-section);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+  position: relative;
+}
+.dmv2-cat.is-open > .dmv2-cat-head {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-color: transparent;
+}
+.dmv2-cat.has-selected > .dmv2-cat-head {
+  background: linear-gradient(
+    180deg,
+    var(--df-bg-section) 0%,
+    color-mix(in oklch, var(--df-bg-section) 92%, var(--df-accent-user, var(--df-accent-ok)) 8%) 100%
+  );
+}
+
+.dmv2-cat-head-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  min-width: 0;
+}
+.dmv2-cat-head-main:disabled {
+  cursor: default;
+}
+
+/* Used by the static (non-collapsable) CanvasModal headers */
+.dmv2-cat-head--static {
+  cursor: default;
+}
+
+.dmv2-cat-label {
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--df-text-primary);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.45),
+    0 -1px 0 rgba(255, 255, 255, 0.03);
+  flex-shrink: 0;
+}
+
+.dmv2-cat-hint {
+  font-family: var(--df-font-sans);
+  font-size: 11px;
+  color: var(--df-text-muted);
+  letter-spacing: 0.005em;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dmv2-cat-count {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--df-text-muted);
+  padding: 2px 8px;
+  background: var(--df-bg-bowl, var(--df-surface-elevated));
+  /* v14: pill killed → r-xs (4px) — tiny count chip. */
+  border-radius: var(--df-r-xs);
+  border: 1px solid var(--df-border-subtle);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+.dmv2-cat.has-selected .dmv2-cat-count {
+  color: var(--df-accent-user, var(--df-accent-ok));
+  border-color: var(--df-accent-user, var(--df-accent-ok));
+}
+
+.dmv2-cat-caret {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  color: var(--df-text-faint);
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.dmv2-cat-selectall {
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-on-tactile);
+  border: 0;
+  border-radius: var(--df-r-sm);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: var(--df-font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: var(--df-shadow-button-tactile);
+  flex-shrink: 0;
+}
+.dmv2-cat-selectall:hover { box-shadow: var(--df-shadow-button-tactile-hover); }
+.dmv2-cat-selectall:active {
+  box-shadow: var(--df-shadow-button-tactile-pressed);
+  transform: translateY(1px);
+}
+.dmv2-cat-selectall.is-on {
+  background: var(--df-accent-user, var(--df-accent-ok));
+  color: var(--df-text-on-accent, var(--df-bg-base));
+  box-shadow: var(--df-shadow-button-tactile-pressed);
+}
+
+/* ─── Row (the unified pattern — same shape everywhere) ─────────────── */
+
+.dmv2-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  border: 1px solid var(--df-border-subtle);
+  border-top: 0;
+  border-bottom-left-radius: var(--df-r-sm);
+  border-bottom-right-radius: var(--df-r-sm);
+  background: var(--df-bg-section);
+  overflow: hidden;
+  animation: dmv2-rows-in 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes dmv2-rows-in {
+  from { opacity: 0; transform: translateY(-2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dmv2-rows { animation: none; }
+}
+
+/* Row layout uses `display: flex` (not grid) so the label is
+ * content-sized and the descriptor flexes naturally — min-width: 0
+ * plus flex-shrink: 1 means the descriptor only ellipsizes when it
+ * truly needs to, keeping it readable in normal cases. */
+.dmv2-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px 11px 12px;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--df-border-subtle);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--df-text-primary);
+  width: 100%;
+  position: relative;
+  transition: background-color 120ms ease-out;
+}
+.dmv2-row:first-child { border-top: 0; }
+
+.dmv2-row:hover {
+  background: var(--df-interactive-hover);
+}
+.dmv2-row:focus-visible {
+  outline: 2px solid var(--df-accent-user, var(--df-accent-ok));
+  outline-offset: -2px;
+  z-index: 1;
+}
+/* v28: stronger is-on signal — accent left-bar + bg tint. The previous
+ * 12% gradient was too subtle in light mode; this gives a clear visual
+ * hit when the user picks an item. */
+.dmv2-row.is-on {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklch, var(--df-bg-section) 80%, var(--df-accent-user, var(--df-accent-ok)) 20%) 0%,
+    color-mix(in oklch, var(--df-bg-section) 92%, var(--df-accent-user, var(--df-accent-ok)) 8%) 100%
+  );
+  box-shadow: inset 3px 0 0 var(--df-accent-user, var(--df-accent-ok));
+}
+.dmv2-row.is-on .dmv2-row-label {
+  color: var(--df-accent-user, var(--df-accent-ok));
+  font-weight: 600;
+}
+
+/* Inline variant — used by Canvas custom row where width/height inputs
+ * sit beside the row instead of below. Same row shape, no border. */
+.dmv2-row--inline {
+  grid-template-columns: auto auto;
+  flex-shrink: 0;
+  width: auto;
+  border-top: 0;
+  padding-right: 14px;
+}
+
+/* Checkbox bowl — recess deep with dot accent center when ON. */
+.dmv2-row-check {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: var(--df-bg-bowl, var(--df-surface-elevated));
+  border: 1px solid var(--df-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.02);
+  flex-shrink: 0;
+  position: relative;
+}
+.dmv2-row-check-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--df-accent-user, var(--df-accent-ok));
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--df-accent-user, var(--df-accent-ok)) 60%, transparent 40%),
+    0 1px 0 rgba(255, 255, 255, 0.2);
+  transform: scale(0);
+  transition: transform 100ms cubic-bezier(0.5, 1.5, 0.5, 1);
+}
+.dmv2-row.is-on .dmv2-row-check-dot {
+  transform: scale(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .dmv2-row-check-dot { transition: none; }
+}
+
+/* Radio variant: same shell, but circular */
+.dmv2-row[role="radio"] .dmv2-row-check,
+.dmv2-row[role="radio"] .dmv2-row-check-dot {
+  border-radius: 50%;
+}
+
+/* v28: label is content-sized inside the flex row; mr-auto pushes desc
+ * to the right. */
+.dmv2-row-label {
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  letter-spacing: -0.005em;
+  font-weight: 500;
+  color: var(--df-text-primary);
+  margin-right: auto;
+  flex-shrink: 0;
+}
+
+/* v28: flex layout — desc flexes 0 1 auto so it shows full text by
+ * default, only truncates when the row is genuinely tight (mobile or
+ * very long desc). Min-width 0 lets ellipsis kick in on overflow. */
+.dmv2-row-desc {
+  font-family: var(--df-font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.01em;
+  color: var(--df-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+/* ─── Section header for Canvas modal (no collapse) ─────────────────── */
+
+.dmv2-section {
+  margin: 0 20px 12px;
+}
+.dmv2-section .dmv2-cat-head {
+  background: var(--df-bg-section);
+  margin-bottom: 0;
+}
+.dmv2-section .dmv2-rows {
+  border-top: 0;
+}
+
+/* ─── Custom canvas row (inputs inline) ──────────────────────────────── */
+
+/* v28: Canvas "Personalizado" is now a single row (.dmv2-row--custom)
+ * sitting at the bottom of the presets list with W × H inputs in the
+ * desc column. Removes the awkward separate <section>+header that made
+ * the modal feel disconnected. */
+.dmv2-row--custom {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px 11px 12px;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--df-border-subtle);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--df-text-primary);
+  width: 100%;
+  position: relative;
+  outline: none;
+  transition: background-color 120ms ease-out;
+}
+.dmv2-row--custom:hover { background: var(--df-interactive-hover); }
+.dmv2-row--custom:focus-visible {
+  outline: 2px solid var(--df-accent-user, var(--df-accent-ok));
+  outline-offset: -2px;
+  z-index: 1;
+}
+.dmv2-row--custom.is-on {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklch, var(--df-bg-section) 80%, var(--df-accent-user, var(--df-accent-ok)) 20%) 0%,
+    color-mix(in oklch, var(--df-bg-section) 92%, var(--df-accent-user, var(--df-accent-ok)) 8%) 100%
+  );
+  box-shadow: inset 3px 0 0 var(--df-accent-user, var(--df-accent-ok));
+}
+.dmv2-row--custom.is-on .dmv2-row-label {
+  color: var(--df-accent-user, var(--df-accent-ok));
+  font-weight: 600;
+}
+
+.cnv-custom-inputs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.cnv-custom-input {
+  /* v28: tightened from 88px so both inputs + × + unit fit comfortably
+   * inside the row's right column. */
+  width: 64px;
+  /* Cavity contrast — drops to sunken-1 so numeric input fields read
+   * as engraved into the modal stage. */
+  background: var(--df-surface-sunken-1);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-sm);
+  padding: 5px 8px;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--df-text-primary);
+  outline: none;
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.18),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.025);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.cnv-custom-input:focus { border-color: var(--df-accent-user, var(--df-accent-ok)); }
+.cnv-custom-input::-webkit-outer-spin-button,
+.cnv-custom-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.cnv-custom-input[type=number] { -moz-appearance: textfield; }
+
+.cnv-custom-x {
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  color: var(--df-text-faint);
+}
+
+.cnv-custom-unit {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--df-text-faint);
+  text-transform: uppercase;
+}
+
+/* ─── Footer ─────────────────────────────────────────────────────────── */
+
+.dmv2-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--df-border-subtle);
+  background: var(--df-bg-section);
+}
+
+/* v28: footer-left slot holds stat + optional inline modifiers (e.g.,
+ * Canvas Responsivo toggle). Flex wrap so it stacks gracefully on narrow
+ * viewports without overflowing the action buttons. */
+.dmv2-foot-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.dmv2-foot-stat {
+  font-family: var(--df-font-sans);
+  font-size: 12.5px;
+  letter-spacing: -0.005em;
+  color: var(--df-text-muted);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.3;
+}
+
+.dmv2-foot-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* v28: text/ghost button — flat Geist sentence-case (matches v27b spec:
+ * "labels em botoes devem ser flat sempre, usar geist"). */
+.dmv2-btn-text {
+  background: transparent;
+  border: 0;
+  color: var(--df-text-muted);
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+  padding: 7px 12px;
+  border-radius: var(--df-r-sm);
+  cursor: pointer;
+  line-height: 1.2;
+}
+.dmv2-btn-text:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+}
+.dmv2-btn-text:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* v28: primary tactile — flat Geist sentence-case. Tactile bezel kept
+ * (3D physical surface ≠ uppercase mono "engrave" effect). */
+.dmv2-btn-primary {
+  background: var(--df-bg-button-tactile);
+  color: var(--df-text-on-tactile);
+  border: 0;
+  border-radius: var(--df-r-sm);
+  padding: 8px 16px;
+  font-family: var(--df-font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  cursor: pointer;
+  box-shadow: var(--df-shadow-button-tactile);
+  text-transform: none;
+  line-height: 1.2;
+}
+.dmv2-btn-primary:hover { box-shadow: var(--df-shadow-button-tactile-hover); }
+.dmv2-btn-primary:active {
+  box-shadow: var(--df-shadow-button-tactile-pressed);
+  transform: translateY(1px);
+}
+.dmv2-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: default;
+  transform: none;
+}
+
+/* ─── Empty state ───────────────────────────────────────────────────── */
+
+.dmv2-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--df-text-muted);
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Light mode (paper feel — NOT inverted dark) ───────────────────── */
+
+[data-theme="light"] .dmv2-title {
+  /* v28: title is now flat Geist sentence-case (no engrave shadow). */
+  color: var(--df-text-primary);
+}
+[data-theme="light"] .dmv2-subtitle {
+  color: var(--df-text-muted);
+}
+
+[data-theme="light"] .dmv2-cat-label {
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6),
+    0 -1px 0 rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .dmv2-search-wrap {
+  /* v21: paper-recess parity with dark sunken-1. Warmer mix gives the
+   * "ink-stained paper" feel without heavy black drop. */
+  background: var(--df-surface-sunken-1);
+  box-shadow:
+    inset 0 1px 3px rgba(80, 70, 50, 0.20),
+    inset 0 0 0 1px rgba(80, 70, 50, 0.08),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.55);
+}
+
+[data-theme="light"] .dmv2-row-check {
+  background: var(--df-bg-bowl, #f0ece2);
+  box-shadow:
+    inset 0 1px 2px rgba(80, 70, 50, 0.18),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="light"] .dmv2-row.is-on {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklch, var(--df-bg-section) 80%, var(--df-accent-user, var(--df-accent-ok)) 20%) 0%,
+    color-mix(in oklch, var(--df-bg-section) 92%, var(--df-accent-user, var(--df-accent-ok)) 8%) 100%
+  );
+  box-shadow: inset 3px 0 0 var(--df-accent-user, var(--df-accent-ok));
+}
+
+[data-theme="light"] .cnv-custom-input {
+  /* v21: paper-recess parity. */
+  background: var(--df-surface-sunken-1);
+  box-shadow:
+    inset 0 1px 3px rgba(80, 70, 50, 0.18),
+    inset 0 0 0 1px rgba(80, 70, 50, 0.07),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* ════════════════════════════════════════════════════════════════════
+ * Modal sizing + scroll — Canvas / Format / Rules
+ *
+ * The modal max-height is pinned at 72vh and the body scrolls. The
+ * header (eyebrow + title + close OR + search) and the footer
+ * (stat + actions) are flex-shrink: 0 so they stay docked. A custom
+ * scrollbar makes the overflow read as intentional rather than a raw
+ * browser default.
+ *
+ * Touches three modals: .cnv-modal (Canvas), .fmt-modal (Format),
+ * .dmv2-modal (Rules). All extend DfModal which already provides
+ * `display: flex` + `flex-direction: column` +
+ * `df-modal-body { flex: 1; overflow-y: auto }`. The rules below only
+ * refine bounds, scrollbar, and head/foot docking.
+ * ════════════════════════════════════════════════════════════════════ */
+
+/* Pin max-height — DfModal default is 80vh; we want 72vh so the modal
+ * never feels like it pretends to be the whole viewport. The 'lg' and
+ * 'xl' size variants stay; only the cap shrinks. */
+.df-modal.cnv-modal,
+.df-modal.fmt-modal,
+.df-modal.dmv2-modal {
+  max-height: min(72vh, 760px);
+}
+
+/* The DfModal body already scrolls; we add a CUSTOM scrollbar so it reads
+ * as part of the chrome. Webkit + Firefox fallbacks. */
+.df-modal.cnv-modal .df-modal-body,
+.df-modal.fmt-modal .df-modal-body,
+.df-modal.dmv2-modal .df-modal-body {
+  /* Reset DfModal's default 20px padding so our internal sections control
+   * their own — section headers want to span flush. */
+  padding: 0;
+  /* Scrollbar styling — Firefox. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--df-text-faint) transparent;
+}
+.df-modal.cnv-modal .df-modal-body::-webkit-scrollbar,
+.df-modal.fmt-modal .df-modal-body::-webkit-scrollbar,
+.df-modal.dmv2-modal .df-modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+.df-modal.cnv-modal .df-modal-body::-webkit-scrollbar-track,
+.df-modal.fmt-modal .df-modal-body::-webkit-scrollbar-track,
+.df-modal.dmv2-modal .df-modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.df-modal.cnv-modal .df-modal-body::-webkit-scrollbar-thumb,
+.df-modal.fmt-modal .df-modal-body::-webkit-scrollbar-thumb,
+.df-modal.dmv2-modal .df-modal-body::-webkit-scrollbar-thumb {
+  background: var(--df-text-faint);
+  border-radius: 3px;
+}
+.df-modal.cnv-modal .df-modal-body::-webkit-scrollbar-thumb:hover,
+.df-modal.fmt-modal .df-modal-body::-webkit-scrollbar-thumb:hover,
+.df-modal.dmv2-modal .df-modal-body::-webkit-scrollbar-thumb:hover {
+  background: var(--df-text-muted);
+}
+
+/* The .dmv2-cats inside Rules already had its own max-height + overflow.
+ * Remove that — the body handles scroll. Keep the gap + flex layout. */
+.df-modal.dmv2-modal .df-modal-body > .dmv2-cats {
+  max-height: none;
+  overflow: visible;
+  padding: 12px 20px 16px;
+}
+
+/* Canvas + Format use .dmv2-section (not .dmv2-cats). Add a top padding
+ * inside the body so the first section header sits clear of the search
+ * separator (or, in Canvas case, clear of the head divider). */
+.df-modal.cnv-modal .df-modal-body,
+.df-modal.fmt-modal .df-modal-body {
+  padding-top: 12px;
+}
+
+/* Head + foot stay docked — these are siblings of body inside the modal,
+ * not children. DfModal already paints them; we ensure they don't shrink
+ * if the content is taller than the body bounds. */
+.df-modal.cnv-modal .dmv2-head,
+.df-modal.fmt-modal .dmv2-head,
+.df-modal.dmv2-modal .dmv2-head,
+.df-modal.cnv-modal .dmv2-search-wrap,
+.df-modal.fmt-modal .dmv2-search-wrap,
+.df-modal.dmv2-modal .dmv2-search-wrap,
+.df-modal.cnv-modal .dmv2-foot,
+.df-modal.fmt-modal .dmv2-foot,
+.df-modal.dmv2-modal .dmv2-foot {
+  flex-shrink: 0;
+}
+
+/* Hover refinement on rows — make every row in every modal feel
+ * pressable. The existing .dmv2-row only had a checked-on highlight;
+ * add a subtle hover tint. */
+.dmv2-row:hover:not(.is-on) {
+  background: color-mix(in srgb, var(--df-bg-section) 70%, var(--df-text-faint) 5%);
+  border-color: color-mix(in srgb, var(--df-border-subtle) 50%, var(--df-text-muted) 50%);
+}
+.dmv2-row:focus-visible {
+  outline: 2px solid var(--df-accent-user, var(--df-accent-ok));
+  outline-offset: -2px;
+}
+
+/* Disabled state on category head when search is active — already handled
+ * by the component but visually muted is missing. */
+.dmv2-cat-head-main[disabled] {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Mobile — modals collapse to nearly full-screen for thumb reach. */
+@media (max-width: 768px) {
+  .df-modal.cnv-modal,
+  .df-modal.fmt-modal,
+  .df-modal.dmv2-modal {
+    width: 100%;
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: var(--df-r-2xl, 14px) var(--df-r-2xl, 14px) 0 0;
+  }
+}
+@media (max-height: 640px) {
+  .df-modal.cnv-modal,
+  .df-modal.fmt-modal,
+  .df-modal.dmv2-modal {
+    max-height: 88vh;
+  }
+}

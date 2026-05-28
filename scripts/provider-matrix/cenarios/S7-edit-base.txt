@@ -1,0 +1,5 @@
+Create the most impressive gooey experience.
+
+A viscous, living field of orange and sage orbs that merge and pull apart under the cursor. Move to disturb the surface, click to ignite. The HYVE dot grid and vignette frame the gooey physics engine.
+
+Output: a single self-contained HTML file. Must start with <!DOCTYPE html>, use only inline CSS/JS (no external assets), and include the SVG goo filter + cursor follower. Reply with 1-3 short paragraphs describing what you built.

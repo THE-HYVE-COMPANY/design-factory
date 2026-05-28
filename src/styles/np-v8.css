@@ -1,0 +1,1772 @@
+/* np-v8.css — Home v8 unified topbar + 3-col grid + premium TE-vibe.
+ *
+ * Spec 2026-05-05 (v8):
+ *   1. Topbar unificada — logo + tabs lado a lado, sem divisor.
+ *   2. Eliminar sidebar de novo projeto — botão centralizado acima da grid.
+ *   3. Grid 3 colunas centralizada (não 4 dispersas no main).
+ *   4. Modal v8 — title input inline na topbar, botão TE-tátil.
+ *   5. Polish global — hover weight-shift + accent LED + click bounce-back.
+ *
+ * hyve-taste preset: premium_ui_surface
+ *   TACTILITY=10, POLISH=10, BRAND_FIDELITY=9, ORIGINALITY=7.
+ *
+ * Rules applied (per skill):
+ *   · tactile-button-affordance — bezel 3-layer + LED + click recess
+ *   · premium-bezel-3-layer — outer ring + middle bevel + inset
+ *   · motion-tactile-bounce — 80ms scale(0.98) on active
+ *   · motion-respects-reduced — all animations gated
+ *   · microcopy-mono-uppercase — letter-spacing 0.08em TE signature
+ *   · accent-led-status — pulsing dot, off when disabled
+ *   · weight-shift-hover — translateY(-1..-2px), no flatten
+ *
+ * ALL tokens — no raw hex except inside box-shadow rgba() pairs that need
+ * alpha channels (parity with np-modal.css convention).
+ */
+
+/* ─── 1. Home v8 — unified topbar (logo + tabs adjacent) ──────────────── */
+
+.editor-topbar.home-topbar.home-topbar--v8 {
+  /* Override v7's 3-col `460px 1fr auto` — v8 collapses brand+tabs into a
+   * single contiguous left strip (no border-right divider). */
+  grid-template-columns: auto auto 1fr auto;
+  height: 56px;
+  align-items: center;
+}
+
+.home-topbar--v8 .home-topbar-brand {
+  /* Kill the v7 divider between brand and tabs. */
+  border-right: 0;
+  padding: 0 14px 0 18px;
+  gap: 10px;
+}
+
+.home-topbar--v8 .topbar-center {
+  /* Tabs sit immediately to the right of the brand — no flex-grow gap. */
+  justify-self: flex-start;
+  margin: 0;
+  padding: 0;
+  gap: 2px;
+}
+
+/* Tabs in v8 are smaller chiclets — TE chip vibe vs v7 file-tabs. */
+.home-topbar--v8 .topbar-file-tab {
+  height: 30px;
+  padding: 0 14px;
+  font-family: var(--df-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--df-text-muted);
+  border-radius: var(--df-r-sm);
+  position: relative;
+  transition:
+    color 120ms var(--df-ease-out),
+    background 120ms var(--df-ease-out),
+    box-shadow 120ms var(--df-ease-out);
+}
+.home-topbar--v8 .topbar-file-tab:hover:not([aria-selected="true"]) {
+  color: var(--df-text-secondary);
+  background: var(--df-interactive-hover);
+}
+.home-topbar--v8 .topbar-file-tab[aria-selected="true"] {
+  color: var(--df-text-primary);
+  background: var(--df-surface-raised);
+  box-shadow:
+    inset 0 0 0 1px var(--df-border-subtle),
+    inset 0 1px 0 var(--df-skeu-top-light);
+}
+.home-topbar--v8 .topbar-file-tab[aria-selected="true"] .topbar-file-tab-name {
+  /* Stronger contrast on the active label. */
+  color: var(--df-text-primary);
+}
+/* Hide the v7 corner SVGs in v8 — chiclet has its own bezel. */
+.home-topbar--v8 .topbar-file-tab .tab-corner {
+  display: none;
+}
+
+/* ─── 2. Home v8 — single-column body (no sidebar) ────────────────────── */
+
+.home-body-v2.home-body-v2--v8 {
+  /* No flex-side-by-side — one big stage. */
+  display: block;
+  position: relative;
+  flex: 1;
+  overflow-y: auto;
+  background: var(--df-bg-base);
+}
+
+/* The main stage gets a centered max-width container + top breathing room. */
+.home-stage-v8 {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 28px 56px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+/* ─── 3. New Project plate (CTA above the grid) ───────────────────────── */
+/*
+ * TE-vibe affordance — engraved kicker on a faceplate, large click target,
+ * status LED, premium bezel. Mirrors the "Iniciar projeto" begin button
+ * tactility (3-layer bezel, weight-shift hover, click bounce) so the two
+ * surfaces feel like the same instrument family.
+ */
+.home-cta-plate {
+  position: relative;
+  display: grid;
+  grid-template-columns: 38px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  width: min(560px, 100%);
+  margin: 8px auto 0;
+  padding: 14px 18px 14px 16px;
+  background:
+    linear-gradient(180deg,
+      var(--df-surface-elevated) 0%,
+      var(--df-bg-section) 100%);
+  border: 0;
+  /* v14: aligned with hero/Aqua radius (r-xl 12px). */
+  border-radius: var(--df-r-xl);
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  /* TE 3-layer bezel: outer ring + middle bevel + inset edge. */
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.32),
+    0 1px 0 rgba(255, 255, 255, 0.04),
+    0 8px 18px -8px rgba(0, 0, 0, 0.45),
+    0 24px 48px -16px rgba(0, 0, 0, 0.32);
+  transition:
+    transform 160ms var(--df-ease-out),
+    box-shadow 160ms var(--df-ease-out);
+}
+[data-theme="light"] .home-cta-plate {
+  background:
+    linear-gradient(180deg,
+      var(--df-surface-raised) 0%,
+      var(--df-bg-section) 100%);
+  box-shadow:
+    0 0 0 1px var(--df-border-strong, rgba(0, 0, 0, 0.18)),
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.05),
+    0 1px 0 rgba(255, 255, 255, 0.6),
+    0 6px 12px -4px rgba(0, 0, 0, 0.16),
+    0 18px 32px -10px rgba(0, 0, 0, 0.18);
+}
+.home-cta-plate:hover {
+  transform: translateY(1px);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-hover),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.32),
+    0 1px 0 rgba(255, 255, 255, 0.06),
+    0 12px 22px -8px rgba(0, 0, 0, 0.55),
+    0 32px 56px -16px rgba(0, 0, 0, 0.4),
+    0 0 24px -4px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 30%, transparent);
+}
+[data-theme="light"] .home-cta-plate:hover {
+  box-shadow:
+    0 0 0 1px var(--df-border-strong, rgba(0, 0, 0, 0.22)),
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-hover),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.7),
+    0 8px 14px -4px rgba(0, 0, 0, 0.18),
+    0 24px 40px -10px rgba(0, 0, 0, 0.22),
+    0 0 24px -4px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 25%, transparent);
+}
+.home-cta-plate:active {
+  transform: translateY(0);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.55),
+    inset 0 2px 4px rgba(0, 0, 0, 0.4),
+    inset 0 0 0 1px var(--df-border-hover),
+    0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* Plus glyph — recessed milled circle with engraved + */
+.home-cta-plate-glyph {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--df-bg-base);
+  color: var(--df-text-primary);
+  font-family: var(--df-font-sans);
+  font-size: 22px;
+  font-weight: 300;
+  line-height: 1;
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.35),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+  transition: color 160ms var(--df-ease-out);
+}
+.home-cta-plate:hover .home-cta-plate-glyph {
+  color: var(--df-accent-user, var(--df-accent-ok));
+}
+
+.home-cta-plate-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.home-cta-plate-kicker {
+  font-family: var(--df-font-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--df-text-faint);
+  /* Engraved feel — soft shadow above + bright underneath in dark. */
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.45),
+    0 -1px 0 var(--df-skeu-top-light);
+}
+[data-theme="light"] .home-cta-plate-kicker {
+  text-shadow:
+    0 1px 0 var(--df-skeu-top-light),
+    0 -1px 0 rgba(0, 0, 0, 0.04);
+}
+.home-cta-plate-label {
+  font-family: var(--df-font-display, var(--df-font-sans));
+  font-size: 15px;
+  font-weight: var(--df-fw-bold, 700);
+  letter-spacing: 0.04em;
+  color: var(--df-text-primary);
+}
+
+/* Status LED — pulses subtle when at rest, brightens on hover. */
+.home-cta-plate-led {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--df-accent-user, var(--df-accent-ok));
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--df-accent-user, var(--df-accent-ok)) 60%, transparent 40%),
+    0 0 6px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 40%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  opacity: 0.7;
+  animation: home-cta-led-pulse 1.6s ease-in-out infinite;
+}
+.home-cta-plate:hover .home-cta-plate-led {
+  opacity: 1;
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--df-accent-user, var(--df-accent-ok)) 70%, transparent 30%),
+    0 0 12px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 60%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+@keyframes home-cta-led-pulse {
+  0%, 100% { opacity: 0.7; }
+  50%      { opacity: 1; }
+}
+
+/* ─── 4. Grid v8 — 3 columns centered ─────────────────────────────────── */
+
+.home-stage-v8 .home-right-grid {
+  /* Override the v7 4-col main grid. V8 = 3 col centered. */
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+@media (max-width: 1100px) {
+  .home-stage-v8 .home-right-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 720px) {
+  .home-stage-v8 .home-right-grid { grid-template-columns: 1fr; }
+  .home-cta-plate { width: 100%; }
+}
+
+/* ─── 5. EntityCard — TE-vibe enhancements over .home-pcard ─────────── */
+
+/*
+ * Flat-plane shadow override.
+ *
+ * The canonical --df-shadow-card stacks 4 outer drops up to
+ *   0 32px 70px -14px deep-far
+ * which on a 3-col grid with 18px gap bleeds heavily across adjacent
+ * cards (the wide blur radius far exceeds the gutter). The visual
+ * read becomes "tower of cards stacked at different heights" instead
+ * of "row of cards on a single shelf".
+ *
+ * Fix: in the v8 stage cards get a quasi-FLAT envelope — tight inset
+ * bezel (top hi + bottom dark + 1px ring) + ONE thin contact shadow
+ * `0 1px 2px` and ONE narrow ambient `0 4px 8px -4px`. Total reach is
+ * under 8px so it stays inside the 18px gap. Adjacent cards never
+ * overlap optically — depth lives on the BG plate, not on each card
+ * individually.
+ *
+ * Hover keeps the weight-shift translateY(-1px) but the shadow grows
+ * only modestly (no ambient explosion) so the lifted card doesn't
+ * smother its neighbors.
+ */
+.home-stage-v8 .home-pcard {
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 1px 2px rgba(0, 0, 0, 0.18),
+    0 4px 8px -4px rgba(0, 0, 0, 0.16);
+}
+.home-stage-v8 .home-pcard-tile:hover .home-pcard {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.32),
+    inset 0 0 0 1px var(--df-border-hover),
+    0 1px 2px rgba(0, 0, 0, 0.22),
+    0 6px 12px -4px rgba(0, 0, 0, 0.22);
+}
+[data-theme="light"] .home-stage-v8 .home-pcard {
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 4px 8px -4px rgba(0, 0, 0, 0.08);
+}
+[data-theme="light"] .home-stage-v8 .home-pcard-tile:hover .home-pcard {
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.08),
+    inset 0 0 0 1px var(--df-border-hover),
+    0 2px 3px rgba(0, 0, 0, 0.08),
+    0 6px 10px -4px rgba(0, 0, 0, 0.1);
+}
+
+/*
+ * Add a SINGLE deeper background shadow to the grid container so the
+ * "depth" still reads — but it's painted on the bg plate (sunken
+ * surface under the grid), not on each card. This is the bridge from
+ * "shadow per card" to "shadow on the grid plate".
+ */
+.home-stage-v8 .home-right-grid {
+  position: relative;
+}
+
+.entity-card {
+  position: relative;
+}
+
+/* The LED accent is intentionally absent from these cards. The footer
+   reads as: title left, date left, three horizontal dots right —
+   calmer and more editorial. The .entity-card-led class is kept
+   un-styled in case any host still renders it via the `showLed` prop
+   during a deprecation window. */
+
+/* Reduced motion — no card lift on hero CTA plate. */
+@media (prefers-reduced-motion: reduce) {
+  .home-cta-plate-led { animation: none; }
+  .home-cta-plate { transition: none; }
+  .home-cta-plate:hover { transform: none; }
+}
+
+/* ─── 6. Modal v8 — title input inline on faceplate ───────────────────── */
+/*
+ * Replaces the static .np-modal-face-title text with an editable input
+ * that uses the same engraved typography. Faceplate logo glow already
+ * tracks name length via .is-active (np-canonical-plus.css line 2483).
+ */
+
+.np-modal-face-title-input {
+  font-family: var(--df-font-display, var(--df-font-sans));
+  font-size: 16px;
+  font-weight: var(--df-fw-bold, 700);
+  letter-spacing: 0.14em;
+  color: var(--df-text-primary);
+  text-transform: uppercase;
+  text-align: center;
+  background: transparent;
+  border: 0;
+  padding: 4px 8px;
+  margin: 0;
+  width: min(420px, 100%);
+  outline: none;
+  caret-color: var(--df-accent-user, var(--df-accent-ok));
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.55),
+    0 -1px 0 var(--df-skeu-top-light);
+  transition: color 160ms var(--df-ease-out);
+}
+[data-theme="light"] .np-modal-face-title-input {
+  text-shadow:
+    0 1px 0 var(--df-skeu-top-light),
+    0 -1px 0 rgba(0, 0, 0, 0.05);
+}
+.np-modal-face-title-input::placeholder {
+  color: var(--df-text-faint);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+.np-modal-face-title-input:focus {
+  /* Borderless even on focus — the caret plus the glowing faceplate
+   * logo already carry the active signal, so an underline or border
+   * here would just be visual noise. */
+  box-shadow: none;
+  outline: none;
+  border: 0;
+}
+.np-modal-face-title-input:hover,
+.np-modal-face-title-input:active {
+  /* Same — no chrome on any state. */
+  box-shadow: none;
+  outline: none;
+  border: 0;
+}
+
+/* When the faceplate is hosting the editable input, drop the text-only
+ * class so they don't both render. Container keeps its layout. */
+.np-modal-face-title-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  min-width: 0;
+}
+
+/* ─── 7. Begin button v8 — premium TE-tátil ───────────────────────────── */
+/*
+ * Replaces the v5 cnp-begin (flat tactile rect with ⌘⏎ key indicator).
+ * V8 strips the key indicator entirely (users asked) and adds:
+ *   · 3-layer bezel (outer dark ring / middle bevel / inset top-light)
+ *   · Status LED dot pulsing when armed (name typed)
+ *   · Hover: weight-shift translateY(-1px) + accent ring glow
+ *   · Active: translateY(1px) + inner shadow recess + LED flash
+ *   · Disabled: opacity 0.5, cursor not-allowed, LED off
+ *   · Loading: LED rotates; label "INICIANDO..."
+ *
+ * Naming: .cnp-begin--v8 — additive to existing .cnp-begin so we keep the
+ * fallback for the standalone /np-canonical-plus lab route.
+ */
+.cnp-begin.cnp-begin--v8 {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 22px;
+  background:
+    linear-gradient(180deg,
+      var(--df-bg-button-tactile) 0%,
+      color-mix(in srgb, var(--df-bg-button-tactile) 92%, #000 8%) 100%);
+  border-radius: var(--df-r-md);
+  /* v27b (user): label flat sentence-case Geist. No text-shadow,
+   * no uppercase-mono. User: "labels em botoes devem ser flat
+   * sempre, usar geist". */
+  font-family: var(--df-font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--df-text-on-tactile);
+  /* TE 3-layer bezel — same DNA as the home-cta-plate so the two surfaces
+   * read like the same instrument family. */
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.04),
+    0 6px 12px -4px rgba(0, 0, 0, 0.45),
+    0 20px 36px -12px rgba(0, 0, 0, 0.35);
+  transition:
+    transform 160ms var(--df-ease-out),
+    box-shadow 160ms var(--df-ease-out),
+    opacity 160ms var(--df-ease-out);
+}
+[data-theme="light"] .cnp-begin.cnp-begin--v8 {
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.4),
+    0 4px 10px -3px rgba(0, 0, 0, 0.18),
+    0 16px 28px -10px rgba(0, 0, 0, 0.2);
+}
+.cnp-begin.cnp-begin--v8:hover:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.05),
+    0 10px 20px -4px rgba(0, 0, 0, 0.55),
+    0 28px 48px -12px rgba(0, 0, 0, 0.4),
+    0 0 24px -4px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 35%, transparent);
+}
+.cnp-begin.cnp-begin--v8:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.6),
+    inset 0 2px 5px rgba(0, 0, 0, 0.45),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+.cnp-begin.cnp-begin--v8:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cnp-begin-led {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--df-accent-user, var(--df-accent-ok));
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--df-accent-user, var(--df-accent-ok)) 60%, transparent 40%),
+    0 0 8px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 50%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  animation: cnp-begin-led-pulse 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+.cnp-begin.cnp-begin--v8:hover:not(:disabled) .cnp-begin-led {
+  filter: saturate(1.2) brightness(1.1);
+}
+.cnp-begin.cnp-begin--v8:disabled .cnp-begin-led {
+  background: var(--df-text-faint);
+  animation: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  opacity: 0.5;
+}
+.cnp-begin.cnp-begin--v8.is-loading .cnp-begin-led {
+  /* Spinning ring effect — accent rotates around. */
+  animation: cnp-begin-led-spin 0.9s linear infinite;
+  background: transparent;
+  border: 2px solid color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 30%, transparent);
+  border-top-color: var(--df-accent-user, var(--df-accent-ok));
+  box-shadow: none;
+}
+@keyframes cnp-begin-led-pulse {
+  0%, 100% { opacity: 0.85; }
+  50%      { opacity: 1; }
+}
+@keyframes cnp-begin-led-spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.cnp-begin-label {
+  text-align: left;
+  letter-spacing: 0;
+  /* v27b (user): flat label, sem 3D fake. */
+}
+
+/* TE chevron arrow on the right — minimal, replaces the ⌘⏎ key indicator. */
+.cnp-begin-arrow {
+  font-family: var(--df-font-mono);
+  font-size: 14px;
+  letter-spacing: 0;
+  opacity: 0.5;
+  transition: transform 160ms var(--df-ease-out), opacity 160ms var(--df-ease-out);
+}
+.cnp-begin.cnp-begin--v8:hover:not(:disabled) .cnp-begin-arrow {
+  transform: translateX(3px);
+  opacity: 0.85;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cnp-begin-led { animation: none; }
+  .cnp-begin.cnp-begin--v8 { transition: none; }
+  .cnp-begin.cnp-begin--v8:hover:not(:disabled),
+  .cnp-begin.cnp-begin--v8:active:not(:disabled) { transform: none; }
+  .cnp-begin-arrow { transition: none; }
+  .cnp-begin.cnp-begin--v8:hover:not(:disabled) .cnp-begin-arrow { transform: none; }
+}
+
+/* ─── 8. Picker keys — TE click bounce on active ──────────────────────── */
+/*
+ * Adds the 80ms scale(0.98) bounce-back to PickerKey + the existing
+ * cnp-format-key + cnp-dir-key without disturbing the rest of their
+ * layered-shadow stack.
+ */
+.cnp-zone--split .cnp-stack-row :is(.cnp-format-key, .cnp-dir-key, button[type="button"].cnp-picker-key):active:not(:disabled) {
+  transition: transform 80ms cubic-bezier(0.5, 0, 0.5, 1);
+  transform: scale(0.98) translateY(1px);
+}
+
+/* ─── 9. DS row — horizontal scroll-snap (replaces wrap) ─────────────── */
+/*
+ * v8: users asked DS cards to flow side-by-side with snap, not wrap.
+ * Existing .cnp-ds-cards-row already exists; v8 variant adds overflow.
+ */
+.cnp-ds-cards-row.cnp-ds-cards-row--v8 {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 8px;
+  padding-bottom: 6px;
+  /* Hide scrollbar visually but keep keyboard scroll. */
+  scrollbar-width: thin;
+  scrollbar-color: var(--df-border-subtle) transparent;
+}
+.cnp-ds-cards-row.cnp-ds-cards-row--v8 > * {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  min-width: 140px;
+}
+.cnp-ds-cards-row.cnp-ds-cards-row--v8::-webkit-scrollbar {
+  height: 6px;
+}
+.cnp-ds-cards-row.cnp-ds-cards-row--v8::-webkit-scrollbar-thumb {
+  background: var(--df-border-subtle);
+  border-radius: 3px;
+}
+
+/* DS card hover — TE micro LED top-right + weight shift. */
+.cnp-ds-card {
+  position: relative;
+  transition:
+    transform 160ms var(--df-ease-out),
+    box-shadow 160ms var(--df-ease-out);
+}
+.cnp-ds-card::after {
+  /* Micro LED corner indicator. */
+  content: "";
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--df-accent-user, var(--df-accent-ok));
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--df-accent-user, var(--df-accent-ok)) 50%, transparent 50%);
+  opacity: 0;
+  transition: opacity 160ms var(--df-ease-out);
+  pointer-events: none;
+}
+.cnp-ds-card:hover::after { opacity: 0.7; }
+.cnp-ds-card.is-on::after { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cnp-ds-card { transition: none; }
+  .cnp-ds-card::after { transition: none; }
+}
+
+/* ─── 10. Mobile + responsive ───────────────────────────────────────── */
+
+@media (max-width: 1023px) {
+  .editor-topbar.home-topbar.home-topbar--v8 {
+    grid-template-columns: auto 1fr auto;
+  }
+  .home-topbar--v8 .topbar-center {
+    /* Tabs collapse to a horizontal scroll strip on tablet. */
+    overflow-x: auto;
+    flex-shrink: 1;
+    min-width: 0;
+  }
+  .home-topbar--v8 .topbar-file-tab {
+    flex-shrink: 0;
+  }
+  .home-stage-v8 { padding: 22px 20px 40px; }
+}
+
+@media (max-width: 767px) {
+  .editor-topbar.home-topbar.home-topbar--v8 {
+    height: auto;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    gap: 0;
+  }
+  .home-topbar--v8 .home-topbar-brand {
+    grid-column: 1;
+    grid-row: 1;
+    padding: 10px 14px;
+  }
+  .home-topbar--v8 .topbar-right {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .home-topbar--v8 .topbar-center {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    padding: 0 14px 8px;
+    overflow-x: auto;
+  }
+  .home-stage-v8 { padding: 18px 16px 36px; gap: 16px; }
+  .home-cta-plate {
+    grid-template-columns: 32px 1fr auto;
+    padding: 12px 14px 12px 12px;
+  }
+  .home-cta-plate-glyph { width: 32px; height: 32px; font-size: 18px; }
+  .home-cta-plate-label { font-size: 13px; }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+ * Corrective surface tweaks
+ * ════════════════════════════════════════════════════════════════════════
+ *   1. Aqua topbar — handled by NOT applying the .home-topbar--v8 modifier
+ *      in JSX, so the global.css Aqua treatment wins.
+ *   2. Hero block (replaces the older cta-plate) — Design Factory display
+ *      title, decal kicker, centered tactile button.
+ *   3. Modal: rivets removed in JSX, DS cards laid out 4 full-width, picker
+ *      labels (Canvas / Formato / Regras) removed, footer right-aligned
+ *      and smaller.
+ *
+ * hyve-taste preset: premium_ui_surface (POLISH 10, REFINEMENT 9).
+ * Refinement here means subtlety, not less craft.
+ */
+
+/* ─── 1. Hero wrapper — width container for canonical SkeuHero ───────── */
+/* The bespoke .home-hero plate (radial gradient + corner brackets +
+ * decal LED + bespoke title) is replaced by the canonical
+ * <SkeuHero size="lg"> component (DNA: ascii grain + corner mark +
+ * bezel inset). The previous .home-hero-* classes are gone — see
+ * skeu-hero.css for the unified pattern. The wrapper here only
+ * constrains width so the hero plate matches the projects feed's
+ * horizontal rhythm.
+ *
+ * Width is 100% (full feed width). The hero lives inside
+ * .home-stage-v8 (max-width 1180px, 28px side padding), so 100% here =
+ * exactly the feed grid inner width. The hero plate and the projects
+ * grid below share the same horizontal inset. */
+.home-hero-wrap {
+  width: 100%;
+  margin: 0 auto;
+}
+/* The search bar lives below the Projects hero (not in the topbar).
+ * Width matches the feed grid (100%) so it lines up cleanly with
+ * project cards below. A subtle skeu cavity (sunken-1) keeps it
+ * reading as part of the page surface rather than a CTA. */
+.home-projects-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-top: 18px;
+  padding: 0 16px;
+  height: 44px;
+  background: var(--df-surface-sunken-1);
+  border: 1px solid var(--df-border-subtle);
+  border-radius: var(--df-r-md);
+  color: var(--df-text-faint);
+  transition: border-color 160ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 160ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.home-projects-search:focus-within {
+  border-color: var(--df-border);
+  box-shadow:
+    inset 0 1px 2px 0 rgba(0, 0, 0, 0.06),
+    0 0 0 3px color-mix(in oklab, var(--df-accent) 14%, transparent);
+}
+.home-projects-search > svg {
+  flex-shrink: 0;
+  color: var(--df-text-faint);
+}
+.home-projects-search > input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--df-text-primary);
+  font-family: inherit;
+  font-size: var(--df-text-sm);
+  min-width: 0;
+}
+.home-projects-search > input::placeholder {
+  color: var(--df-text-faint);
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-projects-search {
+    transition: none;
+  }
+}
+/* v16 — left brand decoration: oversized Logo on the faceplate, anchored
+ * to the left side of the feed-aligned hero. Reads as a stamp. */
+.home-hero-decoration-logo {
+  color: var(--df-text-primary);
+  display: block;
+}
+
+/* ─── Tactile CTA — refined skeu ─────────────────────────────────────────
+ *
+ * Three rules drive the look:
+ *   1. The Logo replaces the LED dot inside the button.
+ *   2. The Logo lights up on hover and sinks on press (skeumorphic).
+ *   3. No heavy outer shadow — it would dominate the surface.
+ *
+ * Implementation: --df-bezel-raised (1px ring + top-light inset)
+ * composed with a SINGLE close ambient drop (8–16px max). Hover lifts
+ * +1.5px and brightens the glow; active sinks via --df-bezel-pressed
+ * (recessed inset, no outer shadow). The Logo at idle is muted
+ * (opacity 0.6); on hover it lights up (accent color + soft 4–6px
+ * glow); on active it dims back and sinks. */
+.home-hero-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  height: 56px;
+  padding: 0 26px 0 22px;
+  /* HYVE skeu — 3-stop gradient with specular crest at top so the
+   * surface reads as a forged-metal instrument key, not a flat token.
+   * User ask 2026-05-11: "mais skeu HYVE e cantos menos
+   * arredondados". */
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--df-bg-button-tactile) 92%, #fff 8%) 0%,
+      var(--df-bg-button-tactile) 38%,
+      color-mix(in srgb, var(--df-bg-button-tactile) 88%, #000 12%) 100%);
+  border: 0;
+  /* Cantos tightened from --df-r-2xl (~14px) to 8px so the button
+   * reads as machined hardware (TE-tátil instrument key) instead of a
+   * pill. */
+  border-radius: var(--df-r-md, 8px);
+  /* Label is flat sentence-case Geist, no mono uppercase. */
+  font-family: var(--df-font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--df-text-on-tactile);
+  cursor: pointer;
+  z-index: 2;
+  /* 4-layer skeu stack: specular lip + under-cap shadow + sharp edge
+   * contact + ambient drop. Replaces the --df-bezel-raised tokens
+   * (too soft for the forged-key direction). */
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 0 rgba(0, 0, 0, 0.28),
+    0 1px 0 0 rgba(0, 0, 0, 0.45),
+    0 4px 10px -2px rgba(0, 0, 0, 0.32);
+  transition:
+    transform 160ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 160ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    background 160ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.home-hero-cta:hover {
+  transform: translateY(1px);
+  /* Hover — lift the key, brighten the specular crest, extend ambient. */
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--df-bg-button-tactile) 88%, #fff 12%) 0%,
+      var(--df-bg-button-tactile) 35%,
+      color-mix(in srgb, var(--df-bg-button-tactile) 90%, #000 10%) 100%);
+  box-shadow:
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.24),
+    inset 0 -1px 0 0 rgba(0, 0, 0, 0.30),
+    0 1px 0 0 rgba(0, 0, 0, 0.50),
+    0 8px 18px -4px rgba(0, 0, 0, 0.40);
+}
+.home-hero-cta:active {
+  /* Active — sink the key into the recess. Outer drop collapses,
+   * inset deepens so the press reads BELOW the surface. */
+  transform: translateY(1px);
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--df-bg-button-tactile) 96%, #000 4%) 0%,
+      var(--df-bg-button-tactile) 60%,
+      color-mix(in srgb, var(--df-bg-button-tactile) 92%, #fff 8%) 100%);
+  box-shadow:
+    inset 0 2px 4px 0 rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 0 rgba(0, 0, 0, 0.20),
+    0 0 0 1px rgba(0, 0, 0, 0.35);
+  transition-duration: 80ms;
+}
+
+/* Logo affordance — the skeumorphic centerpiece of v16. */
+.home-hero-cta-mark {
+  flex-shrink: 0;
+  color: var(--df-text-on-tactile);
+  opacity: 0.6;
+  transition:
+    opacity 160ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    color 160ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    filter 160ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 160ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.home-hero-cta:hover .home-hero-cta-mark {
+  /* Acende: opacity full + accent color + soft glow. */
+  opacity: 1;
+  color: var(--df-accent-user, var(--df-accent-ok));
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 55%, transparent));
+}
+.home-hero-cta:active .home-hero-cta-mark {
+  /* Afunda: glow apaga, opacity volta, sutil sink. */
+  opacity: 0.7;
+  filter: none;
+  transform: translateY(0.5px);
+  transition-duration: 80ms;
+}
+
+.home-hero-cta-label {
+  /* v27b (user): flat, sem text-shadow. */
+}
+.home-hero-cta-arrow {
+  font-family: var(--df-font-mono);
+  font-size: 14px;
+  letter-spacing: 0;
+  opacity: 0.55;
+  transition:
+    transform 160ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    opacity 160ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.home-hero-cta:hover .home-hero-cta-arrow {
+  transform: translateX(3px);
+  opacity: 0.9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-hero-cta,
+  .home-hero-cta-mark,
+  .home-hero-cta-arrow { transition: none; }
+  .home-hero-cta:hover,
+  .home-hero-cta:active { transform: none; }
+  .home-hero-cta:hover .home-hero-cta-arrow { transform: none; }
+  .home-hero-cta:active .home-hero-cta-mark { transform: none; }
+}
+
+@media (max-width: 720px) {
+  .home-hero-cta {
+    height: 50px;
+    padding: 0 22px 0 18px;
+    font-size: 12px;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ─── 2. DS cards — 4 full-width grid (no scroll) ─────────────────────── */
+/* Spec v9: "diminuir o card de design system quero q caibam 4 e
+ * sejam full width no modal". Override v8 scroll-snap horizontal. */
+.cnp-ds-cards-row.cnp-ds-cards-row--v8 {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr);
+  flex-wrap: nowrap;
+  overflow: visible;
+  scroll-snap-type: none;
+  gap: 10px;
+  padding-bottom: 0;
+}
+.cnp-ds-cards-row.cnp-ds-cards-row--v8 > * {
+  flex-shrink: initial;
+  scroll-snap-align: none;
+  min-width: 0;
+  width: auto;
+}
+/* Smaller card height + tighter padding. */
+.cnp-ds-cards-row.cnp-ds-cards-row--v8 .cnp-ds-card {
+  padding: 8px 9px 9px;
+  gap: 6px;
+  min-height: 56px;
+}
+.cnp-ds-cards-row.cnp-ds-cards-row--v8 .cnp-ds-card-name {
+  font-size: 11px;
+}
+/* If 5+ DSes exist, the "Ver mais" key swaps with the 4th card slot:
+ * we keep the same 4-col grid and let the more key occupy the last cell.
+ * No horizontal scroll. */
+.cnp-ds-cards-row.cnp-ds-cards-row--v8 .cnp-ds-more-key,
+.cnp-ds-cards-row.cnp-ds-cards-row--v8 .cnp-ds-empty-key {
+  min-height: 56px;
+  padding: 8px 10px;
+  font-size: 10px;
+}
+
+@media (max-width: 720px) {
+  .cnp-ds-cards-row.cnp-ds-cards-row--v8 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ─── 3. Stack rows without label (Canvas/Formato/Regras) ─────────────── */
+/* Spec v9: picker keys without small uppercase title above. */
+.cnp-stack-row--unlabeled {
+  /* No gap needed since label is gone. */
+  gap: 0;
+}
+
+/* ─── 4. Modal footer — right-aligned, smaller buttons ────────────────── */
+/* Spec v9: "esse botao de iniciar projeto ta um exagero ocupando
+ * muito espaço quero ambos os botoes menores e na direita embaixo, nao
+ * lado a lado". Interpretation: inline horizontal pair right-aligned
+ * (both small, Limpar ghost + Iniciar primary). */
+.np-modal-stage .cnp-foot-row {
+  display: flex !important;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  grid-template-columns: none;
+}
+.np-modal-stage .cnp-foot-row .cnp-foot-reset {
+  width: auto;
+  height: 38px;
+  padding: 0 18px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+}
+.np-modal-stage .cnp-foot-row .cnp-begin.cnp-begin--v8 {
+  display: inline-flex;
+  width: auto;
+  height: 40px;
+  padding: 0 20px;
+  gap: 10px;
+  grid-template-columns: none;
+  /* Smaller font + tighter letter-spacing for compact CTA. */
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  flex-shrink: 0;
+}
+.np-modal-stage .cnp-foot-row .cnp-begin.cnp-begin--v8 .cnp-begin-led {
+  width: 7px;
+  height: 7px;
+}
+.np-modal-stage .cnp-foot-row .cnp-begin.cnp-begin--v8 .cnp-begin-arrow {
+  font-size: 12px;
+}
+
+@media (max-width: 720px) {
+  .np-modal-stage .cnp-foot-row {
+    /* Mobile: stack vertical right-aligned for thumb reach. */
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .np-modal-stage .cnp-foot-row .cnp-foot-reset,
+  .np-modal-stage .cnp-foot-row .cnp-begin.cnp-begin--v8 {
+    width: 100%;
+  }
+}
+
+/*
+ * ════════════════════════════════════════════════════════════════════════
+ *  v10 — TOPBAR CENTERED · PER-TAB HEROS · FADE GRADIENT · DS POLISH
+ * ════════════════════════════════════════════════════════════════════════
+ * Spec 2026-05-05 (v10):
+ *   1. Topbar: remover divisória + tabs centradas alinhadas ao feed.
+ *   2. Hero "Design Factory" SOMENTE em /projects, mesma largura do grid.
+ *   3. Templates: hero próprio + cards consertados.
+ *   4. Design Systems: hero próprio + cards refinados + modal updates.
+ *   5. Skills: hero próprio.
+ *   6. Fade gradient da tab no topo do feed em todas as 4 abas.
+ *
+ * hyve-taste preset still: premium_ui_surface (POLISH 10, REFINEMENT 9).
+ * Refinement = sutileza. User explícito sobre 6 frentes específicas.
+ */
+
+/* ─── 1. Topbar — divisor removido + tabs centradas ───────────────────── */
+/*
+ * v10 layout: brand left, tabs in center (aligned to viewport midpoint
+ * which matches the feed grid center because feed uses max-width: 1180px
+ * margin auto), actions right. The brand divisor border is dropped.
+ *
+ * Implementation: 3-column grid with equal-width side columns (1fr each)
+ * and auto-sized center column. Tabs are justify-self: center within their
+ * cell, brand justify-self: start, actions justify-self: end. Equal 1fr
+ * sides guarantee the center cell sits at viewport midpoint. No absolute
+ * positioning → no overlap → no z-index hacks.
+ */
+/*
+ * Tabs absolutely centered to viewport midpoint.
+ *
+ * A `1fr auto 1fr` grid would center the tabs IN their cell, but the
+ * cell midpoint = (brand-end + right-cluster-start) / 2. When the CLI
+ * selector text width changed (e.g. "Claude Code · 2.1.128" vs a
+ * longer label), the right cluster grew and the cell midpoint shifted
+ * left — tabs visibly drifted with each provider switch.
+ *
+ * Fix: keep brand on the left and right cluster on the right with
+ * standard flow (relative positioning), but absolutely position
+ * .topbar-center at left:50% so it ALWAYS sits at the viewport
+ * midpoint regardless of side-cluster widths. Side clusters become
+ * free of the grid constraint and can grow without disturbing the
+ * tabs.
+ *
+ * Specificity bump (`.home-body-v2 ~`): the canonical .editor-topbar
+ * rule in global.css (display: grid) sits at the same specificity as
+ * ours but loads AFTER np-v8 in the Vite bundle order, so it would
+ * otherwise override our display: flex. Using a sibling selector
+ * lifts our specificity above the global rule.
+ */
+/* ─── Topbar feed-aligned ────────────────────────────────────────────
+ *
+ * Tabs sit just to the right of the brand, with breathing room, and
+ * stay anchored to the feed's left vertical guide regardless of
+ * viewport width.
+ *
+ * Strategy:
+ *   · Topbar outer = full viewport width (background, floor, theme).
+ *   · Topbar inner content = max-width 1180px (matches .home-stage-v8
+ *     feed grid container exactly), centered with margin: 0 auto, padded
+ *     28px sides (matches feed inner padding so tabs land on the feed's
+ *     left vertical guide).
+ *   · 3-column grid: brand (auto) · tabs (1fr, justify-start) · right (auto).
+ *   · Tabs justify-self: start with column-gap 32px → tabs sit "with
+ *     folga" right after the brand cluster, left-anchored not centered.
+ *   · Brand + right clusters get min-width caps so provider/agent picker
+ *     width changes don't shift tab position laterally.
+ *
+ * Stability vs v13b: v13b absolute-centered the tabs to keep them static
+ * during provider switches. v16 achieves the same stability by placing
+ * tabs inside a fixed-width grid cell that's anchored to the brand-end
+ * column edge — provider width changes only consume the right cluster's
+ * own column, never the tabs' column. */
+.editor-topbar.home-topbar.home-topbar {
+  /* v16c (user fix): "as tabs poderiam comecar bem na linha do feed
+   * tambem, mais perto do logo do app, mas ainda com folga e alinhado
+   * sempre ao feed, max width de cada pagina". Topbar full bleed
+   * edge-to-edge. Brand absolute left:0 (out of flow). Tabs in normal
+   * flow with margin-left = feed-left line, so first tab "Projetos"
+   * starts at calc((100vw - 1180px) / 2). Right cluster absolute right:0. */
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+/* Brand cluster — ABSOLUTE positioned at left edge of topbar.
+ * Out of normal flow so it doesn't push tabs. Tabs can use margin-left
+ * to align with feed-left line independently.
+ *
+ * Responsive collapse: at viewports where feed-gutter < ~190px (i.e.
+ * viewport width <= ~1560px), the gutter is too narrow to fit
+ * "Design Factory BETA" (~196px) before tabs start at feed-left line.
+ * In that range, hide text + badge, keep only the Logo (~44px). */
+.editor-topbar.home-topbar.home-topbar .home-topbar-brand {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  border-right: 0;
+  padding: 0 18px;
+  z-index: 4;
+}
+@media (max-width: 1560px) {
+  .editor-topbar.home-topbar.home-topbar .home-topbar-brand .home-brand-name,
+  .editor-topbar.home-topbar.home-topbar .home-topbar-brand .home-brand-badge {
+    display: none;
+  }
+}
+/* Tabs — in normal flow, margin-left pushes them to feed-left line.
+ * Feed line at 1440 viewport with 1180 feed = (1440-1180)/2 = 130px.
+ * Formula: max(60px, calc((100vw - 1180px) / 2)).
+ * 60px clamp = brand width (44px logo+name) + small folga at narrow viewports. */
+.editor-topbar.home-topbar.home-topbar .topbar-center {
+  position: static;
+  transform: none;
+  align-self: end;  /* concave Aqua corners kiss the topbar-floor */
+  align-items: flex-end;
+  display: flex;
+  /* Clamp 80px = brand width 62 + folga 18. Below feed width (1180),
+   * tabs sit right after brand with consistent breathing room.
+   * Above 1180, calc dominates so tabs land on feed-left line. */
+  margin-left: max(80px, calc((100vw - 1180px) / 2));
+  gap: 12px;
+  padding: 0;
+  z-index: 3;
+}
+.editor-topbar.home-topbar.home-topbar .topbar-file-tab {
+  /* Canonical padding 16px (v13b breathing room) */
+  padding: 0 16px;
+}
+/* Right cluster — ABSOLUTE positioned flush against right edge of topbar.
+ * Mirrors brand strategy (left:0): cluster reaches the viewport edge with
+ * canonical 18px internal padding, matching the brand's visual rhythm. */
+.editor-topbar.home-topbar.home-topbar .topbar-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  padding: 0 18px;
+  gap: 8px;
+  z-index: 2;
+}
+/* Spacer absorbs remaining horizontal — pushes nothing since right is
+ * absolute, but ensures tabs container doesn't expand.
+ * Actually with right absolute, we just need tabs to NOT expand to fill.
+ * flex-grow: 0 already implicit. No spacer needed. */
+/* AgentPicker label — match minWidth=maxWidth so provider switches do
+ * NOT change the cluster's overall horizontal footprint.
+ * v16d: overflow: hidden + cap so the inline-styled label can't bleed
+ * into adjacent siblings (theme/avatar) at narrow viewports. */
+.editor-topbar.home-topbar.home-topbar .topbar-right .agent-picker-trigger {
+  min-width: 0;
+  max-width: 200px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* ─── Responsive scale (v16d) ────────────────────────────────────────
+ * Default model (v16c): display:flex, brand absolute left:0, tabs in
+ * normal flow with margin-left = max(60px, calc((100vw - 1180px) / 2))
+ * so first tab aligns with feed-left line, right cluster absolute right:0.
+ *
+ * Breakpoints designed around feed-left math:
+ *   ≥1560: brand full ("Logo + Design Factory + BETA") fits in gutter
+ *   1180-1559: brand collapses to Logo-only (gutter < brand width)
+ *   <1180: viewport narrower than feed, tabs sit right after brand
+ *           with min folga 60px (the clamp value in margin-left)
+ *   <960: reduce tab padding + Search input width
+ *   <760: hide Search input (keep theme toggle + avatar + agent picker)
+ *   <600: simplify further — agent picker becomes icon-only
+ */
+
+/* Below feed width (1180) the dynamic max() naturally clamps to 60px
+ * folga from brand, but right cluster width (search + cli + theme +
+ * avatar ~440px + 36px brand) leaves room only for ~3 tabs. Tighten
+ * tab padding so all 4 still fit. */
+@media (max-width: 1180px) {
+  .editor-topbar.home-topbar.home-topbar .topbar-file-tab {
+    padding: 0 12px;
+  }
+  .editor-topbar.home-topbar.home-topbar .topbar-center {
+    gap: 8px;
+  }
+}
+
+/* Below 960 — search shrinks, agent picker label tightens, tabs gap reduces */
+@media (max-width: 960px) {
+  .editor-topbar.home-topbar.home-topbar .topbar-file-tab {
+    padding: 0 10px;
+  }
+  .editor-topbar.home-topbar.home-topbar .topbar-center {
+    gap: 4px;
+  }
+  .editor-topbar.home-topbar.home-topbar .topbar-right .agent-picker-trigger {
+    max-width: 80px;
+  }
+  /* v24: search bar removed from topbar — moved below Projects hero.
+   * Old `.home-topbar-search` rule blocks deleted (no longer rendered). */
+}
+
+/* Below 760 — right cluster tightens (search no longer here as of v24) */
+@media (max-width: 760px) {
+  .editor-topbar.home-topbar.home-topbar .topbar-right {
+    gap: 6px;
+    padding: 0 12px;
+  }
+}
+
+/* Below 640 — agent picker collapses to icon (text-overflow ellipsis +
+ * forced overflow hidden so label can't bleed visually past max-width). */
+@media (max-width: 640px) {
+  .editor-topbar.home-topbar.home-topbar .topbar-right .agent-picker-trigger {
+    max-width: 36px !important;
+    padding: 0 8px;
+    overflow: hidden !important;
+  }
+  .editor-topbar.home-topbar.home-topbar .topbar-right .agent-picker-trigger > * {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: clip;
+  }
+  .editor-topbar.home-topbar.home-topbar .topbar-file-tab {
+    padding: 0 8px;
+    font-size: 13px;
+  }
+}
+
+/* Below 540 — drop CLI selector entirely (theme + avatar remain).
+ * Tabs scroll horizontally within explicit width, brand stays Logo. */
+@media (max-width: 540px) {
+  .editor-topbar.home-topbar.home-topbar .topbar-right .agent-picker-root {
+    display: none !important;
+  }
+  .editor-topbar.home-topbar.home-topbar .topbar-center {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    /* Right cluster after collapse = theme(36) + avatar(36) + gap(6) +
+     * padding(24) = ~102px. Brand 80. Folga 16. */
+    max-width: calc(100vw - 80px - 102px - 16px);
+  }
+  .editor-topbar.home-topbar.home-topbar .topbar-center::-webkit-scrollbar {
+    display: none;
+  }
+  .editor-topbar.home-topbar.home-topbar .topbar-file-tab {
+    flex-shrink: 0;
+  }
+}
+
+/* ─── 2. Body fade gradient — restored across all tabs ────────────────── */
+/*
+ * v8 introduced .home-body-v2--v8 as the scroll container, but the canonical
+ * mask-image lived on .home-main-body (legacy v7 path). Restore the fade by
+ * applying the same gradient to the v8 scroll container. The fade originates
+ * just below the topbar (transparent → opaque over ~96px).
+ */
+.home-body-v2.home-body-v2--v8 {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    rgba(0, 0, 0, 0.05) 24px,
+    rgba(0, 0, 0, 0.4) 48px,
+    rgba(0, 0, 0, 0.85) 72px,
+    black 96px
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    rgba(0, 0, 0, 0.05) 24px,
+    rgba(0, 0, 0, 0.4) 48px,
+    rgba(0, 0, 0, 0.85) 72px,
+    black 96px
+  );
+}
+
+/* ─── 3. Stage padding — heros sit lower (user: "mais pra baixo") ──── */
+/*
+ * v9 had 28px top padding. v10 increases to ~64px so the hero starts well
+ * below the fade gradient (which is ~96px tall). The fade is still visible
+ * above the hero — no abrupt overlap.
+ */
+.home-stage-v8 {
+  padding: 64px 28px 56px;
+}
+
+/* ─── 4-5. Hero block + secondary CTA — DELETED v15 ─────────────────────
+ * The v10 .home-hero width override + .home-hero--label variant + the
+ * .home-hero-cta-secondary tactile button were dead code: HomeTabHero
+ * (the consumer of those classes) was rejected by user in v11 and
+ * the canonical Projects hero now uses <SkeuHero /> directly. Width
+ * is provided by .home-hero-wrap; bezel/grain/title come from
+ * skeu-hero.css. Removed to keep this file tight. */
+
+/* ─── 6. Templates — fix iframe overflow + add bezel cover ────────────── */
+/*
+ * Bug v9: the iframe scaling (scale 0.45 + width/height 222%) was clipping
+ * inside the 16:9 thumb because `.home-pcard-thumb` already has padding
+ * from .ds-card-cover override leaking onto template thumbs in some cases,
+ * and the iframe was rendering but pointer-events:none stops "clicked area"
+ * showing as the card hover target. v10 solution:
+ *   · Standardize the iframe wrapper so it always fills the thumb area.
+ *   · Cover overlay so click target is the EntityCard button, not iframe.
+ *   · Subtle scrim so the screenshot reads as a tile cover, not a live HTML.
+ */
+.entity-card-template-thumb {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--df-surface-raised);
+  display: flex;
+}
+.entity-card-template-thumb iframe {
+  /* v17: render iframe at fixed desktop viewport (1280×720) and scale
+   * down to fit the 16:9 thumb container via transform. Container width
+   * varies (~280-380px depending on grid columns), so we use object-fit
+   * style: 1280px iframe scaled 0.3 = 384px visual, fits any reasonable
+   * card width. transform-origin top-left keeps the "screenshot" look
+   * (snapshot of top-left of the template). */
+  border: none;
+  pointer-events: none;
+  width: 1280px;
+  height: 720px;
+  transform: scale(0.3);
+  transform-origin: top left;
+  background: white;
+  /* Position absolute so transform doesn't push parent geometry */
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+[data-theme="dark"] .entity-card-template-thumb iframe {
+  background: white; /* HTML defaults to white; preserve template contrast. */
+}
+.entity-card-template-thumb::after {
+  /* Soft top-down scrim so card title reads even on bright HTML. */
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 36%;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.18) 0%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* ─── 7. DS card v10 — refined swatch row + LED accent ─────────────────── */
+/*
+ * User: "pagina design system precisamos melhorar o card de design
+ * system". v9 used .ds-card with a 16:10 cover containing swatches. v10
+ * upgrades the cover with a layered backdrop + larger swatches (36px) +
+ * subtle bezel inset + accent LED. Reads as a real DS chip vs generic card.
+ */
+.ds-card {
+  /* v10 — slightly larger padding + premium 3-layer bezel feel. */
+  padding: 22px 20px 18px;
+}
+.ds-card-cover {
+  /* Inset bezel illusion + soft inner glow. */
+  box-shadow:
+    inset 0 0 0 1px var(--df-border-subtle),
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    inset 0 0 24px -8px rgba(255, 255, 255, 0.04);
+}
+[data-theme="light"] .ds-card-cover {
+  box-shadow:
+    inset 0 0 0 1px var(--df-border-subtle),
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.04),
+    inset 0 0 22px -8px rgba(0, 0, 0, 0.06);
+}
+
+/* Bigger swatch row — drop the inherited .home-pcard-thumb sizing for
+ * DS cards specifically and replace with a generous flex row. */
+.ds-card-cover .home-pcard-thumb {
+  padding: 0 18px;
+  gap: 10px;
+}
+.ds-card-cover .home-pcard-thumb > span[aria-hidden] {
+  width: 36px !important;
+  height: 36px !important;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.08) !important;
+  border: 0 !important;
+}
+
+/* Accent LED corner top-right — same vibe as EntityCard hover affordance. */
+.ds-card::before {
+  content: "";
+  position: absolute;
+  top: 12px; right: 12px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--df-accent-user, var(--df-accent-ok));
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--df-accent-user, var(--df-accent-ok)) 40%, transparent 60%),
+    0 0 6px color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 35%, transparent);
+  opacity: 0;
+  transition: opacity 200ms var(--df-ease-out);
+  pointer-events: none;
+  z-index: 2;
+}
+.ds-card:hover::before { opacity: 1; }
+
+/* ─── 8. DsSetupModal v10 — refined faceplate + skeu source picker ───── */
+/*
+ * User: "atualizar o modal de criação". Match NewProject modal v9
+ * canonical: faceplate without rivets, mono-uppercase header, footer
+ * small + right-aligned. v9 NewProject removed the corner rivets and used
+ * a clean grid-template-columns layout.
+ *
+ * The DsSetupModal stays inline-styled (not a refactor target) but we
+ * provide CSS overrides keyed off .ds-setup-modal-shell so the new look
+ * applies without touching every inline style block.
+ */
+.ds-setup-modal-shell {
+  /* Replaces inline 1024×720 card with proper grid + premium chrome. */
+  width: 1024px;
+  height: 720px;
+  max-width: 94vw;
+  max-height: 92vh;
+  background: var(--df-surface-elevated);
+  border-radius: var(--df-r-3xl);
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  grid-template-rows: auto 1fr auto;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 12px 28px -10px rgba(0, 0, 0, 0.45),
+    0 32px 64px -16px rgba(0, 0, 0, 0.4),
+    0 64px 120px -32px rgba(0, 0, 0, 0.32);
+}
+[data-theme="light"] .ds-setup-modal-shell {
+  box-shadow:
+    0 0 0 1px var(--df-border-strong, rgba(0, 0, 0, 0.16)),
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    0 8px 18px -6px rgba(0, 0, 0, 0.16),
+    0 22px 44px -12px rgba(0, 0, 0, 0.18),
+    0 44px 88px -24px rgba(0, 0, 0, 0.12);
+}
+
+/* Faceplate header (matches np-modal-face anatomy minus rivets).
+ * v15: ascii dot grain backdrop added (canonical SkeuHero DNA) so the
+ * faceplate reads as a hero strip — same texture language as the
+ * Projects hero and the New Project modal stage. */
+.ds-setup-face {
+  grid-column: 1 / -1;
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 22px;
+  background:
+    linear-gradient(180deg,
+      var(--df-surface-elevated) 0%,
+      var(--df-bg-section) 100%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+}
+[data-theme="light"] .ds-setup-face {
+  background:
+    linear-gradient(180deg,
+      var(--df-surface-raised) 0%,
+      var(--df-bg-section) 100%);
+  border-bottom-color: var(--df-border-subtle);
+}
+.ds-setup-face::after {
+  /* Canonical SkeuHero DNA — ascii dot grain echo (CSS approximation, no
+   * literal pre to keep the markup clean). Sits above bg, below content. */
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    circle at center,
+    var(--df-text-faint) 0.7px,
+    transparent 0.8px
+  );
+  background-size: 14px 14px;
+  opacity: 0.18;
+  /* Fade hard from right so right edge stays clean for close button. */
+  mask-image: linear-gradient(90deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.4) 70%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.4) 70%, transparent 100%);
+  z-index: 0;
+}
+[data-theme="light"] .ds-setup-face::after {
+  opacity: 0.28;
+}
+.ds-setup-face > * {
+  position: relative;
+  z-index: 1;
+}
+.ds-setup-face-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.ds-setup-face-kicker {
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  font-weight: var(--df-fw-medium, 500);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--df-text-faint);
+}
+.ds-setup-face-title {
+  font-family: var(--df-font-display, var(--df-font-sans));
+  font-size: 18px;
+  font-weight: var(--df-fw-semibold, 600);
+  letter-spacing: -0.01em;
+  color: var(--df-text-primary);
+  text-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.4),
+    0 -1px 0 var(--df-skeu-top-light);
+}
+[data-theme="light"] .ds-setup-face-title {
+  text-shadow:
+    0 1px 0 var(--df-skeu-top-light),
+    0 -1px 0 rgba(0, 0, 0, 0.04);
+}
+
+/* Logo glow on faceplate (matches NewProject v9 modal). v14: genuine
+ * circles (28×28 logo marks) — preserve `border-radius: 50%`. */
+.ds-setup-face-mark {
+  width: 28px; height: 28px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--df-bg-base);
+  color: var(--df-text-primary);
+  position: relative;
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18);
+}
+.ds-setup-face-mark::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 22%, transparent) 0%,
+    transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+  filter: blur(2px);
+}
+
+/* Source rail (left) — skeu picker keys instead of pill rail. */
+.ds-setup-rail {
+  grid-row: 2 / 4;
+  border-right: 1px solid var(--df-border-subtle);
+  background: var(--df-bg-section);
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: auto;
+}
+
+/* Source picker key — matches NewProject v9 PickerKey aesthetic. */
+.ds-setup-rail-key {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  width: 100%;
+  background: transparent;
+  border: 0;
+  border-radius: var(--df-r-md);
+  font-family: var(--df-font-mono);
+  font-size: 12px;
+  font-weight: var(--df-fw-medium, 500);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--df-text-secondary);
+  cursor: pointer;
+  text-align: left;
+  min-height: 44px;
+  transition:
+    background 120ms var(--df-ease-out),
+    color 120ms var(--df-ease-out),
+    box-shadow 120ms var(--df-ease-out);
+}
+.ds-setup-rail-key:hover {
+  background: var(--df-interactive-hover);
+  color: var(--df-text-primary);
+}
+.ds-setup-rail-key[aria-pressed="true"] {
+  background: var(--df-surface-raised);
+  color: var(--df-text-primary);
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    0 1px 2px rgba(0, 0, 0, 0.18);
+}
+[data-theme="light"] .ds-setup-rail-key[aria-pressed="true"] {
+  box-shadow:
+    inset 0 1px 0 var(--df-skeu-top-light),
+    inset 0 0 0 1px var(--df-border-subtle),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.04),
+    0 1px 2px rgba(0, 0, 0, 0.06);
+}
+.ds-setup-rail-key svg {
+  width: 16px; height: 16px;
+  color: currentColor;
+  opacity: 0.8;
+}
+
+/* Footer right-aligned + smaller (matches NewProject v9 cnp-foot-row). */
+.ds-setup-footer {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--df-border-subtle);
+  background: var(--df-bg-section);
+  font-size: 11px;
+  color: var(--df-text-faint);
+}
+.ds-setup-footer-status {
+  margin-right: auto;
+  font-family: var(--df-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ─── 9. Mobile — heros stay readable ─────────────────────────────────── */
+@media (max-width: 720px) {
+  .home-stage-v8 { padding: 48px 16px 36px; }
+  .editor-topbar.home-topbar {
+    grid-template-columns: minmax(140px, 1fr) auto minmax(120px, 1fr);
+  }
+  .home-hero-wrap {
+    max-width: none;
+  }
+  .ds-setup-modal-shell {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    border-radius: 0;
+    grid-template-columns: 1fr;
+  }
+  .ds-setup-rail {
+    grid-row: 2 / 3;
+    flex-direction: row;
+    overflow-x: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--df-border-subtle);
+  }
+}
+
+/* ─── v26 Skill card preview ───────────────────────────────────────────
+ * Typographic thumb for skill EntityCards. Skills have no visual cover
+ * (markdown files), so we render the trigger as hero text on a soft
+ * surface, plus a small source chip top-right. Same 16:9 frame as
+ * Project/Template/DS thumbs so all 4 grids align. */
+
+.skill-card-thumb {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(140% 80% at 50% 0%,
+      color-mix(in oklab, var(--df-bg-section) 100%, white 1.5%) 0%,
+      var(--df-bg-section) 65%);
+  padding: 10px 16px;
+}
+
+.skill-card-thumb-trigger {
+  font-family: var(--df-font-mono);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--df-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  text-align: center;
+}
+
+.skill-card-thumb-source {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-family: var(--df-font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: var(--df-r-sm);
+  background: var(--df-surface-raised);
+  border: 1px solid var(--df-border-subtle);
+  color: var(--df-text-muted);
+}
+.skill-card-thumb-source--df {
+  color: var(--df-accent-user, var(--df-accent-ok));
+  border-color: color-mix(in srgb, var(--df-accent-user, var(--df-accent-ok)) 40%, transparent);
+}
+.skill-card-thumb-source--project {
+  color: var(--df-text-secondary);
+}
