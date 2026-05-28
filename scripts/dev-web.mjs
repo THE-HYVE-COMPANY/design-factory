@@ -282,25 +282,92 @@ function bindKeys() {
 const t0 = Date.now();
 
 // resolve ports (reclaim own daemon / auto-pick next free) — returns a human note
+/** Find PIDs listening on `port`. Cross-platform: netstat on Windows,
+ *  lsof on Mac/Linux. Empty array on failure / no listener. */
+function findPidsOnPort(port) {
+  try {
+    if (process.platform === "win32") {
+      // netstat -ano output: "  TCP    127.0.0.1:1420    0.0.0.0:0    LISTENING    12345"
+      const out = spawnSync("netstat", ["-ano"], { encoding: "utf8" }).stdout || "";
+      const re = new RegExp(`[: .]${port}\\s+\\S+\\s+LISTENING\\s+(\\d+)`, "m");
+      const pids = new Set();
+      for (const line of out.split(/\r?\n/)) {
+        const m = line.match(re);
+        if (m) pids.add(Number(m[1]));
+      }
+      return [...pids];
+    }
+    // POSIX — lsof -t -i :PORT lists owning PIDs, one per line.
+    const out = spawnSync("lsof", ["-tiTCP:" + port, "-sTCP:LISTEN"], { encoding: "utf8" }).stdout || "";
+    return out.split(/\r?\n/).map((s) => Number(s.trim())).filter((n) => Number.isFinite(n) && n > 0);
+  } catch { return []; }
+}
+
+/** True when the PID is a node process. Used as a safety filter before
+ *  killing — we never reap SSH sessions, VS Code port-forwards, browser
+ *  tabs, etc. Cross-platform via process name lookup. */
+function isNodeProcess(pid) {
+  try {
+    if (process.platform === "win32") {
+      // tasklist /FI "PID eq N" /FO CSV → "Image Name","PID",...
+      const out = spawnSync("tasklist", ["/FI", `PID eq ${pid}`, "/FO", "CSV", "/NH"], { encoding: "utf8" }).stdout || "";
+      return /node\.exe/i.test(out);
+    }
+    // POSIX — `ps -p PID -o comm=` prints just the command name.
+    const out = spawnSync("ps", ["-p", String(pid), "-o", "comm="], { encoding: "utf8" }).stdout || "";
+    return /\bnode\b/.test(out);
+  } catch { return false; }
+}
+
+/** Fallback reaper: when a port the script wants is held by a stray
+ *  node process AND the lockfile-based reapPriorInstance() didn't catch
+ *  it (Windows X-close, run from a different cwd, lockfile deleted),
+ *  identify the PID via netstat/lsof and kill it IF it's node. Only
+ *  ever touches node processes — SSH/IDE/browser owning the port stays
+ *  untouched and we fall back to picking a different port.
+ *  Returns true when at least one node PID was killed and the port is
+ *  now free. */
+async function reapStalePortIfNode(port) {
+  const pids = findPidsOnPort(port);
+  const nodePids = pids.filter(isNodeProcess);
+  if (nodePids.length === 0) return false;
+  stepRun(`Porta :${port}`, `node órfão detectado (pid ${nodePids.join(", ")}) — matando…`);
+  for (const pid of nodePids) killTree(pid);
+  // Wait briefly for the port to actually free (kill is async on Windows).
+  for (let i = 0; i < 20; i++) {
+    if (!(await portInUse(port))) return true;
+    await new Promise((r) => setTimeout(r, 100));
+  }
+  return false;
+}
+
 async function resolvePorts() {
   const parts = [];
   // Resolve the WEB port first so the daemon-reuse decision below can see it.
   // Reserve DAEMON_PORT: it is the (still unbound) bridge port, so without this
   // the scan could hand the same port to web + bridge.
   if (await portInUse(VITE_PORT)) {
-    const free = await nextFreePort(VITE_PORT + 1, 40, new Set([DAEMON_PORT]));
-    if (free == null) fatalPort(VITE_PORT);
-    parts.push(`:${VITE_PORT} ocupada → web em :${free}`);
-    VITE_PORT = free;
+    // Try to reclaim — only kills node processes, never foreign ones.
+    if (await reapStalePortIfNode(VITE_PORT)) {
+      parts.push(`:${VITE_PORT} reclaimada de orfão node`);
+    } else {
+      const free = await nextFreePort(VITE_PORT + 1, 40, new Set([DAEMON_PORT]));
+      if (free == null) fatalPort(VITE_PORT);
+      parts.push(`:${VITE_PORT} ocupada → web em :${free}`);
+      VITE_PORT = free;
+    }
   }
   if (await portInUse(DAEMON_PORT)) {
-    // Our prior instance was already reaped (start fresh), so a port still held
-    // here belongs to a FOREIGN process — reclaim onto the next free port.
-    // Reserve VITE_PORT so the daemon never steals the web port.
-    const free = await nextFreePort(DAEMON_PORT + 1, 40, new Set([VITE_PORT]));
-    if (free == null) fatalPort(DAEMON_PORT);
-    parts.push(`:${DAEMON_PORT} ocupada → bridge em :${free}`);
-    DAEMON_PORT = free;
+    // Same reclaim attempt for the daemon port. Lockfile reap above
+    // catches DF's own daemon; this catches every other orphan node.
+    if (await reapStalePortIfNode(DAEMON_PORT)) {
+      parts.push(`:${DAEMON_PORT} reclaimada de orfão node`);
+    } else {
+      const free = await nextFreePort(DAEMON_PORT + 1, 40, new Set([VITE_PORT]));
+      if (free == null) fatalPort(DAEMON_PORT);
+      parts.push(`:${DAEMON_PORT} ocupada → bridge em :${free}`);
+      DAEMON_PORT = free;
+    }
   }
   return parts.length ? parts.join(" · ") : `:${VITE_PORT} + :${DAEMON_PORT} livres`;
 }

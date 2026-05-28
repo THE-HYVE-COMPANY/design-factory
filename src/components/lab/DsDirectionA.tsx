@@ -8,7 +8,7 @@
 // preview). Simpler than the old modal — no GitHub OAuth device flow and
 // no folder file-pick UI; the founder accepted that trade-off (Opção 1).
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, FileText, Folder, GitBranch, Link, Upload, type LucideIcon } from "lucide-react";
 import {
   BRIDGE_URL, designSystemsDir, fetchUrlViaBridge, gitShallowClone, listFolder,
@@ -19,6 +19,11 @@ import {
   invokeDsGeneration, looksLikeDesignMd,
 } from "@/runtime/ds-invoker";
 import type { DsEntry } from "@/types/ds";
+import type { ProviderId } from "@/providers/types";
+import {
+  defaultModelForProvider, readLastModel, writeLastModel,
+  useLiveModelOptions,
+} from "@/providers/model-lists";
 
 type Source = "folder" | "github" | "upload" | "url";
 
@@ -27,6 +32,24 @@ const SOURCES: Array<{ id: Source; Icon: LucideIcon; name: string; hint: string;
   { id: "github", Icon: GitBranch,  name: "GitHub",    hint: "Cole a URL de um repositório público. A IA lê os arquivos de estilo e destila o design.md.", placeholder: "https://github.com/org/repo" },
   { id: "upload", Icon: FileText,   name: "design.md", hint: "Já tem um design.md canônico? Ele entra como está, sem reprocessar.", placeholder: undefined },
   { id: "url",    Icon: Link,       name: "URL",       hint: "Cole a URL de um site. A IA captura o fingerprint visual (cores, tipografia, espaçamento).", placeholder: "https://site.com" },
+];
+
+// Providers the DS forge can ask to generate the design.md (folder/url/
+// github sources) and the preview HTML. CLI providers spawn locally;
+// BYOK APIs need a token in the daemon's config; Ollama needs a model
+// pulled. The picker greys out unavailable providers but keeps them
+// selectable so the user can switch to install them and retry.
+const PROVIDER_OPTIONS: Array<{ id: ProviderId; label: string }> = [
+  { id: "claude",     label: "Claude Code" },
+  { id: "codex",      label: "Codex CLI" },
+  { id: "gemini",     label: "Gemini CLI" },
+  { id: "opencode",   label: "Opencode CLI" },
+  { id: "kimi",       label: "Kimi Code CLI" },
+  { id: "ollama",     label: "Ollama (local)" },
+  { id: "openrouter", label: "OpenRouter (BYOK)" },
+  { id: "anthropic",  label: "Anthropic API (BYOK)" },
+  { id: "openai",     label: "OpenAI API (BYOK)" },
+  { id: "gemini-api", label: "Gemini API (BYOK)" },
 ];
 
 const RELEVANT_FILE_NAMES = [
@@ -80,6 +103,26 @@ export function DsDirectionA({ onClose, onSaved }: { onClose: () => void; onSave
   const active = SOURCES.find((s) => s.id === source)!;
   const saving = status !== "idle";
 
+  // Provider + model picker — replaces the disabled "Claude Code/sonnet"
+  // chips. Remembers the last picked provider via localStorage so the
+  // founder doesn't re-select on every modal open. Switching provider
+  // resets the model to that provider's last-picked (or its default).
+  const [provider, setProvider] = useState<ProviderId>(
+    () => (readLastModel("__df:ds-provider" as ProviderId) as ProviderId) || "claude",
+  );
+  const [model, setModel] = useState<string>(
+    () => readLastModel(provider) ?? defaultModelForProvider(provider),
+  );
+  // Ollama / OpenRouter get LIVE model lists from the local server /
+  // public catalog. Other providers fall back to the static catalog.
+  const modelChoices = useLiveModelOptions(provider);
+  // When the user switches provider, restore the last-used model for
+  // that provider (or its default). Avoids leaking e.g. "sonnet" into
+  // a kimi run, which the daemon would reject as a foreign alias.
+  useEffect(() => {
+    setModel(readLastModel(provider) ?? defaultModelForProvider(provider));
+  }, [provider]);
+
   const appendLog = (line: string) => setLog((prev) => [...prev, line]);
 
   const fireOptionalPreview = (entry: DsEntry) => {
@@ -90,8 +133,8 @@ export function DsDirectionA({ onClose, onSaved }: { onClose: () => void; onSave
       body: JSON.stringify({
         dsPath: entry.path,
         designMdPath: entry.designMdPath,
-        provider: "claude",
-        model: "sonnet",
+        provider,
+        model,
       }),
     }).catch(() => { /* DsPreviewScreen surfaces failures */ });
   };
@@ -131,20 +174,23 @@ export function DsDirectionA({ onClose, onSaved }: { onClose: () => void; onSave
     };
     fireOptionalPreview(entry);
     setStatus("idle");
-    // Forward intent: when preview was requested, the caller routes
-    // the user to the DS detail Preview tab so they actually SEE the
-    // generation in flight. Without this, the modal closes into the
-    // silent home grid while the daemon spends ~minute generating —
-    // user feedback: "marquei pra gerar preview ... se gerou preview
-    // nao foi pra o lugar certo" (the preview did land, just nothing
-    // surfaced the result loudly enough).
-    onSaved(entry, { openPreview: genPreview });
+    // Always route the user into /ds/:slug after a successful save —
+    // they just created/imported a DS, the next thing they want is to
+    // SEE it. The detail screen has tokens + preview tabs; the Preview
+    // tab automatically polls for `.preview-generating.json` when the
+    // generation toggle was on, so the result has somewhere visible to
+    // land. Founder: "qnd clico criar, ja devia ... ir direto pra
+    // pagina preview mostrar status de processando."
+    onSaved(entry, { openPreview: true });
     onClose();
   };
 
   const generateAndPersist = async (prompt: string, folder: string, src: DsEntry["source"], sourceRef?: string) => {
     setStatus("generating");
-    appendLog("streaming from claude · sonnet…");
+    appendLog(`streaming from ${provider} · ${model}…`);
+    // Remember the user's pick so the next modal open defaults to it.
+    writeLastModel(provider, model);
+    writeLastModel("__df:ds-provider" as ProviderId, provider);
     let acc = "";
     try {
       await invokeDsGeneration(prompt, {
@@ -154,7 +200,7 @@ export function DsDirectionA({ onClose, onSaved }: { onClose: () => void; onSave
         onResult: (r) => appendLog(`done · ${r.durationMs ?? "?"}ms`),
         onDone: (clean) => { void persist(clean, folder, src, sourceRef); },
         onError: (e) => { setStatus("idle"); setError(e); },
-      }, { provider: "claude", model: "sonnet" });
+      }, { provider, model });
     } catch (e) {
       setStatus("idle");
       setError(e instanceof Error ? e.message : String(e));
@@ -316,16 +362,77 @@ export function DsDirectionA({ onClose, onSaved }: { onClose: () => void; onSave
         </div>
       </div>
 
-      {/* Engine — engraved provider + model */}
+      {/* Engine — provider + model picker. The wrapping label says
+          "motor do preview" for the upload source (the only stage the
+          engine touches is preview generation, since the design.md is
+          already canonical), and "motor de extração" for the other
+          sources (the engine first DISTILLS design.md from the inputs,
+          then generates the preview if the toggle is on). Both stages
+          use the same provider/model — keeping it one pick avoids
+          UI complexity for the rare case where they'd legitimately
+          differ. */}
       <div className="dsl-zone">
         <span className="dsl-engrave">{source === "upload" ? "motor do preview" : "motor de extração"}</span>
         <div className="dsl-engine">
-          <button className="dsl-engine-chip" type="button" disabled>
-            <span className="dsl-engine-k">provider</span> Claude Code
-          </button>
-          <button className="dsl-engine-chip" type="button" disabled>
-            <span className="dsl-engine-k">modelo</span> sonnet
-          </button>
+          <label className="dsl-engine-chip" style={{ cursor: saving ? "default" : "pointer" }}>
+            <span className="dsl-engine-k">provider</span>
+            <select
+              value={provider}
+              onChange={(e) => setProvider(e.target.value as ProviderId)}
+              disabled={saving}
+              style={{
+                background: "transparent",
+                color: "inherit",
+                border: "none",
+                fontFamily: "inherit",
+                fontSize: "inherit",
+                outline: "none",
+                cursor: saving ? "default" : "pointer",
+                appearance: "auto",
+              }}
+            >
+              {PROVIDER_OPTIONS.map((p) => (
+                <option key={p.id} value={p.id}>{p.label}</option>
+              ))}
+            </select>
+          </label>
+          <label className="dsl-engine-chip" style={{ cursor: saving ? "default" : "pointer" }}>
+            <span className="dsl-engine-k">modelo</span>
+            <select
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              disabled={saving || modelChoices.loading}
+              style={{
+                background: "transparent",
+                color: "inherit",
+                border: "none",
+                fontFamily: "inherit",
+                fontSize: "inherit",
+                outline: "none",
+                cursor: saving ? "default" : "pointer",
+                appearance: "auto",
+              }}
+            >
+              {modelChoices.options.length === 0 && (
+                <option value="">— sem modelos disponíveis —</option>
+              )}
+              {modelChoices.options.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.label}{m.sub ? `  ·  ${m.sub}` : ""}
+                </option>
+              ))}
+            </select>
+          </label>
+          {modelChoices.loading && (
+            <span style={{
+              fontFamily: "var(--df-font-mono)",
+              fontSize: "10px",
+              color: "var(--df-text-muted)",
+              alignSelf: "center",
+            }}>
+              listando…
+            </span>
+          )}
         </div>
       </div>
 

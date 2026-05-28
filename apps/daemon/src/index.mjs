@@ -259,12 +259,31 @@ const HOME = process.env.HOME || "/";
 // collision via dedupe(). Resolved lazily via git --git-common-dir so
 // worktree dev setups still land at the main checkout rather than
 // inside .aios/worktrees/*.
+// Cache the resolved repo root for the process lifetime. The daemon's
+// cwd doesn't change at runtime, so re-spawning git on every request
+// (32+ call sites previously) burned ~3-5ms × dozens of polls/min for
+// nothing. When the folder isn't a git repo (founder case: D:\design-
+// factory bootstrapped via the v0.1.0 tarball scaffolder), the cache
+// also stops `fatal: not a git repository` from spamming stderr —
+// previously execFileSync's default stderr inheritance leaked git's
+// failure message into the user's terminal on every request.
+let cachedRepoRoot = null;
+
 function getRepoRoot() {
+  if (cachedRepoRoot) return cachedRepoRoot;
   let repoRoot = process.cwd();
   try {
-    const out = execFileSync("git", ["rev-parse", "--path-format=absolute", "--git-common-dir"], { cwd: process.cwd(), timeout: 3000 }).toString().trim();
+    // stdio: capture stdout, SUPPRESS stderr so the "fatal: not a git
+    // repository" message git writes on failure doesn't bubble up to
+    // the user's dev:web log on non-git folders.
+    const out = execFileSync(
+      "git",
+      ["rev-parse", "--path-format=absolute", "--git-common-dir"],
+      { cwd: process.cwd(), timeout: 3000, stdio: ["ignore", "pipe", "ignore"] },
+    ).toString().trim();
     if (out) repoRoot = dirname(out);
   } catch {}
+  cachedRepoRoot = repoRoot;
   return repoRoot;
 }
 
@@ -2071,15 +2090,7 @@ const server = http.createServer(async (req, res) => {
       // Resolve repoRoot from git-common-dir (same pattern as the chat
       // endpoints further down). Falls back to process.cwd() outside a
       // git checkout so dev / test scaffolds work.
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch { /* not in git or git missing — keep process.cwd() */ }
+      const repoRoot = getRepoRoot();
 
       // : optional project-files resolver. Default OFF until the
       // first release. With the flag on, we authoritatively re-resolve the
@@ -2271,15 +2282,7 @@ const server = http.createServer(async (req, res) => {
       const requestedPath = u.searchParams.get("path");
 
       // Resolve repoRoot the same way /fs/write/artifact does.
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch { /* not in git */ }
+      const repoRoot = getRepoRoot();
 
       const result = await deleteArtifactSafely({ requestedPath, repoRoot });
       res.writeHead(200, { "Content-Type": "application/json" });
@@ -2660,16 +2663,7 @@ const server = http.createServer(async (req, res) => {
   // slugs that currently have a folder.
   if (req.method === "GET" && req.url.startsWith("/fs/list-projects")) {
     try {
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git",
-          ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {}
+      const repoRoot = getRepoRoot();
       const root = join(repoRoot, "projects");
       let entries = [];
       try {
@@ -2865,15 +2859,7 @@ const server = http.createServer(async (req, res) => {
   // list that could drift from disk.
   if (req.method === "GET" && req.url.startsWith("/fs/list-design-systems")) {
     try {
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {}
+      const repoRoot = getRepoRoot();
       const root = join(repoRoot, "design-systems");
       let entries = [];
       try {
@@ -3159,15 +3145,7 @@ const server = http.createServer(async (req, res) => {
       if (!body?.message || typeof body.message !== "object") {
         res.writeHead(400); res.end(JSON.stringify({ error: "message required" })); return;
       }
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {}
+      const repoRoot = getRepoRoot();
       const projectsRoot = resolveProjectsRoot(repoRoot);
       let target;
       try { target = assertPathInScope(slug, projectsRoot); }
@@ -3203,15 +3181,7 @@ const server = http.createServer(async (req, res) => {
       const slug = normalizeProjectSlug(rawSlug);
       const threadId = (u.searchParams.get("threadId") || "").replace(/[^A-Za-z0-9._-]+/g, "-").slice(0, 80);
       if (!slug || !threadId) { res.writeHead(400); res.end(JSON.stringify({ error: "slug + threadId required" })); return; }
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {}
+      const repoRoot = getRepoRoot();
       const filePath = join(repoRoot, "projects", slug, ".df", "chat", `${threadId}.jsonl`);
       let text = "";
       try { text = await readFile(filePath, "utf8"); }
@@ -3251,15 +3221,7 @@ const server = http.createServer(async (req, res) => {
       const slug = normalizeProjectSlug(rawSlug);
       const threadId = (u.searchParams.get("threadId") || "").replace(/[^A-Za-z0-9._-]+/g, "-").slice(0, 80);
       if (!slug || !threadId) { res.writeHead(400); res.end(JSON.stringify({ error: "slug + threadId required" })); return; }
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {}
+      const repoRoot = getRepoRoot();
       const filePath = join(repoRoot, "projects", slug, ".df", "chat", `${threadId}.jsonl`);
       let text = "";
       try { text = await readFile(filePath, "utf8"); }
@@ -3369,15 +3331,7 @@ const server = http.createServer(async (req, res) => {
       const raw = u.searchParams.get("slug") ?? "";
       const slug = raw.toLowerCase().replace(/[^a-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80);
       if (!slug) { res.writeHead(400); res.end(JSON.stringify({ error: "slug required" })); return; }
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {}
+      const repoRoot = getRepoRoot();
       const projectsRoot = resolveProjectsRoot(repoRoot);
       let target;
       try { target = assertPathInScope(slug, projectsRoot); }
@@ -3441,15 +3395,7 @@ const server = http.createServer(async (req, res) => {
         ? body.threadId.replace(/[^A-Za-z0-9._-]+/g, "-").slice(0, 80)
         : "";
       if (!slug || !threadId) { res.writeHead(400); res.end(JSON.stringify({ error: "slug + threadId required" })); return; }
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {}
+      const repoRoot = getRepoRoot();
       const projectsRoot = resolveProjectsRoot(repoRoot);
       let target;
       try { target = assertPathInScope(slug, projectsRoot); }
@@ -3493,15 +3439,7 @@ const server = http.createServer(async (req, res) => {
         console.warn("[chat-append-turn] 400: malformed turn", JSON.stringify(turn).slice(0, 200));
         res.writeHead(400); res.end(JSON.stringify({ error: "turn with string id required", got: { hasUser: !!turn?.user, hasAi: !!turn?.ai, idType: typeof turn?.id } })); return;
       }
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {}
+      const repoRoot = getRepoRoot();
       const projectsRoot = resolveProjectsRoot(repoRoot);
       let target;
       try { target = assertPathInScope(slug, projectsRoot); }
@@ -3549,15 +3487,7 @@ const server = http.createServer(async (req, res) => {
       if (!slug || !threadId) { res.writeHead(400); res.end(JSON.stringify({ error: "slug + threadId required" })); return; }
       const messages = Array.isArray(body?.messages) ? body.messages : null;
       if (!messages) { res.writeHead(400); res.end(JSON.stringify({ error: "messages array required" })); return; }
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {}
+      const repoRoot = getRepoRoot();
       const projectsRoot = resolveProjectsRoot(repoRoot);
       let target;
       try { target = assertPathInScope(slug, projectsRoot); }
@@ -3592,15 +3522,7 @@ const server = http.createServer(async (req, res) => {
       const slug = normalizeProjectSlug(rawSlug);
       const threadId = (u.searchParams.get("threadId") || "").replace(/[^A-Za-z0-9._-]+/g, "-").slice(0, 80);
       if (!slug || !threadId) { res.writeHead(400); res.end(JSON.stringify({ error: "slug + threadId required" })); return; }
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {}
+      const repoRoot = getRepoRoot();
       const filePath = join(repoRoot, "projects", slug, ".df", "chat", `${threadId}.snapshot.json`);
       try {
         const text = await readFile(filePath, "utf8");
@@ -3631,15 +3553,7 @@ const server = http.createServer(async (req, res) => {
       const raw = u.searchParams.get("slug") || "";
       const slug = raw.toLowerCase().replace(/[^a-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80);
       if (!slug) { res.writeHead(400); res.end(JSON.stringify({ error: "slug required" })); return; }
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {}
+      const repoRoot = getRepoRoot();
       const metaPath = join(repoRoot, "projects", slug, ".df", "meta.json");
       // Read + parse separately so we never call writeHead BEFORE a possible
       // throw. The original code wrote headers first and then called
@@ -3688,15 +3602,7 @@ const server = http.createServer(async (req, res) => {
       if (!body?.meta || typeof body.meta !== "object") {
         res.writeHead(400); res.end(JSON.stringify({ error: "meta required" })); return;
       }
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {}
+      const repoRoot = getRepoRoot();
       const projectsRoot = resolveProjectsRoot(repoRoot);
       let target;
       try { target = assertPathInScope(slug, projectsRoot); }
@@ -3736,15 +3642,7 @@ const server = http.createServer(async (req, res) => {
           const raw = u.searchParams.get("slug") || "";
           const slug = raw.toLowerCase().replace(/[^a-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80);
           if (!slug) { res.writeHead(400); res.end(JSON.stringify({ error: "slug required" })); return; }
-          let repoRoot = process.cwd();
-          try {
-            const { stdout } = await execFileP(
-              "git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-              { cwd: process.cwd(), timeout: 3000 },
-            );
-            const commonDir = stdout.trim();
-            if (commonDir) repoRoot = dirname(commonDir);
-          } catch {}
+          const repoRoot = getRepoRoot();
           const filePath = join(repoRoot, "projects", slug, ".df", file);
           let fileContent;
           try {
@@ -3783,15 +3681,7 @@ const server = http.createServer(async (req, res) => {
           if (!payload || typeof payload !== "object") {
             res.writeHead(400); res.end(JSON.stringify({ error: `${key} required` })); return;
           }
-          let repoRoot = process.cwd();
-          try {
-            const { stdout } = await execFileP(
-              "git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-              { cwd: process.cwd(), timeout: 3000 },
-            );
-            const commonDir = stdout.trim();
-            if (commonDir) repoRoot = dirname(commonDir);
-          } catch {}
+          const repoRoot = getRepoRoot();
           const projectsRoot = resolveProjectsRoot(repoRoot);
           let target;
           try { target = assertPathInScope(slug, projectsRoot); }
@@ -3827,16 +3717,7 @@ const server = http.createServer(async (req, res) => {
       const body = await readJson(req);
       const raw = typeof body?.path === "string" ? body.path : "";
       if (!raw) { res.writeHead(400); res.end(JSON.stringify({ error: "path required" })); return; }
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git",
-          ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {}
+      const repoRoot = getRepoRoot();
       const projectsRoot = resolveProjectsRoot(repoRoot);
       // Strip a leading projects/ if relative, then validate.
       const rel = raw.startsWith("/") ? raw : raw.replace(/^projects\//, "");
@@ -3869,16 +3750,7 @@ const server = http.createServer(async (req, res) => {
       const raw = typeof body?.slug === "string" ? body.slug : "";
       const slug = raw.toLowerCase().replace(/[^a-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80);
       if (!slug) { res.writeHead(400); res.end(JSON.stringify({ error: "slug required" })); return; }
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git",
-          ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {}
+      const repoRoot = getRepoRoot();
       const projectsRoot = resolveProjectsRoot(repoRoot);
       let target;
       try { target = assertPathInScope(slug, projectsRoot); }
@@ -3919,16 +3791,7 @@ const server = http.createServer(async (req, res) => {
       const rawSlug = decodeURIComponent(match[1]);
       const slug = normalizeProjectSlug(rawSlug);
       if (!slug) { res.writeHead(400); res.end(JSON.stringify({ error: "slug required" })); return; }
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git",
-          ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {}
+      const repoRoot = getRepoRoot();
       const projectsRoot = resolveProjectsRoot(repoRoot);
       let target;
       try { target = assertPathInScope(slug, projectsRoot); }
@@ -4025,15 +3888,7 @@ const server = http.createServer(async (req, res) => {
       const rawSlug = decodeURIComponent(m[1]);
       const slug = normalizeProjectSlug(rawSlug);
       if (!slug) { res.writeHead(400); res.end(JSON.stringify({ error: "slug required" })); return; }
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {}
+      const repoRoot = getRepoRoot();
       const projectsRoot = resolveProjectsRoot(repoRoot);
       let target;
       try { target = assertPathInScope(slug, projectsRoot); }
@@ -4096,15 +3951,7 @@ const server = http.createServer(async (req, res) => {
       if (version.html.length > 4 * 1024 * 1024) {
         res.writeHead(413); res.end(JSON.stringify({ error: "version html too large (>4MB)" })); return;
       }
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {}
+      const repoRoot = getRepoRoot();
       const projectsRoot = resolveProjectsRoot(repoRoot);
       let target;
       try { target = assertPathInScope(slug, projectsRoot); }
@@ -4150,15 +3997,7 @@ const server = http.createServer(async (req, res) => {
       const rawVid = decodeURIComponent(m[2]);
       const safeVid = sanitizeVersionId(rawVid);
       if (!slug || !safeVid) { res.writeHead(400); res.end(JSON.stringify({ error: "slug+vid required" })); return; }
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {}
+      const repoRoot = getRepoRoot();
       const projectsRoot = resolveProjectsRoot(repoRoot);
       let target;
       try { target = assertPathInScope(slug, projectsRoot); }
@@ -4197,15 +4036,7 @@ const server = http.createServer(async (req, res) => {
       const rawVid = decodeURIComponent(m[2]);
       const safeVid = sanitizeVersionId(rawVid);
       if (!slug || !safeVid) { res.writeHead(400); res.end(JSON.stringify({ error: "slug+vid required" })); return; }
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {}
+      const repoRoot = getRepoRoot();
       const projectsRoot = resolveProjectsRoot(repoRoot);
       let target;
       try { target = assertPathInScope(slug, projectsRoot); }
@@ -4239,20 +4070,19 @@ const server = http.createServer(async (req, res) => {
       const raw = typeof body?.slug === "string" ? body.slug : "";
       const slug = raw.toLowerCase().replace(/[^a-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80);
       if (!slug) { res.writeHead(400); res.end(JSON.stringify({ error: "slug required" })); return; }
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git",
-          ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {}
+      const repoRoot = getRepoRoot();
       const dsRoot = join(repoRoot, "design-systems");
       const target = resolve(dsRoot, slug);
-      if (!target.startsWith(dsRoot + "/") && target !== dsRoot) {
-        res.writeHead(400); res.end(JSON.stringify({ error: "path escapes design-systems root" }));
+      // Path escape check via relative() — works on both POSIX (sep "/")
+      // and Windows (sep "\"). The previous literal `dsRoot + "/"` check
+      // matched paths on Linux but always failed on Windows (separator
+      // mismatch), so the daemon returned 400, the UI did an optimistic
+      // remove, and the next reconcile brought the DS back from disk.
+      // Founder repro 2026-05-28: "nao consigo deletar ds, some e volta".
+      const rel = relative(dsRoot, target);
+      if (rel.startsWith("..") || isAbsolute(rel)) {
+        res.writeHead(400);
+        res.end(JSON.stringify({ error: "path escapes design-systems root" }));
         return;
       }
       await rm(target, { recursive: true, force: true });
@@ -4323,18 +4153,7 @@ const server = http.createServer(async (req, res) => {
   // resolve ~ — sometimes /root/, sometimes $HOME. Return absolute paths up
   // front so the UI can seed its defaults correctly.
   if (req.method === "GET" && req.url.startsWith("/fs/workspace-info")) {
-    let repoRoot = process.cwd();
-    try {
-      const { stdout } = await execFileP(
-        "git",
-        ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-        { cwd: process.cwd(), timeout: 3000 },
-      );
-      const commonDir = stdout.trim();
-      if (commonDir) repoRoot = dirname(commonDir);
-    } catch {
-      // not a git repo — keep cwd
-    }
+    const repoRoot = getRepoRoot();
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify({
       repoRoot,
@@ -4361,18 +4180,7 @@ const server = http.createServer(async (req, res) => {
       const raw = typeof body?.slug === "string" ? body.slug : "";
       const slug = raw.toLowerCase().replace(/[^a-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80);
       if (!slug) { res.writeHead(400); res.end(JSON.stringify({ error: "slug required" })); return; }
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git",
-          ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {
-        // not a git repo — keep cwd
-      }
+      const repoRoot = getRepoRoot();
       const root = join(repoRoot, "design-systems");
       await mkdir(root, { recursive: true });
       const dest = join(root, slug);
@@ -5929,15 +5737,7 @@ const server = http.createServer(async (req, res) => {
     };
 
     // Resolve project root same way other endpoints do.
-    let repoRoot = process.cwd();
-    try {
-      const { stdout } = await execFileP(
-        "git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-        { cwd: process.cwd(), timeout: 3000 },
-      );
-      const commonDir = stdout.trim();
-      if (commonDir) repoRoot = dirname(commonDir);
-    } catch {}
+    const repoRoot = getRepoRoot();
 
     void (async () => {
       const startedAt = Date.now();
@@ -6143,15 +5943,7 @@ body { overflow: hidden !important; }
     try {
       const u = new URL(req.url, "http://localhost");
       const relPath = u.searchParams.get("path") || "";
-      let repoRoot = process.cwd();
-      try {
-        const { stdout } = await execFileP(
-          "git", ["rev-parse", "--path-format=absolute", "--git-common-dir"],
-          { cwd: process.cwd(), timeout: 3000 },
-        );
-        const commonDir = stdout.trim();
-        if (commonDir) repoRoot = dirname(commonDir);
-      } catch {}
+      const repoRoot = getRepoRoot();
       const projectsRoot = resolveProjectsRoot(repoRoot);
       let target;
       try { target = assertPathInScope(relPath.replace(/^projects\//, ""), projectsRoot); }

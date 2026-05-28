@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { readFileViaBridge, writeFile, gitShallowClone, db, BRIDGE_URL } from "@/lib/claude-bridge";
+import { readFileViaBridge, writeFile, gitShallowClone, db, BRIDGE_URL, openFolderViaBridge } from "@/lib/claude-bridge";
 import { parseDesignSystem, type ParsedDesignSystem } from "@/lib/ds-google";
 import { renderMarkdownSafe } from "@/lib/safe-markdown";
 import type { DsEntry } from "@/types/ds";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { GeneratePreviewModal } from "@/components/GeneratePreviewModal";
 import { TabCornerLeft, TabCornerRight } from "@/components/TabCorner";
-import { Settings } from "lucide-react";
+import { FolderOpen, Settings } from "lucide-react";
 
 interface GenerationState {
   provider: string;
@@ -357,8 +357,36 @@ export function DsPreviewScreen({ entry, onBack, onOpenSettings, theme, onThemeC
 
         <div
           className="topbar-right"
-          style={{ position: "static", marginLeft: "auto" }}
+          style={{ position: "static", marginLeft: "auto", display: "flex", alignItems: "center", gap: 8 }}
         >
+          {/* Open folder — dispatches Finder/Explorer/xdg-open on the
+              DS folder. Same shape the skill detail uses. Founder ask:
+              "na pagina de design system, quero botao pra abrir pasta
+              localmente". */}
+          {entry.path && (
+            <button
+              type="button"
+              className="df-btn df-btn--secondary"
+              title={`Abrir ${entry.path}`}
+              aria-label="Open design system folder"
+              onClick={() => {
+                void openFolderViaBridge(entry.path).then((r) => {
+                  if ("error" in r) {
+                    // Best-effort surfacing — fallback to a console log
+                    // when no toast surface is mounted in this screen.
+                    console.warn("[ds] open-folder failed:", r.error);
+                  }
+                });
+              }}
+              style={{
+                width: 32, height: 32, padding: 0,
+                borderRadius: "var(--df-r-md)", flexShrink: 0,
+                display: "inline-flex", alignItems: "center", justifyContent: "center",
+              }}
+            >
+              <FolderOpen size={16} strokeWidth={2} aria-hidden="true" />
+            </button>
+          )}
           {theme && onThemeChange && <ThemeToggle theme={theme} onChange={onThemeChange} />}
           {onOpenSettings && (
             <button

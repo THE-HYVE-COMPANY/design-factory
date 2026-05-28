@@ -9,6 +9,10 @@ export function resolveRepoRoot(cwd = process.cwd()) {
     cwd,
     encoding: "utf8",
     timeout: 3000,
+    // SUPPRESS stderr — git writes "fatal: not a git repository" to
+    // stderr on failure, which inherits to the daemon's stderr by
+    // default and spammed the user's dev:web log on non-git folders.
+    stdio: ["ignore", "pipe", "ignore"],
   });
   if (git.status === 0 && git.stdout.trim()) return dirname(git.stdout.trim());
   return cwd;
