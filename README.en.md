@@ -9,7 +9,7 @@
 
 # Design Factory
 
-Design with AI without always starting from an empty prompt.
+HYVE's first open-source project.
 
 <p>
   <a href="LICENSE"><img alt="Apache 2.0" src="https://img.shields.io/badge/license-Apache_2.0-blue.svg"></a>
@@ -17,10 +17,31 @@ Design with AI without always starting from an empty prompt.
   <a href="docs/providers.md"><img alt="Multi-provider" src="https://img.shields.io/badge/providers-multi--model-ff5524.svg"></a>
 </p>
 
-Design Factory is a local-first, open-source workspace for generating and
-editing HTML artifacts with AI. Each project starts with preconfigured direction
-(canvas, format, rules, design system, skills) before the first output. You can
-work with multiple models in the same project.
+An open experiment offering a local workspace that makes context, direction,
+and taste more operable inside AI-assisted design. An open-source alternative
+to Claude Design and other closed AI-assisted design applications.
+
+## What ships in this version
+
+- configuration of formats, rules, commands, and prompts;
+- generation of editable HTML artifacts;
+- design-system ingestion and preview;
+- skill creation and import;
+- tweaks via CSS variables;
+- inline text editing and component property edits;
+- comments as structured direction;
+- version snapshots, file manager, and embedded terminal;
+- public documentation.
+
+## Providers you can use inside the same project
+
+- Claude Code
+- Codex
+- Gemini
+- Opencode
+- Kimi
+- OpenRouter
+- Ollama
 
 ---
 
@@ -49,20 +70,20 @@ npm run dev:web
 The launcher boots the app and opens your browser at `http://localhost:1420`. If
 the port is busy, it picks another and prints the URL.
 
-No terminal needed: after cloning, double-click `start.command` (macOS) or
-`start.bat` (Windows). The first run installs dependencies and opens the app. To
-update, use `update.command` / `update.bat`.
+No terminal: after cloning, double-click `start.command` (macOS) or `start.bat`
+(Windows). The first run installs dependencies and opens the app. To update,
+use `update.command` / `update.bat`.
 
-> **First time on macOS:** if you see "cannot be opened because Apple cannot
-> check it", that's just because the app is open-source and unsigned.
-> **Right-click** (or Control-click) `start.command` → **Open** → **Open** again
-> in the prompt. Double-click works normally after that. (Cloning with `git`
-> avoids the warning; downloading the `.zip` is what triggers macOS's block.)
+> **macOS first-time gotcha:** if you see "cannot be opened because Apple cannot
+> verify it", that's just because the app is open-source and unsigned. **Right-
+> click** (or Control-click) `start.command` → **Open** → **Open** again on the
+> warning. After that, double-click works as usual. (Cloning with `git` avoids
+> this; the `.zip` download is what triggers macOS quarantine.)
 
-### Day to day (after install)
+### Day to day (once installed)
 
-Open a terminal **inside the project folder**: type `cd ` (with a space), drag
-the `design-factory` folder from your file browser into the terminal window, and
+Open the terminal **inside the project folder**: in Terminal, type `cd ` (with
+a space), drag the `design-factory` folder from Finder into the window, and
 press Enter. With the terminal in the folder, just copy:
 
 **Open Design Factory:**
@@ -77,9 +98,9 @@ npm run dev:web
 git fetch origin && git reset --hard origin/main && npm install
 ```
 
-Once it opens, go to Settings → Providers. CLIs you already have logged in show
-as connected; BYOK keys are optional. Create a project, give it context,
-generate, then refine with tweaks, comments, and edits. Walkthrough in
+After opening, go to Settings → Providers. CLIs you're already logged into show
+as connected; BYOK keys are optional. Create a project, add context, generate,
+and refine with tweaks, comments, and edits. Step-by-step in
 [docs/quickstart.md](docs/quickstart.md).
 
 ---
@@ -152,4 +173,4 @@ quality gates, docs, and tests.
 
 [Apache License 2.0](LICENSE) © The HYVE Company. Use, fork, study, and adapt.
 Read [NOTICE](NOTICE) before reusing the HYVE or Design Factory marks: the
-license covers code and docs, the marks stay reserved.
+license covers code and docs, the mark stays reserved.

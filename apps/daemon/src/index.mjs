@@ -2959,8 +2959,7 @@ const server = http.createServer(async (req, res) => {
       } catch {}
       // cover.html generation was prototyped here (wordmark+dot) but
       // user rejected the visual ("ta carnaval"). Disabled — DS
-      // cards fall back to the palette+Aa swatch band again. Module
-      // apps/daemon/src/ds-cover.mjs kept for future reference.
+      // cards fall back to the palette+Aa swatch band again.
 
       res.writeHead(202, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ status: "started", provider, model }));

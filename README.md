@@ -9,7 +9,7 @@
 
 # Design Factory
 
-Design com IA sem partir sempre de um prompt vazio.
+O primeiro projeto open-source da HYVE.
 
 <p>
   <a href="LICENSE"><img alt="Apache 2.0" src="https://img.shields.io/badge/license-Apache_2.0-blue.svg"></a>
@@ -17,10 +17,32 @@ Design com IA sem partir sempre de um prompt vazio.
   <a href="docs/providers.md"><img alt="Multi-provider" src="https://img.shields.io/badge/providers-multi--model-ff5524.svg"></a>
 </p>
 
-Design Factory é um workspace local-first e open-source para gerar e editar
-artefatos HTML com IA. Cada projeto começa com direção pré-configurada (canvas,
-formato, regras, design system, skills) antes do primeiro output. Você pode
-trabalhar com múltiplos modelos em um mesmo projeto.
+Um experimento aberto que oferece um workspace local para tornar contexto,
+direção e taste mais operáveis dentro do design assistido por IA. Uma
+alternativa open-source ao Claude Design e outras aplicações fechadas de design
+assistido por IA.
+
+## O que já entra nessa versão
+
+- configuração de formatos, regras, comandos e prompts;
+- geração de artefatos HTML editáveis;
+- ingestão e preview de design systems;
+- criação e importação de skills;
+- tweaks por CSS variables;
+- edição de texto inline e propriedades de componentes;
+- comentários como direção estruturada;
+- snapshots de versão, file manager e terminal integrado;
+- documentação pública.
+
+## Provedores que você pode usar dentro do mesmo projeto
+
+- Claude Code
+- Codex
+- Gemini
+- Opencode
+- Kimi
+- OpenRouter
+- Ollama
 
 ---
 

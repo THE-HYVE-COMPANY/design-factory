@@ -5,19 +5,14 @@ import { useT, setLang, type Lang } from "@/i18n";
 import { PROVIDERS, probeAllProviders } from "@/providers/registry";
 import { type ProviderId, type ProviderStatusReport } from "@/providers/types";
 import { InsumosPanel, type InsumoTab } from "@/components/InsumosPanel";
-// DFDSPanel removed from Settings nav. Component file preserved as a
-// reference surface for future debug routes — not referenced from
-// Settings now.
-// VercelPublishCard + GithubProviderCard removed from Settings →
-// Providers. Vercel publish + GitHub auth are not part of the current
-// public surface (users authenticate via `vercel login` / `gh auth` in
-// the terminal directly when they need those flows). Component
-// exports preserved in ProviderTokenInline.tsx (marked DEPRECATED).
+// DS components panel removed from Settings nav (user: "pagina de
+// componentes podemos apagar"). Vercel publish + GitHub auth removed
+// from Settings → Providers — users authenticate via `vercel login` /
+// `gh auth` in the terminal directly when they need those flows
+// (VercelPublishCard / GithubProviderCard exports in
+// ProviderTokenInline.tsx are marked DEPRECATED and no longer rendered).
 import { InlineProviderToken } from "@/components/ProviderTokenInline";
 import { ColorPickerPopover } from "@/components/dfds";
-// Advanced theme editor disclosure removed from Aparência. Component
-// file preserved for a potential future debug surface; not referenced
-// here.
 import "@/styles/settings-appearance.css";
 
 interface SettingsScreenProps {
@@ -363,8 +358,7 @@ export function SettingsScreen({ theme, onThemeChange, onBack, returnLabel, sect
 
               {/* Advanced theme editor disclosure dropped from the
                   current public surface. Three groups remain — Tema,
-                  Cores, Idioma. ThemeEditor.tsx is preserved for
-                  future debug routes. */}
+                  Cores, Idioma. */}
             </section>
           )}
 

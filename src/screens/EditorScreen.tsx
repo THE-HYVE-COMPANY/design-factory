@@ -35,10 +35,8 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { RatioChangeConfirmModal } from "@/components/RatioChangeConfirmModal";
 import { RatioRegenOverlay } from "@/components/RatioRegenOverlay";
 // Vercel publish + GitHub auth are not part of the current public
-// surface. The PublishDialog import is intentionally dropped — users
-// publish manually via `vercel deploy` in the terminal until a
-// future wave reintegrates the dialog with polished UX.
-// import { PublishDialog } from "@/components/PublishDialog";
+// surface. Users publish manually via `vercel deploy` in the terminal
+// until a future wave reintegrates a publish dialog with polished UX.
 import { regenerateForRatio, RegenError } from "@/runtime/ratio-regen";
 import { parseArtifact } from "@/runtime/artifact-processor";
 import {
@@ -62,13 +60,9 @@ import { loadAllVerbs, matchVerb, type Verb } from "@/runtime/verbs/registry";
 import { listCustomCommands } from "@/lib/claude-bridge";
 import { ActiveVerbPill } from "@/components/ActiveVerbPill";
 import { CommandLibrary } from "@/components/CommandLibrary";
-// The VideoTab editor is not part of the current public surface —
-// video presets in NewProject and mp4 export from Share remain, but
-// scene editing and manipulation are deferred. The component file
-// (src/components/VideoTab.tsx) is preserved so a later wave can
-// reactivate it without re-implementing the scene timeline /
-// inspector.
-// import { VideoTab } from "@/components/VideoTab";
+// The VideoTab editor is not part of the current public surface — video
+// presets in NewProject and mp4 export from Share remain, but scene
+// editing and manipulation are deferred to a future wave.
 import { CanvasStage } from "@/components/CanvasStage";
 import { DfLoader } from "@/components/DfLoader";
 import { ShortcutsOverlay } from "@/components/ShortcutsOverlay";
