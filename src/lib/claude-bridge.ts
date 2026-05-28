@@ -449,6 +449,31 @@ export async function readFile(_filePath: string): Promise<string> {
   throw new Error("readFile not supported in browser preview");
 }
 
+/** List extra files (non-SKILL.md) inside a skill folder. Used by the
+ *  detail modal to surface references/, scripts/, assets/ that arrived
+ *  via zip / folder import. Returns absolute `path` so the UI can
+ *  follow up with `/fs/read` to load contents lazily on click. */
+export interface SkillExtraFile {
+  rel: string;
+  name: string;
+  path: string;
+  size: number;
+  isText: boolean;
+}
+
+export async function listSkillFiles(
+  id: string,
+): Promise<{ skillDir: string; files: SkillExtraFile[] } | { error: string }> {
+  try {
+    const r = await fetch(`${BRIDGE_URL}/skills/${encodeURIComponent(id)}/files`);
+    const data = await r.json().catch(() => null);
+    if (!r.ok) return { error: data?.error || `HTTP ${r.status}` };
+    return data;
+  } catch (e) {
+    return { error: String(e) };
+  }
+}
+
 /** Open a project / DS / skill folder in the OS file manager (Finder /
  *  Explorer / xdg-open). Scope-checked daemon-side — refuses paths
  *  outside the canonical workspace roots. Returns the result envelope

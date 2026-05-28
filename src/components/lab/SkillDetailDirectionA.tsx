@@ -4,9 +4,12 @@
 // Delete is destructive — confirms before stub-firing. Real updateSkill /
 // deleteSkill re-wire onto this when the direction is approved.
 
-import { useState } from "react";
-import { ArrowRight, Download, Trash2 } from "lucide-react";
-import { updateSkill, deleteSkill, type Skill } from "@/lib/claude-bridge";
+import { useEffect, useState } from "react";
+import { ArrowRight, Download, FileText, Folder, Trash2 } from "lucide-react";
+import {
+  deleteSkill, listSkillFiles, readFileViaBridge, updateSkill,
+  type Skill, type SkillExtraFile,
+} from "@/lib/claude-bridge";
 
 // Same frontmatter shape the shipped SkillDetailModal exports — kept in
 // sync so both surfaces produce identical .md downloads.
@@ -34,6 +37,44 @@ export function SkillDetailDirectionA({ skill, onClose, onChanged, onDeleted }: 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const dirty = description !== (skill.description ?? "") || body !== skill.body;
+
+  // Multifile display — fetch the skill's extra files once on mount.
+  // Skills imported via folder/zip carry references/, scripts/, assets/
+  // alongside SKILL.md; without this list they're invisible to the user.
+  const [extraFiles, setExtraFiles] = useState<SkillExtraFile[]>([]);
+  const [filesLoading, setFilesLoading] = useState(true);
+  const [selectedFile, setSelectedFile] = useState<SkillExtraFile | null>(null);
+  const [fileContent, setFileContent] = useState<string | null>(null);
+  const [fileContentLoading, setFileContentLoading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    setFilesLoading(true);
+    listSkillFiles(skill.id).then((r) => {
+      if (cancelled) return;
+      setFilesLoading(false);
+      if ("error" in r) {
+        // Silent: extras are a nice-to-have. The detail screen still
+        // functions for editing body/description without them.
+        setExtraFiles([]);
+        return;
+      }
+      setExtraFiles(r.files);
+    });
+    return () => { cancelled = true; };
+  }, [skill.id]);
+
+  // Lazy-load file content when the user clicks one. Text files are
+  // rendered as-is; binary files just show "binary, N bytes".
+  const openFile = async (f: SkillExtraFile) => {
+    setSelectedFile(f);
+    if (!f.isText) { setFileContent(null); return; }
+    setFileContentLoading(true);
+    const r = await readFileViaBridge(f.path);
+    setFileContentLoading(false);
+    if (!r || !r.isText) { setFileContent(null); return; }
+    setFileContent(r.content);
+  };
 
   const save = async () => {
     if (!dirty || saving) return;
@@ -110,6 +151,94 @@ export function SkillDetailDirectionA({ skill, onClose, onChanged, onDeleted }: 
           spellCheck={false}
         />
       </div>
+
+      {/* Multifile section — only renders when the skill has extras */}
+      {(filesLoading || extraFiles.length > 0) && (
+        <div className="dsl-zone">
+          <span className="dsl-engrave">
+            arquivos da skill{extraFiles.length > 0 && ` · ${extraFiles.length}`}
+          </span>
+          <div className="dsl-bowl" style={{ padding: 0 }}>
+            {filesLoading ? (
+              <div style={{ padding: "12px 14px", color: "var(--df-text-muted)", fontSize: "var(--df-text-xs)" }}>
+                Carregando…
+              </div>
+            ) : (
+              <>
+                <div style={{ maxHeight: 160, overflowY: "auto", borderBottom: selectedFile ? "1px solid var(--df-border-subtle)" : "none" }}>
+                  {extraFiles.map((f) => (
+                    <button
+                      key={f.rel}
+                      type="button"
+                      onClick={() => void openFile(f)}
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "16px 1fr auto",
+                        alignItems: "center",
+                        gap: 10,
+                        width: "100%",
+                        padding: "8px 14px",
+                        background: selectedFile?.rel === f.rel ? "var(--df-surface-hover)" : "none",
+                        border: "none",
+                        borderTop: "1px solid var(--df-border-subtle)",
+                        cursor: "pointer",
+                        color: "var(--df-text-primary)",
+                        fontSize: "var(--df-text-xs)",
+                        fontFamily: "var(--df-font-mono)",
+                        textAlign: "left",
+                      }}
+                    >
+                      <span style={{ color: "var(--df-text-muted)" }} aria-hidden="true">
+                        {f.isText
+                          ? <FileText size={14} strokeWidth={2} />
+                          : <Folder size={14} strokeWidth={2} />}
+                      </span>
+                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {f.rel}
+                      </span>
+                      <span style={{ color: "var(--df-text-muted)", fontSize: "10px" }}>
+                        {f.size < 1024 ? `${f.size}B` : `${(f.size / 1024).toFixed(1)}KB`}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                {selectedFile && (
+                  <div style={{ padding: "12px 14px", borderTop: extraFiles.length > 0 ? "0" : "1px solid var(--df-border-subtle)" }}>
+                    <div style={{ fontFamily: "var(--df-font-mono)", fontSize: "10px", color: "var(--df-text-muted)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                      {selectedFile.rel}
+                    </div>
+                    {fileContentLoading ? (
+                      <div style={{ color: "var(--df-text-muted)", fontSize: "var(--df-text-xs)" }}>Lendo…</div>
+                    ) : selectedFile.isText && fileContent != null ? (
+                      <pre style={{
+                        margin: 0,
+                        padding: "10px 12px",
+                        background: "var(--df-surface-recessed)",
+                        border: "1px solid var(--df-border-subtle)",
+                        borderRadius: "var(--df-r-sm)",
+                        fontFamily: "var(--df-font-mono)",
+                        fontSize: "11px",
+                        lineHeight: 1.5,
+                        color: "var(--df-text-primary)",
+                        maxHeight: 240,
+                        overflow: "auto",
+                        whiteSpace: "pre-wrap",
+                        wordBreak: "break-word",
+                      }}>
+                        {fileContent}
+                      </pre>
+                    ) : (
+                      <div style={{ color: "var(--df-text-muted)", fontSize: "var(--df-text-xs)" }}>
+                        Arquivo binário · {selectedFile.size} bytes · não renderizável em texto
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="dsl-zone" style={{ color: "var(--df-accent-danger)", fontSize: "var(--df-text-xs)" }} role="alert">
