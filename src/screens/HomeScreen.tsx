@@ -2061,7 +2061,19 @@ function SkillsTabContent({
       {/* Detail modal */}
       {selected && (
         MODAL_LAB ? (
-          <SkillDetailLab skill={selected} onClose={() => setSelected(null)} />
+          <SkillDetailLab
+            skill={selected}
+            onClose={() => setSelected(null)}
+            onChanged={(next) => {
+              setSelected(next);
+              flashToast(tf("home.skills.toast.saved", next.name));
+              void rescan();
+            }}
+            onDeleted={() => {
+              flashToast(t("home.skills.toast.deleted"));
+              void rescan();
+            }}
+          />
         ) : (
           <SkillDetailModal
             skill={selected}
