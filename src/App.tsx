@@ -60,8 +60,8 @@ export function App() {
   const isCoverPreview = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("preview") === "skill-covers";
 
   // Mount theme override hook at the app root so user-customized color
-  // tokens (Settings → Appearance → ThemeEditor) apply everywhere.
-  // Hook injects a <style id="df-theme-overrides"> tag on top of tokens.css.
+  // tokens apply everywhere. Hook injects a <style id="df-theme-overrides">
+  // tag on top of tokens.css.
   useThemeOverrides();
 
   // Audit Fase 2 — start the chat-recovery sync worker. Fires a pass at
