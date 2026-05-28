@@ -368,7 +368,7 @@ export function DsPreviewScreen({ entry, onBack, onOpenSettings, theme, onThemeC
               type="button"
               className="df-btn df-btn--secondary"
               title={`Abrir ${entry.path}`}
-              aria-label="Abrir pasta do design system"
+              aria-label="Open design system folder"
               onClick={() => {
                 void openFolderViaBridge(entry.path).then((r) => {
                   if ("error" in r) {
