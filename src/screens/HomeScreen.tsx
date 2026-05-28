@@ -1478,7 +1478,7 @@ export function HomeScreen({
 
       {showDsSetup && (
         MODAL_LAB ? (
-          <DsModalLab open onClose={() => setShowDsSetup(false)} />
+          <DsModalLab open onClose={() => setShowDsSetup(false)} onSaved={handleDsSaved} />
         ) : (
           <DsSetupModal
             onClose={() => setShowDsSetup(false)}

@@ -10,6 +10,7 @@ import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { DsDirectionA } from "@/components/lab/DsDirectionA";
+import type { DsEntry } from "@/components/DsSetupModal";
 import "@/styles/np-modal.css";
 import "@/styles/np-v8.css";
 import "@/styles/skeu-hero.css";
@@ -18,9 +19,10 @@ import "@/styles/ds-modal-lab.css";
 export interface DsModalLabProps {
   open: boolean;
   onClose: () => void;
+  onSaved: (entry: DsEntry) => void;
 }
 
-export function DsModalLab({ open, onClose }: DsModalLabProps) {
+export function DsModalLab({ open, onClose, onSaved }: DsModalLabProps) {
   if (!open) return null;
 
   return createPortal(
@@ -45,7 +47,7 @@ export function DsModalLab({ open, onClose }: DsModalLabProps) {
         </header>
 
         <div className="np-modal-stage">
-          <DsDirectionA onClose={onClose} />
+          <DsDirectionA onClose={onClose} onSaved={onSaved} />
         </div>
       </div>
     </div>,
