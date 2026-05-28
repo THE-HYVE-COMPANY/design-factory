@@ -4,12 +4,27 @@
 // Delete is destructive — confirms before stub-firing. Real updateSkill /
 // deleteSkill re-wire onto this when the direction is approved.
 
-import { useEffect, useState } from "react";
-import { ArrowRight, Download, FileText, Folder, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowRight, Download, FileText, Folder, FolderOpen, Trash2 } from "lucide-react";
 import {
-  deleteSkill, listSkillFiles, readFileViaBridge, updateSkill,
+  deleteSkill, listSkillFiles, openFolderViaBridge, readFileViaBridge, updateSkill,
   type Skill, type SkillExtraFile,
 } from "@/lib/claude-bridge";
+
+// Daemon-side validators (skills-install.mjs validateSkillInput). Mirror
+// here so the Save button can pre-flight the input before the round-trip
+// + render a clear hint when the user types something invalid.
+const TRIGGER_RX = /^\/[a-z0-9:_-]{1,40}$/i;
+const NAME_MAX = 80;
+
+function validateNameTrigger(name: string, trigger: string): string | null {
+  const n = name.trim();
+  if (!n) return "Dê um nome à skill.";
+  if (n.length > NAME_MAX) return `Nome máximo ${NAME_MAX} caracteres.`;
+  const t = trigger.trim();
+  if (t && !TRIGGER_RX.test(t)) return "Comando inválido — começa com / e usa letras, números, _ ou - (máx 40).";
+  return null;
+}
 
 // Same frontmatter shape the shipped SkillDetailModal exports — kept in
 // sync so both surfaces produce identical .md downloads.
@@ -32,11 +47,22 @@ interface Props {
 }
 
 export function SkillDetailDirectionA({ skill, onClose, onChanged, onDeleted }: Props) {
+  const [name, setName] = useState(skill.name);
+  const [trigger, setTrigger] = useState(skill.trigger);
   const [description, setDescription] = useState(skill.description ?? "");
   const [body, setBody] = useState(skill.body);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const dirty = description !== (skill.description ?? "") || body !== skill.body;
+  const [openingFolder, setOpeningFolder] = useState(false);
+  const dirty =
+    name !== skill.name
+    || trigger !== skill.trigger
+    || description !== (skill.description ?? "")
+    || body !== skill.body;
+  const validationError = useMemo(
+    () => (dirty ? validateNameTrigger(name, trigger) : null),
+    [dirty, name, trigger],
+  );
 
   // Multifile display — fetch the skill's extra files once on mount.
   // Skills imported via folder/zip carry references/, scripts/, assets/
@@ -78,16 +104,38 @@ export function SkillDetailDirectionA({ skill, onClose, onChanged, onDeleted }: 
 
   const save = async () => {
     if (!dirty || saving) return;
+    if (validationError) { setError(validationError); return; }
     setSaving(true);
     setError(null);
-    const result = await updateSkill(skill.id, {
-      body,
-      description: description.trim() || null,
-    });
+    // Pre-flight check: only forward fields the user actually edited.
+    // Sending unchanged fields would be harmless but bloats the request
+    // and makes diffs in logs noisy.
+    const patch: Parameters<typeof updateSkill>[1] = {};
+    if (name.trim() !== skill.name) patch.name = name.trim();
+    if (trigger.trim() !== skill.trigger) patch.trigger = trigger.trim();
+    if (description.trim() !== (skill.description ?? "")) {
+      patch.description = description.trim() || null;
+    }
+    if (body !== skill.body) patch.body = body;
+    const result = await updateSkill(skill.id, patch);
     setSaving(false);
     if ("error" in result) { setError(result.error); return; }
     onChanged(result);
     onClose();
+  };
+
+  /** Open the skill folder in the OS file manager (Finder / Explorer /
+   *  xdg-open). The daemon resolves skill.path's parent dir; we just
+   *  need to send the path. Falls back to a copy-to-clipboard / log
+   *  message when GUI integration is unavailable (SSH / headless). */
+  const openFolder = async () => {
+    if (openingFolder) return;
+    if (!skill.path) { setError("Skill sem path conhecido — não dá pra abrir."); return; }
+    setOpeningFolder(true);
+    setError(null);
+    const r = await openFolderViaBridge(skill.path);
+    setOpeningFolder(false);
+    if ("error" in r) setError(`Não consegui abrir a pasta — ${r.error}`);
   };
 
   const remove = async () => {
@@ -116,16 +164,49 @@ export function SkillDetailDirectionA({ skill, onClose, onChanged, onDeleted }: 
 
   return (
     <div>
-      {/* Meta — trigger + source as engraved chips, read-only */}
+      {/* Identity — name + trigger editable; source stays a read-only
+          chip (it's not a property the user picks, it's how the registry
+          classified the skill). The daemon's updateSkill accepts name +
+          trigger in the patch; both go through the same validator that
+          installSkill uses (TRIGGER_RX + 80-char name limit). */}
       <div className="dsl-zone">
-        <span className="dsl-engrave">identidade</span>
+        <span className="dsl-engrave">nome</span>
+        <input
+          className="dsl-input"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Nome da skill"
+          spellCheck={false}
+          autoComplete="off"
+          style={{ fontFamily: "var(--df-font-sans)" }}
+          maxLength={NAME_MAX}
+        />
+      </div>
+      <div className="dsl-zone">
+        <span className="dsl-engrave">comando</span>
+        <input
+          className="dsl-input"
+          value={trigger}
+          onChange={(e) => setTrigger(e.target.value)}
+          placeholder="/minha-skill"
+          spellCheck={false}
+          autoComplete="off"
+        />
+      </div>
+      <div className="dsl-zone">
+        <span className="dsl-engrave">fonte</span>
         <div className="dsl-engine">
           <div className="dsl-engine-chip" style={{ cursor: "default" }}>
-            <span className="dsl-engine-k">trigger</span> {skill.trigger || "—"}
+            <span className="dsl-engine-k">tipo</span> {skill.source}
           </div>
-          <div className="dsl-engine-chip" style={{ cursor: "default" }}>
-            <span className="dsl-engine-k">fonte</span> {skill.source}
-          </div>
+          {skill.path && (
+            <div className="dsl-engine-chip" style={{ cursor: "default", maxWidth: 360 }}>
+              <span className="dsl-engine-k">path</span>{" "}
+              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {skill.path}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -152,12 +233,44 @@ export function SkillDetailDirectionA({ skill, onClose, onChanged, onDeleted }: 
         />
       </div>
 
-      {/* Multifile section — only renders when the skill has extras */}
+      {/* Multifile section — only renders when the skill has extras.
+          The summary line groups files by top-level folder so the user
+          can see "references (3), scripts (2)" at a glance instead of
+          eyeballing a flat list. */}
       {(filesLoading || extraFiles.length > 0) && (
         <div className="dsl-zone">
           <span className="dsl-engrave">
             arquivos da skill{extraFiles.length > 0 && ` · ${extraFiles.length}`}
           </span>
+          {extraFiles.length > 0 && (() => {
+            // Group by first path segment. Files at the root group as
+            // "raiz". Sort groups by count desc so the densest section
+            // shows first.
+            const groups = new Map<string, number>();
+            for (const f of extraFiles) {
+              const slash = f.rel.indexOf("/");
+              const key = slash === -1 ? "raiz" : f.rel.slice(0, slash);
+              groups.set(key, (groups.get(key) ?? 0) + 1);
+            }
+            const sorted = [...groups.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+            return (
+              <div style={{
+                marginBottom: 8,
+                color: "var(--df-text-muted)",
+                fontSize: "var(--df-text-xs)",
+                fontFamily: "var(--df-font-mono)",
+                lineHeight: 1.6,
+              }}>
+                {sorted.map(([key, count], i) => (
+                  <span key={key}>
+                    {i > 0 && " · "}
+                    <span style={{ color: "var(--df-text-primary)" }}>{key}</span>
+                    {" "}({count})
+                  </span>
+                ))}
+              </div>
+            );
+          })()}
           <div className="dsl-bowl" style={{ padding: 0 }}>
             {filesLoading ? (
               <div style={{ padding: "12px 14px", color: "var(--df-text-muted)", fontSize: "var(--df-text-xs)" }}>
@@ -240,14 +353,14 @@ export function SkillDetailDirectionA({ skill, onClose, onChanged, onDeleted }: 
         </div>
       )}
 
-      {error && (
+      {(error || validationError) && (
         <div className="dsl-zone" style={{ color: "var(--df-accent-danger)", fontSize: "var(--df-text-xs)" }} role="alert">
-          {error}
+          {error || validationError}
         </div>
       )}
 
-      <div className="dsl-foot" style={{ justifyContent: "space-between", alignItems: "center", gap: 10 }}>
-        <div style={{ display: "flex", gap: 8 }}>
+      <div className="dsl-foot" style={{ justifyContent: "space-between", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button
             type="button"
             className="dsl-engine-chip"
@@ -261,12 +374,24 @@ export function SkillDetailDirectionA({ skill, onClose, onChanged, onDeleted }: 
           <button type="button" className="dsl-engine-chip" onClick={exportMd} title="Baixar como .md">
             <Download size={14} strokeWidth={2} aria-hidden="true" /> Exportar .md
           </button>
+          {skill.path && (
+            <button
+              type="button"
+              className="dsl-engine-chip"
+              onClick={() => { void openFolder(); }}
+              disabled={openingFolder || saving}
+              title={`Abrir ${skill.path} no Finder / Explorer`}
+            >
+              <FolderOpen size={14} strokeWidth={2} aria-hidden="true" />{" "}
+              {openingFolder ? "Abrindo…" : "Abrir pasta"}
+            </button>
+          )}
         </div>
         <button
           type="button"
           className={`cnp-begin cnp-begin--v8${saving ? " is-loading" : ""}`}
           onClick={() => { void save(); }}
-          disabled={!dirty || saving}
+          disabled={!dirty || saving || validationError !== null}
           aria-busy={saving}
         >
           <span className="cnp-begin-led" aria-hidden="true" />
