@@ -957,7 +957,6 @@ export function HomeScreen({
         <div className="home-topbar-brand">
           <Logo size={26} className="home-brand-mark" />
           <span className="home-brand-name">{t("home.brand.name")}</span>
-          <span className="home-brand-badge">{t("home.brand.badge")}</span>
         </div>
 
         {/* CENTER — nav tabs Aqua (concave corner arcs on selected). */}
