@@ -17,9 +17,11 @@ import "@/styles/ds-modal-lab.css";
 export interface SkillDetailLabProps {
   skill: Skill;
   onClose: () => void;
+  onChanged: (next: Skill) => void;
+  onDeleted: (id: string) => void;
 }
 
-export function SkillDetailLab({ skill, onClose }: SkillDetailLabProps) {
+export function SkillDetailLab({ skill, onClose, onChanged, onDeleted }: SkillDetailLabProps) {
   return createPortal(
     <div
       className="np-modal-backdrop"
@@ -42,7 +44,7 @@ export function SkillDetailLab({ skill, onClose }: SkillDetailLabProps) {
         </header>
 
         <div className="np-modal-stage">
-          <SkillDetailDirectionA skill={skill} onClose={onClose} />
+          <SkillDetailDirectionA skill={skill} onClose={onClose} onChanged={onChanged} onDeleted={onDeleted} />
         </div>
       </div>
     </div>,
