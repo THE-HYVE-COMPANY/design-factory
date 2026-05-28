@@ -134,34 +134,97 @@ export function SkillsDirectionA({ initialMode, onClose, onCreated, onImported }
         });
         return;
       }
-      // folder — walk + install the first SKILL.md found (depth ≤ 3).
-      const found: CreateSkillInput[] = [];
-      const walk = async (p: string, depth: number) => {
-        if (depth > 3 || found.length >= 1) return;
+      // folder — walk the source tree (depth ≤ 3), find SKILL.md
+      // manifest, bundle every sibling/child file as extraFiles. Mirrors
+      // parseSkillZip so a folder-imported skill arrives with the same
+      // shape as a zip-imported one (references/, scripts/, assets/, …).
+      type Entry = { path: string; name: string; size: number; relPath: string };
+      const all: Entry[] = [];
+      const walk = async (p: string, depth: number, rel: string) => {
+        if (depth > 3 || all.length >= 80) return;
         const r = await listFolder(p);
         if (!r || "error" in r) return;
         for (const e of r.entries) {
-          if (found.length >= 1) break;
+          if (all.length >= 80) break;
+          const childRel = rel ? `${rel}/${e.name}` : e.name;
           if (e.isDir) {
             if (/node_modules|\.git|dist|build/.test(e.name)) continue;
-            await walk(e.path, depth + 1);
-          } else if (e.name.toLowerCase().endsWith(".md") && e.size <= 200_000) {
-            const f = await readFileViaBridge(e.path);
-            if (!f?.isText) continue;
-            const parsed = parseSkillMarkdown(f.content);
-            if (!parsed.name) continue;
-            found.push({
-              name: parsed.name,
-              trigger: parsed.trigger ?? "",
-              description: parsed.description,
-              body: parsed.body,
-            });
+            await walk(e.path, depth + 1, childRel);
+            continue;
           }
+          all.push({ path: e.path, name: e.name, size: e.size, relPath: childRel });
         }
       };
-      await walk(raw, 0);
-      if (found.length === 0) throw new Error("Nenhuma SKILL.md encontrada nessa pasta.");
-      await installStaged(found[0]);
+      await walk(raw, 0, "");
+
+      // Manifest selection: prefer SKILL.md (any case, any depth), else
+      // shallowest .md with `name:` frontmatter. parseSkillZip uses the
+      // same priority.
+      const mdEntries = all.filter((e) => e.name.toLowerCase().endsWith(".md") && e.size <= 200_000);
+      if (mdEntries.length === 0) throw new Error("Nenhum .md encontrado nessa pasta.");
+      const skillMdMatch = mdEntries.find((e) => /^SKILL\.md$/i.test(e.name));
+      let manifest: Entry | null = null;
+      let manifestParsed: ReturnType<typeof parseSkillMarkdown> | null = null;
+      if (skillMdMatch) {
+        const f = await readFileViaBridge(skillMdMatch.path);
+        if (f?.isText) {
+          manifest = skillMdMatch;
+          manifestParsed = parseSkillMarkdown(f.content);
+        }
+      }
+      if (!manifest) {
+        const candidates = [...mdEntries].sort((a, b) => a.relPath.split("/").length - b.relPath.split("/").length);
+        for (const c of candidates) {
+          const f = await readFileViaBridge(c.path);
+          if (!f?.isText) continue;
+          const parsed = parseSkillMarkdown(f.content);
+          if (parsed.name) { manifest = c; manifestParsed = parsed; break; }
+        }
+      }
+      if (!manifest || !manifestParsed) throw new Error("Nenhuma SKILL.md (ou .md com `name:` no frontmatter) encontrada.");
+
+      // Collect siblings relative to the manifest's folder. Files outside
+      // the manifest's subtree are skipped — same rule as parseSkillZip.
+      const manifestDir = manifest.relPath.includes("/")
+        ? manifest.relPath.slice(0, manifest.relPath.lastIndexOf("/") + 1)
+        : "";
+      const extraFiles: Record<string, string> = {};
+      const textToBase64 = (text: string): string => {
+        // utf-8 string → base64. btoa() chokes on multi-byte chars,
+        // so route through TextEncoder.
+        const bytes = new TextEncoder().encode(text);
+        let bin = "";
+        for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+        return btoa(bin);
+      };
+      for (const entry of all) {
+        if (entry.path === manifest.path) continue;
+        if (entry.size > 1_000_000) continue; // skip oversized assets (1MB cap per extra)
+        if (manifestDir && !entry.relPath.startsWith(manifestDir)) continue;
+        const rel = manifestDir ? entry.relPath.slice(manifestDir.length) : entry.relPath;
+        if (!rel || rel.includes("..") || rel.startsWith("/")) continue;
+        if (/^SKILL\.md$/i.test(rel)) continue; // never overwrite the manifest slot
+        const f = await readFileViaBridge(entry.path);
+        if (!f) continue;
+        // f.content is utf-8 for text files, data URI for binary.
+        // For binary, strip the `data:...;base64,` prefix.
+        if (f.isText) {
+          extraFiles[rel] = textToBase64(f.content);
+        } else {
+          const comma = f.content.indexOf(",");
+          if (comma < 0) continue;
+          extraFiles[rel] = f.content.slice(comma + 1);
+        }
+      }
+
+      const fallbackName = raw.split(/[/\\]/).filter(Boolean).pop() || "";
+      await installStaged({
+        name: manifestParsed.name ?? fallbackName,
+        trigger: manifestParsed.trigger ?? "",
+        description: manifestParsed.description,
+        body: manifestParsed.body,
+        extraFiles: Object.keys(extraFiles).length > 0 ? extraFiles : undefined,
+      });
     } catch (e) {
       setSaving(false);
       setError(e instanceof Error ? e.message : String(e));

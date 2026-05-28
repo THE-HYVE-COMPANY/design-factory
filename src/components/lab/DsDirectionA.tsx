@@ -11,7 +11,7 @@
 import { useRef, useState } from "react";
 import { ArrowRight, FileText, Folder, GitBranch, Link, Upload, type LucideIcon } from "lucide-react";
 import {
-  BRIDGE_URL, fetchUrlViaBridge, gitShallowClone, listFolder,
+  BRIDGE_URL, designSystemsDir, fetchUrlViaBridge, gitShallowClone, listFolder,
   readFileViaBridge, writeFile,
 } from "@/lib/claude-bridge";
 import {
@@ -154,6 +154,22 @@ export function DsDirectionA({ onClose, onSaved }: { onClose: () => void; onSave
     }
   };
 
+  /** Resolve the absolute design-systems/<slug>/ folder via the bridge.
+   *  Critical: passing a relative `design-systems/${slug}` to writeFile
+   *  lets the daemon's scope loop match it against the FIRST root
+   *  (projects/) so the file lands at `projects/design-systems/<slug>/`
+   *  — invisible to the DS list scanner and picked up by the projects
+   *  scanner as a brand-new project. Bridge endpoint /fs/design-systems-dir
+   *  returns the absolute path under the canonical root. */
+  const resolveDsFolder = async (slug: string): Promise<string | null> => {
+    const abs = await designSystemsDir(slug);
+    if (!abs) {
+      setError("Bridge offline — não consegui resolver o caminho de design-systems/. Confirma que o dev bridge está rodando.");
+      return null;
+    }
+    return abs;
+  };
+
   const forge = async () => {
     if (saving) return;
     setError(null);
@@ -164,7 +180,8 @@ export function DsDirectionA({ onClose, onSaved }: { onClose: () => void; onSave
       if (source === "upload") {
         if (!uploadedFile) { setError("Escolha um arquivo design.md."); return; }
         const content = await uploadedFile.text();
-        const targetFolder = `design-systems/${slug}`;
+        const targetFolder = await resolveDsFolder(slug);
+        if (!targetFolder) return;
         if (looksLikeDesignMd(content)) {
           // Verbatim — skip LLM entirely.
           appendLog("design.md canônico detectado · salvando como está");
@@ -182,7 +199,14 @@ export function DsDirectionA({ onClose, onSaved }: { onClose: () => void; onSave
         const files = await collectRelevantFiles(raw);
         if (files.length === 0) { setError("Nenhum arquivo de design encontrado (procurei tokens.css, globals.css, design.md, tailwind.config, .css)."); return; }
         appendLog(`achei ${files.length} arquivo(s)`);
-        await generateAndPersist(buildFolderPrompt(files, name.trim()), raw, "folder", raw);
+        // Folder source writes design.md INSIDE the source folder — that
+        // matches the founder's intent ("a DS lives with its tokens").
+        // But the DS list scanner only walks the canonical design-systems/
+        // root, so also persist a copy there so the DS surfaces in the
+        // grid. Source-of-truth is still the user's folder.
+        const canonical = await resolveDsFolder(slug);
+        if (!canonical) return;
+        await generateAndPersist(buildFolderPrompt(files, name.trim()), canonical, "folder", raw);
         return;
       }
       if (source === "github") {
@@ -195,7 +219,11 @@ export function DsDirectionA({ onClose, onSaved }: { onClose: () => void; onSave
         const files = await collectRelevantFiles(cloned.path);
         if (files.length === 0) { setError("Repo clonado mas nenhum arquivo de design encontrado."); return; }
         appendLog(`achei ${files.length} arquivo(s)`);
-        await generateAndPersist(buildGithubPrompt(cloned.slug, "", files), cloned.path, "github", raw);
+        // github: clone is ephemeral (/tmp/...). The persisted design.md
+        // MUST live under design-systems/ so it survives the clone GC.
+        const targetFolder = await resolveDsFolder(slug);
+        if (!targetFolder) return;
+        await generateAndPersist(buildGithubPrompt(cloned.slug, "", files), targetFolder, "github", raw);
         return;
       }
       // source === "url"
@@ -205,7 +233,8 @@ export function DsDirectionA({ onClose, onSaved }: { onClose: () => void; onSave
       const res = await fetchUrlViaBridge(raw);
       if ("error" in res) { setError(res.error); return; }
       appendLog(`OK (${res.size} bytes) · enviando pra IA`);
-      const targetFolder = `design-systems/${slug}`;
+      const targetFolder = await resolveDsFolder(slug);
+      if (!targetFolder) return;
       await generateAndPersist(buildUploadPrompt(raw, res.html), targetFolder, "upload", raw);
     } catch (e) {
       setStatus("idle");

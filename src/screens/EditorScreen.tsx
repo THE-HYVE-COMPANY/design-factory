@@ -5161,6 +5161,23 @@ export function EditorScreen({ projectId, projectName, projectPath, mode, startM
     }
   }, [projectPath, showToast, t]);
 
+  // Reveal the project folder in the OS file manager. Daemon spawns
+  // `open` (macOS) / `explorer` (Windows) / `xdg-open` (Linux) on the
+  // resolved absolute path. Falls back to copying the path when the
+  // bridge is unreachable or the opener errored — the user always has a
+  // path to act on even when GUI integration breaks (SSH, headless).
+  const handleShareOpenFolder = useCallback(async () => {
+    setShowExportMenu(false);
+    if (!projectPath) { showToast(t("editor.share.toast.no.project")); return; }
+    const { openFolderViaBridge } = await import("@/lib/claude-bridge");
+    const res = await openFolderViaBridge(projectPath);
+    if ("error" in res) {
+      showToast(`Não consegui abrir a pasta — ${res.error}. Caminho: ${projectPath}`);
+      return;
+    }
+    showToast(`Abrindo ${res.opened}`);
+  }, [projectPath, showToast, t]);
+
   // handlePublishSuccess + handleShareExportMp4 are not part of the
   // current public surface. Users publish manually via `vercel deploy`
   // in the terminal (CLI is already documented in
@@ -6057,6 +6074,8 @@ export function EditorScreen({ projectId, projectName, projectPath, mode, startM
                         icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" /></svg> },
                       { id: "duplicate", label: t("editor.share.duplicate.label"), handler: handleShareDuplicate, disabled: false,
                         icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="8" y="8" width="14" height="14" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></svg> },
+                      { id: "openfolder", label: "Abrir pasta do projeto", handler: handleShareOpenFolder, disabled: !projectPath,
+                        icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 14 1.45-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.55 6a2 2 0 0 1-1.94 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.93a2 2 0 0 1 1.66.9l.82 1.2a2 2 0 0 0 1.66.9H18a2 2 0 0 1 2 2v2" /></svg> },
                       { id: "copypath", label: "Copiar caminho do projeto", handler: handleShareCopyPath, disabled: !projectPath,
                         icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg> },
                     ].map((opt) => (

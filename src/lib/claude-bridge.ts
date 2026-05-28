@@ -449,6 +449,27 @@ export async function readFile(_filePath: string): Promise<string> {
   throw new Error("readFile not supported in browser preview");
 }
 
+/** Open a project / DS / skill folder in the OS file manager (Finder /
+ *  Explorer / xdg-open). Scope-checked daemon-side — refuses paths
+ *  outside the canonical workspace roots. Returns the result envelope
+ *  so callers can show a toast with the actual opened path. */
+export async function openFolderViaBridge(
+  path: string,
+): Promise<{ ok: true; opened: string; opener: string } | { error: string }> {
+  try {
+    const r = await fetch(`${BRIDGE_URL}/fs/open-folder`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path }),
+    });
+    const data = await r.json().catch(() => null);
+    if (!r.ok) return { error: data?.error || `HTTP ${r.status}` };
+    return data;
+  } catch (e) {
+    return { error: `Bridge unreachable at ${BRIDGE_URL}: ${String(e)}` };
+  }
+}
+
 export async function writeFile(filePath: string, content: string): Promise<void> {
   // Browser preview: hit the dev bridge. Throw loud on failure — the old
   // silent blob-download fallback produced "DS exists but design.md is

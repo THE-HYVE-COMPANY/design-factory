@@ -1951,6 +1951,71 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // ─── FS open-folder ─ reveal a project / DS / skill folder in the
+  // OS file manager (Finder on macOS, Explorer on Windows, xdg-open on
+  // Linux). User ask: "no compartilhar queria adicionar a opcao abrir
+  // pasta do projeto". Scope-checked through the same workspace roots
+  // as /fs/write, so a malicious caller can't open arbitrary paths.
+  // Spawn uses argv (not shell string) — no command-injection surface.
+  if (req.method === "POST" && req.url.startsWith("/fs/open-folder")) {
+    try {
+      const body = await readJson(req);
+      const inputPath = body?.path;
+      if (typeof inputPath !== "string" || !inputPath) {
+        res.writeHead(400); res.end(JSON.stringify({ error: "path required" })); return;
+      }
+      // Resolve through the same scope rules as writes — refuse to open
+      // anything outside the workspace roots unless DF_ALLOW_ARBITRARY_FS
+      // is set. `write: true` so the loop tries projects/, design-systems/,
+      // and skills/ (not landing/ which is read-only here).
+      const abs = resolveLocalFsPath(inputPath, { write: true });
+      let st;
+      try { st = await stat(abs); } catch (e) {
+        res.writeHead(404, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: `path not found: ${abs}` }));
+        return;
+      }
+      const target = st.isDirectory() ? abs : dirname(abs);
+      const platform = process.platform;
+      // Pick the OS opener. Windows can't take "explorer <path>" with
+      // backslashes through Node's spawn without shell:true (the .exe
+      // resolution kicks in); macOS and Linux take argv cleanly.
+      const cmd = platform === "darwin" ? "open"
+                : platform === "win32" ? "explorer"
+                : "xdg-open";
+      const child = spawn(cmd, [target], {
+        detached: true,
+        stdio: "ignore",
+        shell: platform === "win32",
+      });
+      child.on("error", (err) => {
+        if (!res.headersSent) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: `failed to launch ${cmd}: ${err?.message || err}` }));
+        }
+      });
+      child.unref();
+      // Give spawn a tick to surface "ENOENT cmd not found" before we
+      // 200. If the child didn't emit 'error' synchronously, we trust
+      // the OS handler took over.
+      setTimeout(() => {
+        if (!res.headersSent) {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ ok: true, opened: target, opener: cmd }));
+        }
+      }, 30);
+    } catch (e) {
+      if (!res.headersSent) {
+        if (e instanceof PathScopeError) sendPathScopeError(res, e);
+        else {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ error: String(e) }));
+        }
+      }
+    }
+    return;
+  }
+
   // ─── /fs/write/artifact ──────────────────────────────────────
   // Atomic write + per-finalPath lock + rolling backup + Static P0
   // (minimal floor). Routes through artifact-writer.mjs so the policy
