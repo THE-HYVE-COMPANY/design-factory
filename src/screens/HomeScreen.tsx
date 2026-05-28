@@ -25,6 +25,8 @@ import { parseDesignSystem } from "@/lib/ds-google";
 import { DsSetupModal, type DsEntry } from "@/components/DsSetupModal";
 import { DsModalLab } from "@/components/lab/DsModalLab";
 import { SkillsModalLab } from "@/components/lab/SkillsModalLab";
+import { SkillDetailLab } from "@/components/lab/SkillDetailLab";
+import { Settings } from "lucide-react";
 import { PadroesConfirmModal } from "@/components/PadroesConfirmModal";
 import { SkillCreateModal } from "@/components/SkillCreateModal";
 import { SkillImportModal } from "@/components/SkillImportModal";
@@ -999,20 +1001,7 @@ export function HomeScreen({
             aria-label={t("home.brand.settings")}
             onClick={() => onOpenSettings()}
           >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="8" r="4" />
-              <path d="M4 21v-1a7 7 0 0 1 14 0v1" />
-            </svg>
+            <Settings size={16} strokeWidth={2} aria-hidden="true" />
           </button>
         </div>
       </header>
@@ -2060,20 +2049,24 @@ function SkillsTabContent({
 
       {/* Detail modal */}
       {selected && (
-        <SkillDetailModal
-          skill={selected}
-          onClose={() => setSelected(null)}
-          onChanged={(next) => {
-            setSelected(next);
-            flashToast(tf("home.skills.toast.saved", next.name));
-            void rescan();
-          }}
-          onDeleted={() => {
-            flashToast(t("home.skills.toast.deleted"));
-            void rescan();
-          }}
-          onTestInChat={handleTestInChat}
-        />
+        MODAL_LAB ? (
+          <SkillDetailLab skill={selected} onClose={() => setSelected(null)} />
+        ) : (
+          <SkillDetailModal
+            skill={selected}
+            onClose={() => setSelected(null)}
+            onChanged={(next) => {
+              setSelected(next);
+              flashToast(tf("home.skills.toast.saved", next.name));
+              void rescan();
+            }}
+            onDeleted={() => {
+              flashToast(t("home.skills.toast.deleted"));
+              void rescan();
+            }}
+            onTestInChat={handleTestInChat}
+          />
+        )
       )}
 
       <PadroesConfirmModal

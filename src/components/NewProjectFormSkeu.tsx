@@ -707,6 +707,40 @@ export function NewProjectFormSkeu({
     }
   }, [canBegin, name, prompt, canvas, format, rules, selectedDsPath, provider, model, attachments, dialValues, onCreate]);
 
+  // "Começar em branco" — open a blank project skipping the form (no prompt,
+  // no canvas/format/rules/DS/attachments, neutral taste). Same name gate as
+  // handleBegin (a project still needs a name; defaults to "Untitled" via the
+  // modal host).
+  const handleBeginBlank = useCallback(async () => {
+    if (!canBegin) return;
+    setSubmitError(null);
+    const neutralTaste: NewProjectFormPayload["taste"] = {
+      density: 50, motion: 50, contrast: 50, interactions: 50, surface: 50, originality: 50,
+    };
+    const payload: NewProjectFormPayload = {
+      name: name.trim() || "Untitled",
+      prompt: "",
+      canvas: null,
+      format: null,
+      rules: [],
+      designSystem: null,
+      provider,
+      model,
+      attachments: [],
+      taste: neutralTaste,
+      tasteActive: activeTaste(neutralTaste),
+    };
+    if (!onCreate) return;
+    try {
+      setSubmitting(true);
+      await onCreate(payload);
+    } catch (e) {
+      setSubmitError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setSubmitting(false);
+    }
+  }, [canBegin, name, provider, model, onCreate]);
+
   // Cmd/Ctrl + Enter from anywhere in the form fires Begin.
   const handleFormKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -974,6 +1008,15 @@ export function NewProjectFormSkeu({
           title="See the compiled direction before starting"
         >
           Preview prompt
+        </button>
+        <button
+          type="button"
+          className="cnp-foot-reset"
+          onClick={() => { void handleBeginBlank(); }}
+          disabled={!canBegin}
+          title="Abre o projeto em branco — sem prompt, sem direção pré-definida."
+        >
+          Começar em branco
         </button>
         {/* v8: premium TE-tátil button — status LED + chevron arrow,
           * no ⌘⏎ key indicator. ed: "queria um botao de iniciar
