@@ -63,6 +63,16 @@ function slugify(s: string): string {
   return s.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "untitled";
 }
 
+// Directory blocklist. Recursing into these dumps unrelated design
+// surfaces into the prompt and confuses the model — most common
+// founder repro 2026-05-28: pointed at the DF repo itself, walker
+// pulled in 10+ OTHER DSes' design.md files from `design-systems/`
+// (apple, claude, nike, framer…) alongside DF's actual src/styles.
+// Model saw 11 candidate aesthetics and synthesised a generic mush.
+// Each name here is either a known meta surface (build outputs, deps,
+// fixtures) or a place where unrelated DS files commonly live.
+const SKIP_DIRS_RX = /^(node_modules|\.git|\.github|dist|build|\.next|design-systems|apps|docs|tests|test|__tests__|scripts|projects|skills|landing|examples|public|coverage|\.turbo|\.cache|\.vite|\.husky)$/i;
+
 /** Walk a folder (depth ≤ 2) and collect up to 12 design-system files.
  *  Caps each file at 40KB (same as buildFolderPrompt's slicing). */
 async function collectRelevantFiles(root: string): Promise<Array<{ path: string; content: string }>> {
@@ -74,7 +84,7 @@ async function collectRelevantFiles(root: string): Promise<Array<{ path: string;
     for (const e of r.entries) {
       if (out.length >= 12) break;
       if (e.isDir) {
-        if (/node_modules|\.git|dist|build|\.next/.test(e.name)) continue;
+        if (SKIP_DIRS_RX.test(e.name)) continue;
         await walk(e.path, depth + 1);
         continue;
       }
