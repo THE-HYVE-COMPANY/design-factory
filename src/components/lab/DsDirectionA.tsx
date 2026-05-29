@@ -11,12 +11,12 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, FileText, Folder, GitBranch, Link, Upload, type LucideIcon } from "lucide-react";
 import {
-  BRIDGE_URL, designSystemsDir, fetchUrlViaBridge, gitShallowClone, listFolder,
-  readFileViaBridge, writeFile,
+  BRIDGE_URL, designSystemsDir, fetchUrlViaBridge, generateDsDesignMd,
+  gitShallowClone, listFolder, readFileViaBridge, writeFile,
 } from "@/lib/claude-bridge";
 import {
   buildFolderPrompt, buildGithubPrompt, buildUploadPrompt,
-  invokeDsGeneration, looksLikeDesignMd,
+  looksLikeDesignMd,
 } from "@/runtime/ds-invoker";
 import type { DsEntry } from "@/types/ds";
 import type { ProviderId } from "@/providers/types";
@@ -149,14 +149,15 @@ export function DsDirectionA({ onClose, onSaved }: { onClose: () => void; onSave
     }).catch(() => { /* DsPreviewScreen surfaces failures */ });
   };
 
-  /** Write design.md to disk + readback verify. Mirrors saveDs in the old
-   *  modal so the same "bridge offline writes a blob download" guard applies. */
-  const persist = async (markdown: string, folder: string, src: DsEntry["source"], sourceRef?: string) => {
+  /** UPLOAD fast path: design.md content is already in hand (user
+   *  uploaded a canonical .md). Synchronous write → instant navigate.
+   *  No LLM step, no background, no marker files needed. */
+  const persistInstant = async (markdown: string, folder: string, src: DsEntry["source"], sourceRef?: string) => {
     setStatus("saving");
     const trimmed = (markdown ?? "").trim();
     if (trimmed.length < 40) {
       setStatus("idle");
-      setError(trimmed.length === 0 ? "O provider não retornou conteúdo." : `Retornou só ${trimmed.length} chars — parece truncado.`);
+      setError(trimmed.length === 0 ? "O arquivo está vazio." : `Apenas ${trimmed.length} chars — parece truncado.`);
       return;
     }
     const designMdPath = folder.replace(/\/$/, "") + "/design.md";
@@ -173,7 +174,6 @@ export function DsDirectionA({ onClose, onSaved }: { onClose: () => void; onSave
       setError(`design.md caiu como download em vez de ${folder}. O bridge pode estar offline.`);
       return;
     }
-    appendLog(`salvo → ${designMdPath} (${readback.size} bytes)`);
     const entry: DsEntry = {
       name: name.trim() || folder.split("/").filter(Boolean).pop() || "design system",
       path: folder,
@@ -184,37 +184,54 @@ export function DsDirectionA({ onClose, onSaved }: { onClose: () => void; onSave
     };
     fireOptionalPreview(entry);
     setStatus("idle");
-    // Always route the user into /ds/:slug after a successful save —
-    // they just created/imported a DS, the next thing they want is to
-    // SEE it. The detail screen has tokens + preview tabs; the Preview
-    // tab automatically polls for `.preview-generating.json` when the
-    // generation toggle was on, so the result has somewhere visible to
-    // land. Founder: "qnd clico criar, ja devia ... ir direto pra
-    // pagina preview mostrar status de processando."
     onSaved(entry, { openPreview: true });
     onClose();
   };
 
-  const generateAndPersist = async (prompt: string, folder: string, src: DsEntry["source"], sourceRef?: string) => {
+  /** EXTRACTION path (folder/github/url): fire-and-forget. Daemon
+   *  creates the DS folder + placeholder design.md so the DS appears
+   *  in the grid immediately, then runs the LLM in background. Modal
+   *  closes instantly; user lands on /ds/:slug with "Extraindo…"
+   *  status. Founder feedback: "click Forjar must return INSTANTLY
+   *  ... podendo fazer outras coisas enquanto roda".
+   *
+   *  When the genPreview toggle is ON, the daemon chains into preview
+   *  generation as soon as design.md lands. Both stages have their own
+   *  marker files that the detail screen polls independently. */
+  const persistAsync = async (prompt: string, folder: string, src: DsEntry["source"], sourceRef?: string) => {
     setStatus("generating");
-    appendLog(`streaming from ${provider} · ${model}…`);
-    // Remember the user's pick so the next modal open defaults to it.
     writeLastModel(provider, model);
     writeLastModel("__df:ds-provider" as ProviderId, provider);
-    let acc = "";
-    try {
-      await invokeDsGeneration(prompt, {
-        onText: (t) => { acc += t; },
-        onMeta: (m) => appendLog(`model ${m.model ?? "?"} · ttft ${m.ttftMs ?? "?"}ms`),
-        onUsage: () => {},
-        onResult: (r) => appendLog(`done · ${r.durationMs ?? "?"}ms`),
-        onDone: (clean) => { void persist(clean, folder, src, sourceRef); },
-        onError: (e) => { setStatus("idle"); setError(e); },
-      }, { provider, model });
-    } catch (e) {
-      setStatus("idle");
-      setError(e instanceof Error ? e.message : String(e));
+    const designMdPath = folder.replace(/\/$/, "") + "/design.md";
+    const dsName = name.trim() || folder.split(/[/\\]/).filter(Boolean).pop() || "design system";
+    const result = await generateDsDesignMd({
+      dsPath: folder,
+      designMdPath,
+      prompt,
+      provider,
+      model,
+      generatePreviewAfter: genPreview,
+      name: dsName,
+    });
+    setStatus("idle");
+    if ("error" in result) {
+      setError(`Falha ao iniciar extração: ${result.error}`);
+      return;
     }
+    // Daemon writes a placeholder design.md so the DS appears in the
+    // grid + the detail screen has a real file to load. The entry we
+    // send to onSaved is the placeholder; the polling in DsPreviewScreen
+    // will refresh once the real design.md and preview.html land.
+    const entry: DsEntry = {
+      name: dsName,
+      path: folder,
+      designMdPath,
+      source: src,
+      sourceRef,
+      addedAt: Date.now(),
+    };
+    onSaved(entry, { openPreview: true });
+    onClose();
   };
 
   /** Resolve the absolute design-systems/<slug>/ folder via the bridge.
@@ -246,12 +263,12 @@ export function DsDirectionA({ onClose, onSaved }: { onClose: () => void; onSave
         const targetFolder = await resolveDsFolder(slug);
         if (!targetFolder) return;
         if (looksLikeDesignMd(content)) {
-          // Verbatim — skip LLM entirely.
+          // Verbatim — skip LLM entirely. Instant write, instant navigate.
           appendLog("design.md canônico detectado · salvando como está");
-          await persist(content, targetFolder, "upload", uploadedFile.name);
+          await persistInstant(content, targetFolder, "upload", uploadedFile.name);
         } else {
-          appendLog("não parece design.md canônico · normalizando via IA");
-          await generateAndPersist(buildUploadPrompt(uploadedFile.name, content), targetFolder, "upload", uploadedFile.name);
+          appendLog("não parece design.md canônico · normalizando via IA em background");
+          await persistAsync(buildUploadPrompt(uploadedFile.name, content), targetFolder, "upload", uploadedFile.name);
         }
         return;
       }
@@ -261,15 +278,10 @@ export function DsDirectionA({ onClose, onSaved }: { onClose: () => void; onSave
         appendLog(`escaneando ${raw}…`);
         const files = await collectRelevantFiles(raw);
         if (files.length === 0) { setError("Nenhum arquivo de design encontrado (procurei tokens.css, globals.css, design.md, tailwind.config, .css)."); return; }
-        appendLog(`achei ${files.length} arquivo(s)`);
-        // Folder source writes design.md INSIDE the source folder — that
-        // matches the founder's intent ("a DS lives with its tokens").
-        // But the DS list scanner only walks the canonical design-systems/
-        // root, so also persist a copy there so the DS surfaces in the
-        // grid. Source-of-truth is still the user's folder.
+        appendLog(`achei ${files.length} arquivo(s) · enviando pra IA em background`);
         const canonical = await resolveDsFolder(slug);
         if (!canonical) return;
-        await generateAndPersist(buildFolderPrompt(files, name.trim()), canonical, "folder", raw);
+        await persistAsync(buildFolderPrompt(files, name.trim()), canonical, "folder", raw);
         return;
       }
       if (source === "github") {
@@ -281,12 +293,12 @@ export function DsDirectionA({ onClose, onSaved }: { onClose: () => void; onSave
         appendLog(`clonado em ${cloned.path}`);
         const files = await collectRelevantFiles(cloned.path);
         if (files.length === 0) { setError("Repo clonado mas nenhum arquivo de design encontrado."); return; }
-        appendLog(`achei ${files.length} arquivo(s)`);
+        appendLog(`achei ${files.length} arquivo(s) · enviando pra IA em background`);
         // github: clone is ephemeral (/tmp/...). The persisted design.md
         // MUST live under design-systems/ so it survives the clone GC.
         const targetFolder = await resolveDsFolder(slug);
         if (!targetFolder) return;
-        await generateAndPersist(buildGithubPrompt(cloned.slug, "", files), targetFolder, "github", raw);
+        await persistAsync(buildGithubPrompt(cloned.slug, "", files), targetFolder, "github", raw);
         return;
       }
       // source === "url"
@@ -295,10 +307,10 @@ export function DsDirectionA({ onClose, onSaved }: { onClose: () => void; onSave
       appendLog(`buscando ${raw}…`);
       const res = await fetchUrlViaBridge(raw);
       if ("error" in res) { setError(res.error); return; }
-      appendLog(`OK (${res.size} bytes) · enviando pra IA`);
+      appendLog(`OK (${res.size} bytes) · enviando pra IA em background`);
       const targetFolder = await resolveDsFolder(slug);
       if (!targetFolder) return;
-      await generateAndPersist(buildUploadPrompt(raw, res.html), targetFolder, "upload", raw);
+      await persistAsync(buildUploadPrompt(raw, res.html), targetFolder, "upload", raw);
     } catch (e) {
       setStatus("idle");
       setError(e instanceof Error ? e.message : String(e));

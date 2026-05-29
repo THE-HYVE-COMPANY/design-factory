@@ -2930,6 +2930,213 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // ─── /ds/generate-design-md — extract a DS's design.md from sources ──
+  //
+  // Async fire-and-forget: returns 202 immediately, runs the LLM in the
+  // background. Founder ask 2026-05-28: "experiencia q eu queria era
+  // colocar link escolher modelo clicar gerar, ja criar o ds eu entrar
+  // ver o design.md ir em preview e ver o preview em processamento,
+  // podendo fazer outras coisas enquanto roda". Mirrors the existing
+  // /ds/generate-preview pattern so closing the DS modal mid-extraction
+  // (or navigating away) doesn't kill the run.
+  //
+  // Pipeline:
+  //   1. mkdir <dsPath>
+  //   2. write placeholder design.md (so the DS appears in /fs/list-
+  //      design-systems immediately and the detail screen has a target)
+  //   3. write .design-md-generating.json marker
+  //   4. return 202 to the caller
+  //   5. bg: spawn provider via /<provider>/once with the supplied prompt
+  //   6. on success: overwrite design.md with the real extracted content
+  //   7. clear .design-md-generating.json
+  //   8. if generatePreviewAfter: chain into /ds/generate-preview
+  //   9. on failure: write .design-md-error.json so the detail screen
+  //      can surface the error
+  //
+  // Wire: POST /ds/generate-design-md
+  //   body: { dsPath, designMdPath, prompt, provider, model,
+  //           generatePreviewAfter?, name? }
+  //   202:  { status: "started", placeholderWritten: bool }
+  //   4xx:  { error }
+  if (req.method === "POST" && req.url === "/ds/generate-design-md") {
+    try {
+      const body = await readJson(req);
+      const { dsPath, designMdPath, prompt, provider, model, generatePreviewAfter, name } = body || {};
+      if (typeof dsPath !== "string" || !dsPath) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "dsPath required" }));
+        return;
+      }
+      if (typeof designMdPath !== "string" || !designMdPath) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "designMdPath required" }));
+        return;
+      }
+      if (typeof prompt !== "string" || !prompt) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: "prompt required" }));
+        return;
+      }
+      const adapter = getProvider(provider);
+      if (!adapter) {
+        res.writeHead(400, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: `unknown provider: ${provider}` }));
+        return;
+      }
+      // Step 1: ensure the DS folder exists.
+      await mkdir(dsPath, { recursive: true });
+
+      // Step 2: placeholder design.md — minimal valid frontmatter so
+      // /fs/list-design-systems picks the folder up and renders a card.
+      // The body explains the state so the detail screen reads cleanly
+      // even before the real content lands.
+      const placeholder = [
+        `---`,
+        `name: ${name || "extracting…"}`,
+        `description: Design system extraction in progress`,
+        `---`,
+        ``,
+        `# Extraindo design system…`,
+        ``,
+        `O ${provider} está analisando os arquivos de fonte e destilando o`,
+        `design.md canônico. Isso normalmente leva 30–90 segundos.`,
+        ``,
+        `Esta página vai atualizar automaticamente quando a extração terminar.`,
+        `Você pode fechar este modal / navegar pra outra tela — o trabalho`,
+        `roda em background.`,
+      ].join("\n");
+      const errorPath = join(dsPath, ".design-md-error.json");
+      const generatingPath = join(dsPath, ".design-md-generating.json");
+      try { await rm(errorPath, { force: true }); } catch {}
+      // Only write the placeholder if there's no design.md already on
+      // disk (re-run / retry). Don't blow away a real design.md if the
+      // user is re-extracting.
+      if (!existsSync(designMdPath)) {
+        try { await writeFile(designMdPath, placeholder, "utf8"); } catch {}
+      }
+      try {
+        await writeFile(generatingPath, JSON.stringify({
+          provider,
+          model,
+          startedAt: new Date().toISOString(),
+          generatePreviewAfter: !!generatePreviewAfter,
+        }, null, 2), "utf8");
+      } catch {}
+
+      // Acknowledge IMMEDIATELY — caller is fire-and-forget.
+      res.writeHead(202, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ status: "started", placeholderWritten: true, provider, model }));
+
+      // Kick the actual generation in the background. Same sandbox cwd
+      // pattern as /ds/generate-preview — tool-capable CLIs (claude,
+      // codex, kimi, opencode) get a throwaway dir so any Write/Edit
+      // they decide to call lands in /tmp instead of the user's repo.
+      const extractionSandbox = await mkdtemp(join(tmpdir(), "df-ds-extract-"));
+
+      (async () => {
+        const upstreamBody = JSON.stringify({ prompt, model, cwd: extractionSandbox, noWorkspace: true });
+        try {
+          const upstreamData = await new Promise((resolve, reject) => {
+            const lreq = http.request({
+              host: "127.0.0.1",
+              port: PORT,
+              method: "POST",
+              path: `/${provider}/once`,
+              headers: {
+                "Content-Type": "application/json",
+                "Content-Length": Buffer.byteLength(upstreamBody),
+              },
+              timeout: 3_600_000,
+            }, (lres) => {
+              let chunks = "";
+              lres.setEncoding("utf8");
+              lres.on("data", (c) => { chunks += c; });
+              lres.on("end", () => {
+                try {
+                  const parsed = chunks ? JSON.parse(chunks) : {};
+                  resolve({ status: lres.statusCode, body: parsed });
+                } catch {
+                  resolve({ status: lres.statusCode, body: { error: `non-JSON response: ${chunks.slice(0, 200)}` } });
+                }
+              });
+            });
+            lreq.on("timeout", () => lreq.destroy(new Error(`${provider} took longer than 60min`)));
+            lreq.on("error", reject);
+            lreq.write(upstreamBody);
+            lreq.end();
+          });
+          if (upstreamData.status >= 400 || upstreamData.body?.error) {
+            throw new Error(upstreamData.body?.error || `provider ${provider} returned ${upstreamData.status}`);
+          }
+          const rawText = upstreamData.body?.text || "";
+          // Strip markdown code fence if the model wrapped its response,
+          // accept anything starting with `---` frontmatter or with `#`.
+          // Validate minimum length — empty responses are rejected.
+          let md = rawText.trim();
+          const fenceMatch = md.match(/^```(?:markdown|md)?\s*\n([\s\S]*?)\n```\s*$/);
+          if (fenceMatch) md = fenceMatch[1].trim();
+          if (md.length < 40) {
+            throw new Error(`provider returned no recognizable design.md (got ${rawText.length}B). Tenta outro modelo no picker.`);
+          }
+          await writeFile(designMdPath, md, "utf8");
+          // Clear generating marker BEFORE kicking the preview chain so
+          // the detail screen flips from "Extraindo…" to "Gerando preview…"
+          // in one tick rather than briefly showing both.
+          try { await rm(generatingPath, { force: true }); } catch {}
+
+          // Step 8: chain into preview generation if requested. Same
+          // loopback pattern as the extraction call above. Treat this
+          // as fire-and-forget — preview has its own marker files and
+          // the detail screen polls them independently.
+          if (generatePreviewAfter) {
+            const previewBody = JSON.stringify({ dsPath, designMdPath, provider, model });
+            try {
+              await new Promise((resolve, reject) => {
+                const preq = http.request({
+                  host: "127.0.0.1",
+                  port: PORT,
+                  method: "POST",
+                  path: "/ds/generate-preview",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "Content-Length": Buffer.byteLength(previewBody),
+                  },
+                }, (pres) => {
+                  let chunks = "";
+                  pres.on("data", (c) => { chunks += c; });
+                  pres.on("end", () => resolve({ status: pres.statusCode }));
+                });
+                preq.on("error", reject);
+                preq.write(previewBody);
+                preq.end();
+              });
+            } catch (e) {
+              console.warn(`[ds] preview chain failed: ${e?.message || e}`);
+            }
+          }
+        } catch (e) {
+          try {
+            await writeFile(errorPath, JSON.stringify({
+              error: String(e?.message || e),
+              provider,
+              model,
+              at: new Date().toISOString(),
+            }, null, 2), "utf8");
+          } catch {}
+        } finally {
+          try { await rm(extractionSandbox, { recursive: true, force: true }); } catch {}
+          try { await rm(generatingPath, { force: true }); } catch {}
+        }
+      })();
+    } catch (e) {
+      if (!res.headersSent) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: String(e) }));
+      }
+    }
+    return;
+  }
+
   // ─── /ds/generate-preview — render a DS's design.md as preview.html ──
   //
   // Fixed pipeline:
