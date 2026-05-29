@@ -1465,6 +1465,7 @@ async function getAnthropicToken() {
 const OPENAI_CONFIG_PATH = process.env.DF_OPENAI_CONFIG_PATH || configPath("openai.json");
 const GEMINI_CONFIG_PATH = process.env.DF_GEMINI_CONFIG_PATH || configPath("gemini.json");
 const OPENROUTER_CONFIG_PATH = process.env.DF_OPENROUTER_CONFIG_PATH || configPath("openrouter.json");
+const KIMI_CONFIG_PATH = process.env.DF_KIMI_CONFIG_PATH || configPath("kimi.json");
 
 async function getOpenrouterToken() {
   if (process.env.OPENROUTER_API_KEY) return process.env.OPENROUTER_API_KEY;
@@ -1482,6 +1483,16 @@ async function getGeminiApiToken() {
   if (process.env.GEMINI_API_KEY) return process.env.GEMINI_API_KEY;
   if (process.env.GOOGLE_API_KEY) return process.env.GOOGLE_API_KEY;
   const cfg = await readSimpleTokenConfig(GEMINI_CONFIG_PATH).catch(() => ({ token: "" }));
+  return cfg.token || null;
+}
+
+// Moonshot/Kimi BYOK token. OpenAI-compatible HTTP API at api.moonshot.ai.
+// Env KIMI_API_KEY / MOONSHOT_API_KEY take precedence over the on-disk
+// config (kimi.json, chmod 600). Used by GET /kimi/models for live-fetch.
+async function getKimiToken() {
+  if (process.env.KIMI_API_KEY) return process.env.KIMI_API_KEY;
+  if (process.env.MOONSHOT_API_KEY) return process.env.MOONSHOT_API_KEY;
+  const cfg = await readSimpleTokenConfig(KIMI_CONFIG_PATH).catch(() => ({ token: "" }));
   return cfg.token || null;
 }
 
@@ -5119,6 +5130,48 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // ── Kimi / Moonshot BYOK config endpoints ───────────────────
+  // Mirrors the OpenAI/Gemini token storage so the picker can live-fetch
+  // the Moonshot catalog (GET /kimi/models). Env KIMI_API_KEY /
+  // MOONSHOT_API_KEY take precedence. Daemon never echoes the token.
+  if (req.method === "GET" && req.url === "/config/kimi") {
+    const cfg = await readSimpleTokenConfig(KIMI_CONFIG_PATH).catch(() => ({ token: "" }));
+    const envSet = !!(process.env.KIMI_API_KEY || process.env.MOONSHOT_API_KEY);
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify({
+      tokenSet: !!(cfg.token || envSet),
+      source: envSet ? "env" : (cfg.token ? "disk" : null),
+    }));
+    return;
+  }
+  if (req.method === "PUT" && req.url === "/config/kimi") {
+    let body;
+    try { body = await readJson(req); }
+    catch (e) {
+      res.writeHead(400, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: `invalid JSON: ${e}` }));
+      return;
+    }
+    const token = typeof body?.token === "string" ? body.token.trim() : "";
+    // Moonshot keys start with "sk-"; allow flex but reject obvious junk.
+    if (token && !/^sk-/.test(token)) {
+      res.writeHead(400, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: "token doesn't look like a Moonshot/Kimi key (sk-…)" }));
+      return;
+    }
+    try {
+      await writeSimpleTokenConfig(KIMI_CONFIG_PATH, { token });
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ ok: true, tokenSet: !!token }));
+    } catch (err) {
+      if (!res.headersSent) {
+        res.writeHead(500, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ error: String(err) }));
+      }
+    }
+    return;
+  }
+
   // /anthropic/stream + /anthropic/once → providers/anthropic.mjs.
 
   // ── OpenRouter (200+ open + paid models, OpenAI-compatible) ──
@@ -5172,6 +5225,165 @@ const server = http.createServer(async (req, res) => {
         id: m.id,
         sub: m.pricing?.prompt === "0" ? "free" : (m.context_length ? `${Math.round(m.context_length / 1000)}k ctx` : ""),
       })) : [];
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ models }));
+    } catch (e) {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ models: [], error: String(e?.message || e) }));
+    }
+    return;
+  }
+
+  // ── Live model catalogs (BYOK + CLI) ────────────────────────
+  // Same contract as /ollama/models + /openrouter/models:
+  //   { models: [{ id, sub }], error? }
+  // The picker (useLiveModelOptions) fetches these and falls back to a
+  // minimal static list only when the call returns empty / errors (no
+  // key, offline). Source of truth = the provider, never a hardcoded
+  // catalog. Each returns {error:"no-key"} when no token is configured
+  // so the UI can render the fallback + a "configure key" hint.
+
+  // Anthropic — GET /v1/models. id IS the version (claude-opus-4-8);
+  // display_name carries the human label ("Claude Opus 4.8").
+  if (req.method === "GET" && req.url === "/anthropic/models") {
+    try {
+      const token = await getAnthropicToken();
+      if (!token) {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ models: [], error: "no-key" }));
+        return;
+      }
+      const r = await fetch("https://api.anthropic.com/v1/models?limit=100", {
+        headers: { "x-api-key": token, "anthropic-version": "2023-06-01" },
+        signal: AbortSignal.timeout(5000),
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const data = await r.json();
+      const models = Array.isArray(data?.data)
+        ? data.data.map((m) => ({ id: m.id, sub: m.display_name || "" }))
+        : [];
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ models }));
+    } catch (e) {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ models: [], error: String(e?.message || e) }));
+    }
+    return;
+  }
+
+  // OpenAI — GET /v1/models. Catalog includes embeddings/tts/image/etc;
+  // filter to chat/reasoning by capability heuristic (no hardcoded list).
+  if (req.method === "GET" && req.url === "/openai/models") {
+    try {
+      const token = await getOpenaiToken();
+      if (!token) {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ models: [], error: "no-key" }));
+        return;
+      }
+      const r = await fetch("https://api.openai.com/v1/models", {
+        headers: { Authorization: `Bearer ${token}` },
+        signal: AbortSignal.timeout(5000),
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const data = await r.json();
+      const EXCLUDE = /embedding|tts|whisper|audio|image|realtime|moderation|dall-e|transcribe|search|computer-use/i;
+      const KEEP = /^(gpt-|o\d|chatgpt-)/i;
+      const models = Array.isArray(data?.data)
+        ? data.data
+            .map((m) => m.id)
+            .filter((id) => typeof id === "string" && KEEP.test(id) && !EXCLUDE.test(id))
+            .sort()
+            .map((id) => ({ id, sub: "" }))
+        : [];
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ models }));
+    } catch (e) {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ models: [], error: String(e?.message || e) }));
+    }
+    return;
+  }
+
+  // Gemini — GET /v1beta/models. Keep only models that support
+  // generateContent (capability-based filter); displayName/version → sub.
+  if (req.method === "GET" && req.url === "/gemini-api/models") {
+    try {
+      const token = await getGeminiApiToken();
+      if (!token) {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ models: [], error: "no-key" }));
+        return;
+      }
+      const r = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(token)}&pageSize=200`,
+        { signal: AbortSignal.timeout(5000) },
+      );
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const data = await r.json();
+      const models = Array.isArray(data?.models)
+        ? data.models
+            .filter((m) => Array.isArray(m.supportedGenerationMethods) && m.supportedGenerationMethods.includes("generateContent"))
+            .filter((m) => !/embedding|aqa/i.test(m.name || ""))
+            .map((m) => ({ id: (m.name || "").replace(/^models\//, ""), sub: m.displayName || m.version || "" }))
+            .filter((m) => m.id)
+        : [];
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ models }));
+    } catch (e) {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ models: [], error: String(e?.message || e) }));
+    }
+    return;
+  }
+
+  // Kimi/Moonshot — GET /v1/models (OpenAI-compatible). BYOK via /config/kimi.
+  if (req.method === "GET" && req.url === "/kimi/models") {
+    try {
+      const token = await getKimiToken();
+      if (!token) {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ models: [], error: "no-key" }));
+        return;
+      }
+      const r = await fetch("https://api.moonshot.ai/v1/models", {
+        headers: { Authorization: `Bearer ${token}` },
+        signal: AbortSignal.timeout(5000),
+      });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const data = await r.json();
+      const models = Array.isArray(data?.data)
+        ? data.data.map((m) => ({ id: m.id, sub: "" }))
+        : [];
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ models }));
+    } catch (e) {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ models: [], error: String(e?.message || e) }));
+    }
+    return;
+  }
+
+  // opencode — shell-out `opencode models`. Emits `provider/model` per
+  // line. No key needed (opencode uses its own configured providers /
+  // Models.dev registry). shell:true on win32 (npm/.cmd EINVAL guard).
+  if (req.method === "GET" && req.url === "/opencode/models") {
+    try {
+      const out = await new Promise((resolve, reject) => {
+        const child = spawn("opencode", ["models"], { shell: process.platform === "win32" });
+        let stdout = "";
+        let stderr = "";
+        const timer = setTimeout(() => { try { child.kill(); } catch {} reject(new Error("opencode models timed out")); }, 15000);
+        child.stdout.on("data", (d) => { stdout += d; });
+        child.stderr.on("data", (d) => { stderr += d; });
+        child.on("error", (e) => { clearTimeout(timer); reject(e); });
+        child.on("close", (code) => { clearTimeout(timer); code === 0 ? resolve(stdout) : reject(new Error(stderr.trim() || `exit ${code}`)); });
+      });
+      const models = String(out)
+        .split(/\r?\n/)
+        .map((l) => l.trim())
+        .filter((l) => l && l.includes("/"))
+        .map((id) => ({ id, sub: id.split("/")[0] }));
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ models }));
     } catch (e) {
@@ -6376,7 +6588,7 @@ server.listen(PORT, "127.0.0.1", () => {
   }
   console.log(`[dev-bridge] path scoping: realpath-based (assertPathInScope)`);
   console.log(`[dev-bridge] claude binary: ${CLAUDE_BIN}`);
-  console.log(`[dev-bridge] endpoints: GET /healthz · GET /ping (alias) · GET /agents/list · POST /claude/stream · POST /claude/once · POST /codex/stream · POST /codex/once · POST /gemini/stream · POST /gemini/once · GET /ollama/models · POST /ollama/stream · POST /ollama/once · GET|PUT /config/openrouter · GET /openrouter/models · POST /openrouter/stream · POST /openrouter/once · POST /opencode/stream · POST /opencode/once · GET|PUT /config/anthropic · POST /anthropic/stream · POST /anthropic/once · GET|PUT /config/vercel · POST /deploy/vercel · GET /deploy/vercel/status · GET /deploy/vercel/list · GET /deploy/vercel/test ·GET /vercel/projects · GET /vercel/projects/all · GET /vercel/projects/check · GET /vercel/teams · GET /vercel/user · POST /vercel/device/start · POST /vercel/device/poll · GET /gh/user · GET /projects/:slug/zip · GET|POST /projects/:slug/versions · GET|DELETE /projects/:slug/versions/:vid · WS /terminal`);
+  console.log(`[dev-bridge] endpoints: GET /healthz · GET /ping (alias) · GET /agents/list · POST /claude/stream · POST /claude/once · POST /codex/stream · POST /codex/once · POST /gemini/stream · POST /gemini/once · GET /ollama/models · POST /ollama/stream · POST /ollama/once · GET|PUT /config/openrouter · GET /openrouter/models · POST /openrouter/stream · POST /openrouter/once · POST /opencode/stream · POST /opencode/once · GET /opencode/models · GET|PUT /config/anthropic · GET /anthropic/models · GET /openai/models · GET /gemini-api/models · GET|PUT /config/kimi · GET /kimi/models · POST /anthropic/stream · POST /anthropic/once · GET|PUT /config/vercel · POST /deploy/vercel · GET /deploy/vercel/status · GET /deploy/vercel/list · GET /deploy/vercel/test ·GET /vercel/projects · GET /vercel/projects/all · GET /vercel/projects/check · GET /vercel/teams · GET /vercel/user · POST /vercel/device/start · POST /vercel/device/poll · GET /gh/user · GET /projects/:slug/zip · GET|POST /projects/:slug/versions · GET|DELETE /projects/:slug/versions/:vid · WS /terminal`);
   console.log(`[dev-bridge] DS: POST /fs/write · GET /fetch-url · GET /gh/token · GET /gh/repos · POST /git/shallow-clone · POST /git/cleanup`);
   console.log(`[dev-bridge] : POST /fs/write/artifact (atomic write + per-finalPath lock + .df/backups rolling 10)`);
   console.log(`[dev-bridge] Skills: GET /skills/registry · POST/PATCH/DELETE /skills`);
