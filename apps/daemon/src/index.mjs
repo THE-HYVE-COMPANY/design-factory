@@ -3069,14 +3069,42 @@ const server = http.createServer(async (req, res) => {
             throw new Error(upstreamData.body?.error || `provider ${provider} returned ${upstreamData.status}`);
           }
           const rawText = upstreamData.body?.text || "";
-          // Strip markdown code fence if the model wrapped its response,
-          // accept anything starting with `---` frontmatter or with `#`.
-          // Validate minimum length — empty responses are rejected.
+          // Strip optional markdown code fence wrapping the whole body.
           let md = rawText.trim();
           const fenceMatch = md.match(/^```(?:markdown|md)?\s*\n([\s\S]*?)\n```\s*$/);
           if (fenceMatch) md = fenceMatch[1].trim();
-          if (md.length < 40) {
-            throw new Error(`provider returned no recognizable design.md (got ${rawText.length}B). Tenta outro modelo no picker.`);
+
+          // Validate the response IS a design.md, not prose telling us
+          // it wrote one to disk. The model with --dangerously-skip-
+          // permissions sometimes ignores the no-tools rule and uses
+          // Write to save the file to its cwd, then returns a summary
+          // like "DESIGN.md is written at <path>. Here's what it covers:
+          // ..." — that prose would corrupt the design.md if we wrote
+          // it. A real design.md starts with `---` frontmatter or `#`
+          // heading; require one. Founder repro 2026-05-28.
+          const looksLikeMd =
+            /^---\s*\n[\s\S]*?\n---/m.test(md) || /^#\s+\S/m.test(md);
+          if (md.length < 40 || !looksLikeMd) {
+            // Dump the raw response so the user can inspect WHAT the
+            // model returned. Common shapes: tool-use summary prose,
+            // an apology / refusal, or a markdown explanation of what
+            // the doc covers (instead of the doc itself).
+            try {
+              await writeFile(
+                join(dsPath, ".design-md-rawtext.txt"),
+                `# Raw provider response (validation failed)\n` +
+                `# provider: ${provider}\n# model: ${model}\n` +
+                `# bytes: ${rawText.length}\n` +
+                `# looksLikeMd: ${looksLikeMd}\n` +
+                `# at: ${new Date().toISOString()}\n\n${rawText}`,
+                "utf8",
+              );
+            } catch {}
+            throw new Error(
+              `provider returned no recognizable design.md (got ${rawText.length}B, ` +
+              `looksLikeMd=${looksLikeMd}). Raw dump em .design-md-rawtext.txt na pasta da DS. ` +
+              `Comum: modelo usou Write tool em vez de devolver texto. Tenta outro modelo no picker.`,
+            );
           }
           await writeFile(designMdPath, md, "utf8");
           // Clear generating marker BEFORE kicking the preview chain so

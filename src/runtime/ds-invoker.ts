@@ -97,6 +97,37 @@ const DS_GENERATION_SYSTEM = [
 
 // ─── User prompt builders (one per source) ────────────────────────────────
 
+// Constraints appended to every extraction user-prompt. The async
+// /ds/generate-design-md daemon endpoint runs the provider in once-mode
+// without a separate systemPrompt arg (the call shape only supports a
+// single prompt), so the schema + tool-discipline rules have to live
+// INSIDE the user prompt. Otherwise Claude with --dangerously-skip-
+// permissions reads the bare ask "produce a DESIGN.md", sees it has
+// Write available, decides to Write the file to its cwd (the /tmp
+// extraction sandbox), and returns a prose summary like "DESIGN.md is
+// written at <path>. Here's what the document covers: ..." — which the
+// daemon dutifully writes as the design.md, corrupting the result.
+// Founder repro 2026-05-28.
+const ABSOLUTE_CONSTRAINTS = [
+  "",
+  "ABSOLUTE CONSTRAINTS — read these before producing any output:",
+  "",
+  "- DO NOT use any tools. No Write, no Edit, no Bash, no Read on existing",
+  "  files, no file operations of any kind. Your reply text IS the deliverable.",
+  "- DO NOT save the markdown to a file. DO NOT run shell commands. DO NOT",
+  "  touch the filesystem in any way.",
+  "- If you have file-editing tools available, IGNORE THEM ENTIRELY for this",
+  "  task. The system that called you reads your stdout text and writes it",
+  "  to disk on its own. Writing a file yourself causes a duplicate / wrong",
+  "  file because the daemon-side writer will overwrite it with your stdout.",
+  "- DO NOT respond with prose explaining what the document covers. Respond",
+  "  with the document ITSELF, raw, starting at the first `---` of the YAML",
+  "  frontmatter.",
+  "- The very first characters of your response must be `---` (the opening",
+  "  frontmatter fence). The last characters of your response must be the",
+  "  closing of the last markdown section — no trailing commentary.",
+].join("\n");
+
 export function buildFolderPrompt(
   files: Array<{ path: string; content: string }>,
   targetName: string,
@@ -106,6 +137,10 @@ export function buildFolderPrompt(
     .map((f) => `--- ${f.path} ---\n${f.content.slice(0, 40_000)}`)
     .join("\n\n");
   return [
+    DS_GENERATION_SYSTEM,
+    "",
+    "---",
+    "",
     `Source type: local folder`,
     `Target system name: ${targetName}`,
     "",
@@ -115,6 +150,7 @@ export function buildFolderPrompt(
     `Produce a DESIGN.md (Google format) that faithfully captures what these files ship.`,
     `When a value is present verbatim in the source, copy it. When it's implied, infer.`,
     `Skip sections you cannot meaningfully fill — don't invent.`,
+    ABSOLUTE_CONSTRAINTS,
   ].join("\n");
 }
 
@@ -132,6 +168,10 @@ export function looksLikeDesignMd(fileContent: string): boolean {
 export function buildUploadPrompt(fileName: string, fileContent: string): string {
   if (looksLikeDesignMd(fileContent)) {
     return [
+      DS_GENERATION_SYSTEM,
+      "",
+      "---",
+      "",
       `Source type: existing DESIGN.md`,
       `File: ${fileName}`,
       "",
@@ -143,9 +183,14 @@ export function buildUploadPrompt(fileName: string, fileContent: string): string
       `  - Reorder ## sections to match the spec order`,
       `  - Preserve every token the source already provides`,
       `  - Add any missing required sections with tokens derived from context`,
+      ABSOLUTE_CONSTRAINTS,
     ].join("\n");
   }
   return [
+    DS_GENERATION_SYSTEM,
+    "",
+    "---",
+    "",
     `Source type: single stylesheet (${fileName})`,
     "",
     `Content:`,
@@ -154,6 +199,7 @@ export function buildUploadPrompt(fileName: string, fileContent: string): string
     `Read the CSS custom properties, Tailwind theme, or raw values defined in this file.`,
     `Produce a DESIGN.md (Google format) that captures every extractable token.`,
     `Infer the system's personality from the values themselves (e.g. "minimal, utility-first").`,
+    ABSOLUTE_CONSTRAINTS,
   ].join("\n");
 }
 
@@ -167,6 +213,10 @@ export function buildGithubPrompt(
     .map((f) => `--- ${f.path} ---\n${f.content.slice(0, 40_000)}`)
     .join("\n\n");
   return [
+    DS_GENERATION_SYSTEM,
+    "",
+    "---",
+    "",
     `Source type: GitHub repository`,
     `Repo: ${repoFullName}`,
     "",
@@ -179,6 +229,7 @@ export function buildGithubPrompt(
     `Produce a DESIGN.md (Google format). Use the repo name as the DS name.`,
     `If README or package.json hints at the product surface (web app, marketing,`,
     `dashboard), reflect that in the Overview prose.`,
+    ABSOLUTE_CONSTRAINTS,
   ].join("\n");
 }
 
