@@ -37,6 +37,13 @@ export function DsPreviewScreen({ entry, onBack, onOpenSettings, theme, onThemeC
    *  to render the "Gerando…" banner. Cleared on success/error. */
   const [generation, setGeneration] = useState<GenerationState | null>(null);
   const [generationError, setGenerationError] = useState<string | null>(null);
+  /** Mirror of `generation` for the design.md extraction stage. Set when
+   *  the daemon's `.design-md-generating.json` marker exists. The DS lab
+   *  modal writes a placeholder design.md first + the daemon overwrites
+   *  with the real content when the LLM finishes; this flag drives the
+   *  "Extraindo design system…" status on the Design.md tab. */
+  const [extraction, setExtraction] = useState<GenerationState | null>(null);
+  const [extractionError, setExtractionError] = useState<string | null>(null);
   const generationAbortRef = useRef<AbortController | null>(null);
   const previewPath = entry.previewPath || `${entry.path}/preview.html`;
 
@@ -79,6 +86,74 @@ export function DsPreviewScreen({ entry, onBack, onOpenSettings, theme, onThemeC
       })
       .catch(() => {});
   }, [entry.path]);
+
+  // Same mount-time restore for design.md EXTRACTION state. Daemon
+  // writes .design-md-generating.json at the start of /ds/generate-
+  // design-md and clears it once the real design.md lands. While the
+  // marker exists the Design.md tab renders the placeholder content
+  // with an "Extraindo…" banner; once cleared the polling effect
+  // below re-reads the real design.md and refreshes the markdown.
+  useEffect(() => {
+    const generatingPath = `${entry.path}/.design-md-generating.json`;
+    readFileViaBridge(generatingPath)
+      .then((f) => {
+        if (!f?.content) return;
+        try {
+          const parsed = JSON.parse(f.content);
+          const startedAt = parsed?.startedAt ? Date.parse(parsed.startedAt) : Date.now();
+          setExtraction({
+            provider: parsed?.provider || "unknown",
+            model: parsed?.model || "default",
+            startedAt: Number.isFinite(startedAt) ? startedAt : Date.now(),
+          });
+        } catch {}
+      })
+      .catch(() => {});
+  }, [entry.path]);
+
+  // Polling for design.md EXTRACTION completion. Every 4s while an
+  // extraction is in flight: re-read design.md (it may have flipped
+  // from placeholder to real content), check the error marker, and
+  // verify the generating marker hasn't been cleared by the daemon.
+  useEffect(() => {
+    if (!extraction) return;
+    const errorPath = `${entry.path}/.design-md-error.json`;
+    const generatingPath = `${entry.path}/.design-md-generating.json`;
+    const handle = setInterval(() => {
+      // Re-read design.md — daemon overwrites placeholder when LLM done.
+      // Polling the file itself (rather than relying on a "done" marker)
+      // keeps the content in sync if the user manually edits while a
+      // run is in flight (rare but harmless).
+      readFileViaBridge(entry.designMdPath)
+        .then((f) => {
+          if (f?.content && f.content !== md) {
+            setMd(f.content);
+            setDraftMd(f.content);
+          }
+          return readFileViaBridge(generatingPath);
+        })
+        .then((gen) => {
+          if (!gen?.content) {
+            // Marker cleared → extraction done (or failed). Let the
+            // error file check below own the decision; this just frees
+            // the spinner.
+            return readFileViaBridge(errorPath).then((errF) => {
+              if (errF?.content) {
+                try {
+                  const parsed = JSON.parse(errF.content);
+                  setExtractionError(parsed?.error || "Erro desconhecido");
+                } catch {
+                  setExtractionError(errF.content.slice(0, 200));
+                }
+              }
+              setExtraction(null);
+            });
+          }
+        })
+        .catch(() => {});
+    }, 4000);
+    return () => clearInterval(handle);
+  }, [extraction, entry.designMdPath, entry.path, md]);
 
   // Background polling while a generation is in flight — every 4s
   // check the DS folder for preview.html (success), .preview-error
@@ -487,15 +562,63 @@ export function DsPreviewScreen({ entry, onBack, onOpenSettings, theme, onThemeC
         {parsed && (
           <>
             {tab === "design" && (
-              <DesignMdTab
-                md={md}
-                editing={editing}
-                draftMd={draftMd}
-                onDraftChange={setDraftMd}
-                onStartEdit={() => { setDraftMd(md); setEditing(true); }}
-                onCancelEdit={() => setEditing(false)}
-                onSave={save}
-              />
+              <>
+                {(extraction || extractionError) && (
+                  <div style={{
+                    margin: "0 0 18px",
+                    padding: "14px 18px",
+                    border: "1px solid var(--df-border-subtle)",
+                    borderRadius: "var(--df-r-md)",
+                    background: extractionError ? "color-mix(in srgb, var(--df-accent-danger) 6%, transparent)" : "var(--df-surface-recessed)",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 14,
+                  }}>
+                    {extraction && !extractionError && (
+                      <span style={{
+                        width: 16, height: 16, borderRadius: "50%",
+                        border: "2px solid var(--df-border-subtle)",
+                        borderTopColor: "var(--df-accent-user, var(--df-accent-ok))",
+                        animation: "spin 1s linear infinite",
+                        flexShrink: 0,
+                      }} />
+                    )}
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: "var(--df-text-sm)", color: extractionError ? "var(--df-accent-danger)" : "var(--df-text-primary)" }}>
+                        {extractionError
+                          ? `Erro ao extrair design.md: ${extractionError}`
+                          : `Extraindo design system com ${extraction?.provider} · ${extraction?.model}`}
+                      </div>
+                      {extraction && !extractionError && (
+                        <div style={{ marginTop: 4, fontSize: "var(--df-text-xs)", color: "var(--df-text-muted)", fontFamily: "var(--df-font-mono)" }}>
+                          {Math.max(0, Math.floor((Date.now() - extraction.startedAt) / 1000))}s decorridos · roda em background, pode fechar tabs
+                        </div>
+                      )}
+                    </div>
+                    {extractionError && (
+                      <button
+                        type="button"
+                        onClick={() => setExtractionError(null)}
+                        style={{
+                          background: "none", border: "none", cursor: "pointer",
+                          color: "var(--df-text-muted)", fontSize: "var(--df-text-xs)",
+                        }}
+                      >
+                        Dispensar
+                      </button>
+                    )}
+                  </div>
+                )}
+                <DesignMdTab
+                  md={md}
+                  editing={editing}
+                  draftMd={draftMd}
+                  onDraftChange={setDraftMd}
+                  onStartEdit={() => { setDraftMd(md); setEditing(true); }}
+                  onCancelEdit={() => setEditing(false)}
+                  onSave={save}
+                />
+              </>
             )}
 
             {tab === "preview" && (

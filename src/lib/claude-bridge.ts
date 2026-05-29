@@ -474,6 +474,35 @@ export async function listSkillFiles(
   }
 }
 
+/** Kick off async design.md extraction in the daemon. Returns 202
+ *  immediately; the daemon runs the LLM in the background, writes a
+ *  placeholder design.md first so the DS appears in the grid, then
+ *  overwrites with the real content when done. The detail screen
+ *  polls `.design-md-generating.json` to surface progress. Optionally
+ *  chains into preview generation when `generatePreviewAfter: true`. */
+export async function generateDsDesignMd(input: {
+  dsPath: string;
+  designMdPath: string;
+  prompt: string;
+  provider: string;
+  model: string;
+  generatePreviewAfter?: boolean;
+  name?: string;
+}): Promise<{ ok: true } | { error: string }> {
+  try {
+    const r = await fetch(`${BRIDGE_URL}/ds/generate-design-md`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+    const data = await r.json().catch(() => null);
+    if (!r.ok) return { error: data?.error || `HTTP ${r.status}` };
+    return { ok: true };
+  } catch (e) {
+    return { error: `Bridge unreachable at ${BRIDGE_URL}: ${String(e)}` };
+  }
+}
+
 /** Open a project / DS / skill folder in the OS file manager (Finder /
  *  Explorer / xdg-open). Scope-checked daemon-side — refuses paths
  *  outside the canonical workspace roots. Returns the result envelope
