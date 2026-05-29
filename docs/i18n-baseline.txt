@@ -1,6 +1,6 @@
 # i18n-audit baseline — entries here are accepted as known offenders.
 # Format: <relative-path>\t<exact text>  (line-independent — survives edits)
-# Generated: 2026-05-28T23:14:04.965Z
+# Generated: 2026-05-29T00:34:27.005Z
 
 src/App.tsx	No DS matches
 src/App.tsx	. It may have been renamed or removed.
@@ -156,6 +156,8 @@ src/screens/DsPreviewScreen.tsx	GitHub-sourced DSes keep their
 src/screens/DsPreviewScreen.tsx	in an ephemeral cache that gets wiped between runs. Remove this entry and re-add the repo to regenerate.
 src/screens/DsPreviewScreen.tsx	Remove from list
 src/screens/DsPreviewScreen.tsx	Back to workspace
+src/screens/DsPreviewScreen.tsx	s decorridos · roda em background, pode fechar tabs
+src/screens/DsPreviewScreen.tsx	Dismiss
 src/screens/DsPreviewScreen.tsx	This DS has no content
 src/screens/DsPreviewScreen.tsx	The
 src/screens/DsPreviewScreen.tsx	exists but is empty — likely the original generation failed silently. Edit the file directly below, or remove this DS and create a new one.

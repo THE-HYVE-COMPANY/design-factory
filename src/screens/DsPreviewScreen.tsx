@@ -604,7 +604,7 @@ export function DsPreviewScreen({ entry, onBack, onOpenSettings, theme, onThemeC
                           color: "var(--df-text-muted)", fontSize: "var(--df-text-xs)",
                         }}
                       >
-                        Dispensar
+                        Dismiss
                       </button>
                     )}
                   </div>
