@@ -19,7 +19,12 @@
 //
 // @file providers/ollama.mjs
 
-import { resolveOllamaHost } from "./ollama-host.mjs";
+import {
+  resolveOllamaHost,
+  getModelCapabilities,
+  resolveNumCtx,
+  parseEnvThink,
+} from "./ollama-host.mjs";
 
 /**
  * Resolve a usable model id. Caller-supplied wins. "default" / undefined
@@ -53,6 +58,21 @@ function ollamaErrorMessage(err, host) {
     return `Ollama unreachable at ${host} — is it running? Start it with \`ollama serve\` (or set DF_OLLAMA_HOST if it listens elsewhere).`;
   }
   return raw;
+}
+
+/** Actionable message for a model that has no chat template (embedding models,
+ *  raw completion-only GGUF imports). These bounce /api/chat as
+ *  `400 "<model>" does not support chat`. The capability probe guards this
+ *  before we call /api/chat, but we phrase it once here for both call paths
+ *  and as a fallback when the probe was unavailable. */
+function noChatMessage(model) {
+  return `O modelo "${model}" não suporta chat (é completion-only ou um modelo de embedding). Rode \`ollama pull llama3.2\` (ou outro modelo instruct, ex: qwen2.5-coder) e selecione-o no seletor de modelo.`;
+}
+
+/** True when an upstream error string is Ollama's does-not-support-chat 400.
+ *  Safety net for when the capability probe gave its permissive fallback. */
+function isNoChatError(text) {
+  return /does not support (chat|generate)/i.test(String(text || ""));
 }
 
 /** @type {import("./types.mjs").ProviderAdapter} */
@@ -99,6 +119,14 @@ const ollama = {
     messages.push({ role: "user", content: prompt });
 
     const resolvedModel = await resolveModel(host, model);
+    // Probe the model: chat capability (guard), thinking capability (auto),
+    // and max context (clamp). See providers/ollama-host.mjs.
+    const caps = await getModelCapabilities(host, resolvedModel);
+    const numCtx = resolveNumCtx(caps.maxContext, process.env.DF_OLLAMA_NUM_CTX);
+    // think:true routes reasoning to message.thinking (kept out of
+    // message.content, so it never leaks into the artifact). Only enable
+    // when the user hasn't opted out AND the model actually supports it.
+    const think = parseEnvThink(process.env.DF_OLLAMA_THINK) && caps.thinking;
 
     res.writeHead(200, {
       "Content-Type": "text/event-stream",
@@ -107,7 +135,17 @@ const ollama = {
       "X-Accel-Buffering": "no",
     });
     res.flushHeaders?.();
-    res.write(`event: log\ndata: ${JSON.stringify({ level: "info", message: `ollama chat model=${resolvedModel}${model && model !== "default" ? "" : " (auto-picked from /api/tags)"}` })}\n\n`);
+
+    // Guard: completion-only / embedding models have no chat template and
+    // bounce /api/chat as `400 "<model>" does not support chat`. Surface an
+    // actionable error before the upstream call instead of the cryptic 400.
+    if (!caps.chat) {
+      res.write(`event: error\ndata: ${JSON.stringify({ error: noChatMessage(resolvedModel) })}\n\n`);
+      res.end();
+      return;
+    }
+
+    res.write(`event: log\ndata: ${JSON.stringify({ level: "info", message: `ollama chat model=${resolvedModel}${model && model !== "default" ? "" : " (auto-picked from /api/tags)"} · num_ctx=${numCtx}${think ? " · thinking" : ""}` })}\n\n`);
 
     const controller = new AbortController();
     req.on("close", () => { try { controller.abort(); } catch {} });
@@ -116,15 +154,22 @@ const ollama = {
       const upstream = await fetch(`${host}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // think:false disables the reasoning channel on thinking-capable
-        // models (qwen3, deepseek-r1, gpt-oss…) so the answer arrives in
-        // message.content instead of being withheld as message.thinking —
-        // ignored by models that don't support it.
-        body: JSON.stringify({ model: resolvedModel, messages, stream: true, think: false }),
+        // num_ctx lifts Ollama's 4096 default so the DF system-prompt stack
+        // (preamble + craft + output contract + current file + history) isn't
+        // silently truncated before the model reads the user's actual ask.
+        // think routes reasoning to message.thinking when enabled+supported.
+        body: JSON.stringify({ model: resolvedModel, messages, stream: true, think, options: { num_ctx: numCtx } }),
         signal: controller.signal,
       });
       if (!upstream.ok || !upstream.body) {
-        res.write(`event: error\ndata: ${JSON.stringify({ error: `ollama HTTP ${upstream.status}` })}\n\n`);
+        // Safety net: if the probe's permissive fallback let a no-chat model
+        // through, the upstream 400 body carries "does not support chat".
+        let detail = `ollama HTTP ${upstream.status}`;
+        try {
+          const errText = await upstream.text();
+          if (isNoChatError(errText)) detail = noChatMessage(resolvedModel);
+        } catch { /* keep the generic HTTP status */ }
+        res.write(`event: error\ndata: ${JSON.stringify({ error: detail })}\n\n`);
         res.end();
         return;
       }
@@ -200,16 +245,28 @@ const ollama = {
     if (systemPrompt) messages.push({ role: "system", content: systemPrompt });
     messages.push({ role: "user", content: prompt });
     const resolvedModel = await resolveModel(host, model);
+    const caps = await getModelCapabilities(host, resolvedModel);
+    if (!caps.chat) {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ error: noChatMessage(resolvedModel) }));
+      return;
+    }
+    const numCtx = resolveNumCtx(caps.maxContext, process.env.DF_OLLAMA_NUM_CTX);
+    const think = parseEnvThink(process.env.DF_OLLAMA_THINK) && caps.thinking;
     try {
       const upstream = await fetch(`${host}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model: resolvedModel, messages, stream: false, think: false }),
+        body: JSON.stringify({ model: resolvedModel, messages, stream: false, think, options: { num_ctx: numCtx } }),
       });
       const data = await upstream.json();
       res.writeHead(200, { "Content-Type": "application/json" });
-      if (!upstream.ok) res.end(JSON.stringify({ error: data.error || `ollama HTTP ${upstream.status}` }));
-      else res.end(JSON.stringify({ text: data.message?.content || "" }));
+      if (!upstream.ok) {
+        const detail = isNoChatError(data?.error) ? noChatMessage(resolvedModel) : (data.error || `ollama HTTP ${upstream.status}`);
+        res.end(JSON.stringify({ error: detail }));
+      } else {
+        res.end(JSON.stringify({ text: data.message?.content || "" }));
+      }
     } catch (err) {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ error: ollamaErrorMessage(err, host) }));

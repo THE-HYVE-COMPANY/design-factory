@@ -13,6 +13,11 @@ export interface ModelOption {
   id: string;
   label: string;
   sub: string;
+  /** True for models the active provider can't actually generate with — today
+   *  only Ollama completion-only / embedding models (no chat template). The
+   *  picker greys these out so the user doesn't pick one and hit a generation
+   *  error. Optional + defaults to selectable. */
+  disabled?: boolean;
 }
 
 // Generic live-model fetch — every daemon /…/models endpoint speaks the
@@ -256,8 +261,18 @@ export function useLiveModelOptions(provider: ProviderId): {
             ? await fetchOpenrouterModels()
             : await fetchModelsVia(endpoint!);
         if (cancelled) return;
-        // Probe returns { id, sub } — promote to ModelOption (label = id).
-        const opts: ModelOption[] = rows.map((r) => ({ id: r.id, label: r.id, sub: r.sub }));
+        // Probe returns { id, sub } (+ `chat` for ollama) — promote to
+        // ModelOption (label = id). Ollama completion-only / embedding models
+        // (chat === false) are flagged disabled so the picker greys them out.
+        const opts: ModelOption[] = rows.map((r) => {
+          const noChat = "chat" in r && r.chat === false;
+          return {
+            id: r.id,
+            label: r.id,
+            sub: noChat ? "completion-only — não gera (use um modelo instruct)" : r.sub,
+            ...(noChat ? { disabled: true } : {}),
+          };
+        });
         setLive(opts.length > 0 ? opts : null);
       } catch {
         if (!cancelled) setLive(null);

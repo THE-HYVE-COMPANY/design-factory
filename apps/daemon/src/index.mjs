@@ -35,7 +35,7 @@ import {
 // The dispatch loop below auto-routes; adding a provider = drop a file +
 // register in providers/index.mjs (no edits to this file's handlers).
 import { listProviders, getProvider, describeProvider } from "./providers/index.mjs";
-import { probeOllamaHost } from "./providers/ollama-host.mjs";
+import { probeOllamaHost, getModelCapabilities } from "./providers/ollama-host.mjs";
 import { configPath, getConfigDir } from "./lib/config-dir.mjs";
 import { armHeartbeat } from "./lib/sse-heartbeat.mjs";
 import { buildDsPreviewPrompt, stripHtmlFence } from "./ds-preview-prompt.mjs";
@@ -4921,13 +4921,22 @@ const server = http.createServer(async (req, res) => {
     }
     try {
       const data = probe.data;
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({
-        models: Array.isArray(data?.models)
-          ? data.models.map((m) => ({ id: m.name, sub: m.details?.parameter_size || "" }))
-          : [],
-        host: probe.host,
+      const raw = Array.isArray(data?.models) ? data.models : [];
+      // Enrich each model with a `chat` flag so the picker can flag/disable
+      // completion-only + embedding models (which bounce /api/chat as
+      // "does not support chat") BEFORE the user tries to generate with one.
+      // getModelCapabilities is cached + probes via /api/show; the model list
+      // is small so a Promise.all is fine.
+      const models = await Promise.all(raw.map(async (m) => {
+        let chat = true;
+        try {
+          const caps = await getModelCapabilities(probe.host, m.name);
+          chat = caps.chat;
+        } catch { /* keep permissive default */ }
+        return { id: m.name, sub: m.details?.parameter_size || "", chat };
       }));
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ models, host: probe.host }));
     } catch (e) {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(JSON.stringify({ models: [], error: String(e?.message || e) }));
